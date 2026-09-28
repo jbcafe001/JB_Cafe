@@ -1,0 +1,304 @@
+import React, { useState, useEffect } from 'react';
+import { useCafe } from '../../context/CafeContext';
+import { Order, OrderStatus } from '../../types';
+import {
+  ChefHat,
+  Clock,
+  CheckCircle2,
+  Flame,
+  AlertCircle,
+  Bell,
+  Check,
+  RotateCcw,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  Utensils,
+} from 'lucide-react';
+
+type KitchenTab = 'new' | 'preparing' | 'ready' | 'completed';
+
+export const KitchenView: React.FC = () => {
+  const { orders, startPreparingOrder, markOrderReady } = useCafe();
+  const [activeTab, setActiveTab] = useState<KitchenTab>('new');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  );
+
+  // Live Clock
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Filter orders
+  const newOrders = orders.filter((o) => o.status === 'new');
+  const preparingOrders = orders.filter((o) => o.status === 'preparing');
+  const readyOrders = orders.filter((o) => o.status === 'ready');
+  const completedOrders = orders.filter((o) => o.status === 'completed' || o.status === 'served').slice(0, 15);
+
+  const displayedOrders =
+    activeTab === 'new'
+      ? newOrders
+      : activeTab === 'preparing'
+      ? preparingOrders
+      : activeTab === 'ready'
+      ? readyOrders
+      : completedOrders;
+
+  return (
+    <div className="min-h-[calc(100vh-57px)] bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
+      {/* KDS Header */}
+      <header className="bg-white border-b border-stone-200 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-[57px] z-20 shadow-2xs">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-xl bg-[#B45309] flex items-center justify-center text-white shadow-xs">
+            <ChefHat className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-base sm:text-lg font-bold tracking-tight text-stone-900">
+                KITCHEN DISPLAY (KDS)
+              </h1>
+              <span className="bg-stone-100 text-stone-600 border border-stone-200 text-[10px] font-mono px-2 py-0.5 rounded-md uppercase font-bold">
+                Live Terminal
+              </span>
+            </div>
+            <p className="text-xs text-stone-500">Brew & Bite Kitchen Management</p>
+          </div>
+        </div>
+
+        {/* Live Clock & Audio Toggle */}
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`px-3 py-1.5 rounded-xl border text-xs flex items-center space-x-1.5 transition-colors ${
+              soundEnabled
+                ? 'bg-amber-50 border-amber-200 text-[#B45309] font-semibold'
+                : 'bg-stone-50 border-stone-200 text-stone-400'
+            }`}
+            title="Toggle Kitchen Chime"
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            <span className="hidden sm:inline">Chime {soundEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+
+          <div className="bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 font-mono text-xs font-bold text-stone-800">
+            {currentTime}
+          </div>
+        </div>
+      </header>
+
+      {/* Status Bar / Filter Tabs */}
+      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2.5 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar">
+        <button
+          id="kds-tab-new"
+          onClick={() => setActiveTab('new')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
+            activeTab === 'new'
+              ? 'bg-[#B45309] text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+          }`}
+        >
+          <Clock className="w-4 h-4" />
+          <span>NEW ORDERS</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            {newOrders.length}
+          </span>
+        </button>
+
+        <button
+          id="kds-tab-preparing"
+          onClick={() => setActiveTab('preparing')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
+            activeTab === 'preparing'
+              ? 'bg-stone-900 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+          }`}
+        >
+          <Flame className="w-4 h-4" />
+          <span>PREPARING</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            {preparingOrders.length}
+          </span>
+        </button>
+
+        <button
+          id="kds-tab-ready"
+          onClick={() => setActiveTab('ready')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
+            activeTab === 'ready'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+          }`}
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          <span>READY</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            {readyOrders.length}
+          </span>
+        </button>
+
+        <button
+          id="kds-tab-completed"
+          onClick={() => setActiveTab('completed')}
+          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
+            activeTab === 'completed'
+              ? 'bg-stone-700 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+          }`}
+        >
+          <Check className="w-4 h-4" />
+          <span>COMPLETED</span>
+          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            {completedOrders.length}
+          </span>
+        </button>
+      </div>
+
+      {/* Main KDS Grid */}
+      <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
+        {displayedOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[350px] text-stone-400 space-y-3">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-stone-200 flex items-center justify-center text-stone-400 shadow-sm">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <p className="text-base font-semibold text-stone-700">No orders under {activeTab.toUpperCase()}</p>
+            <p className="text-xs text-stone-500 max-w-sm text-center">
+              Incoming orders from waiters will automatically show up here in real time.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+            {displayedOrders.map((order) => {
+              const isNew = order.status === 'new';
+              const isPrep = order.status === 'preparing';
+              const isRdy = order.status === 'ready';
+
+              return (
+                <div
+                  key={order.id}
+                  id={`kds-card-${order.orderNumber.replace('#', '')}`}
+                  className={`bg-white border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${
+                    isNew
+                      ? 'border-amber-400 ring-2 ring-amber-400/20'
+                      : isPrep
+                      ? 'border-stone-800 ring-2 ring-stone-800/15'
+                      : isRdy
+                      ? 'border-emerald-500 ring-2 ring-emerald-500/25'
+                      : 'border-stone-200 opacity-80'
+                  }`}
+                >
+                  {/* Card Header */}
+                  <div>
+                    <div className="flex items-start justify-between pb-3 border-b border-stone-100">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs font-mono font-bold text-[#B45309] bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                            {order.orderNumber}
+                          </span>
+                          <span className="text-xs text-stone-400">{order.createdAt}</span>
+                        </div>
+                        <h3 className="text-2xl font-black tracking-tight text-stone-900 mt-1">
+                          {order.tableNumber}
+                        </h3>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-[11px] uppercase tracking-wider text-stone-400 font-semibold block">
+                          Waiter
+                        </span>
+                        <span className="font-bold text-sm text-stone-800">
+                          {order.waiterName}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Ordered Items List */}
+                    <div className="py-4 space-y-2.5">
+                      {order.items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between text-sm sm:text-base"
+                        >
+                          <div className="flex items-center space-x-2.5">
+                            <span className="w-7 h-7 rounded-lg bg-stone-100 border border-stone-200 font-bold text-stone-800 flex items-center justify-center text-xs">
+                              {item.quantity}×
+                            </span>
+                            <span className="font-bold text-stone-900">{item.name}</span>
+                          </div>
+                          {item.notes && (
+                            <span className="text-xs text-[#B45309] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">
+                              {item.notes}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* General Ticket Note if provided */}
+                      {order.notes && (
+                        <div className="mt-3 p-2.5 rounded-xl bg-amber-50/70 border border-amber-200 text-[#B45309] text-xs">
+                          <span className="font-bold uppercase tracking-wide">Note: </span>
+                          <span className="font-medium">{order.notes}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Primary Action Button */}
+                  <div className="pt-3 border-t border-stone-100">
+                    {isNew && (
+                      <button
+                        id={`start-prep-btn-${order.orderNumber.replace('#', '')}`}
+                        onClick={() => startPreparingOrder(order.id)}
+                        className="w-full py-3 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
+                      >
+                        <Flame className="w-4 h-4" />
+                        <span>START PREPARING</span>
+                      </button>
+                    )}
+
+                    {isPrep && (
+                      <button
+                        id={`mark-ready-btn-${order.orderNumber.replace('#', '')}`}
+                        onClick={() => markOrderReady(order.id)}
+                        className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>MARK READY</span>
+                      </button>
+                    )}
+
+                    {isRdy && (
+                      <div className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                        <span>READY FOR WAITER PICKUP</span>
+                      </div>
+                    )}
+
+                    {order.status === 'served' && (
+                      <div className="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-xl text-center flex items-center justify-center space-x-1.5">
+                        <Utensils className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Served to {order.tableNumber} {order.servedAt ? `(${order.servedAt})` : ''}</span>
+                      </div>
+                    )}
+
+                    {order.status === 'completed' && (
+                      <div className="w-full py-2 bg-stone-100 text-stone-600 text-xs font-medium rounded-xl text-center">
+                        Served & Completed at {order.completedAt}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};

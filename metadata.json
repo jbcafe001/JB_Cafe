@@ -1,0 +1,6 @@
+{
+  "name": "Brew & Bite Café Management",
+  "description": "Simple, fast café and order management system connecting waiters, kitchen display, and admin with real-time order tracking, tables, stock deduction, and sales.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
