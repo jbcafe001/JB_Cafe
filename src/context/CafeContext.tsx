@@ -130,9 +130,9 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<User[]>(saved?.users || INITIAL_USERS);
   const [currentRole, setCurrentRole] = useState<UserRole>(saved?.currentRole || 'waiter');
   const [currentUser, setCurrentUser] = useState<User | null>(
-    saved?.currentUser || INITIAL_USERS.find((u) => u.role === 'waiter') || INITIAL_USERS[1]
+    saved?.currentUser || null
   );
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(saved?.isLoggedIn ?? true);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(saved?.isLoggedIn ?? false);
   const [isMobileFrame, setIsMobileFrame] = useState<boolean>(false);
 
   const [tables, setTables] = useState<Table[]>(saved?.tables || INITIAL_TABLES);
