@@ -157,89 +157,115 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       </div>
 
       {/* Table Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredTables.map((table) => {
-          const badge = getStatusBadge(table.status);
-          const isReady = table.status === 'ready';
-          const isServed = table.status === 'served';
-          const activeOrder = getActiveOrderForTable(table.id);
+      {filteredTables.length === 0 ? (
+        <div className="flex flex-col items-center justify-center min-h-[350px] text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-stone-200/50 flex items-center justify-center text-stone-400">
+            <Utensils className="w-8 h-8 opacity-50" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-stone-700">
+              {filter === 'available' ? 'No Available Tables' :
+               filter === 'occupied' ? 'No Orders Taken' :
+               filter === 'preparing' ? 'Nothing in Kitchen' :
+               filter === 'ready' ? 'Nothing to Serve' :
+               filter === 'served' ? 'No Dining Tables' :
+               'No tables here'}
+            </h3>
+            <p className="text-sm text-stone-500 max-w-[200px] mx-auto mt-1">
+              {filter === 'available' ? 'All tables are currently occupied.' :
+               filter === 'occupied' ? 'No tables are waiting for food preparation.' :
+               filter === 'preparing' ? 'No orders are currently being prepared.' :
+               filter === 'ready' ? 'No orders are ready to be served right now.' :
+               filter === 'served' ? 'No tables are currently dining.' :
+               'There are no tables currently matching this status.'}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {filteredTables.map((table) => {
+            const badge = getStatusBadge(table.status);
+            const isReady = table.status === 'ready';
+            const isServed = table.status === 'served';
+            const activeOrder = getActiveOrderForTable(table.id);
 
-          return (
-            <div
-              key={table.id}
-              onClick={() => handleCardClick(table)}
-              className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${
-                isReady
-                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-emerald-50 bg-emerald-50/20'
-                  : isServed
-                  ? 'border-indigo-300 ring-1 ring-indigo-400/20 bg-indigo-50/10'
-                  : table.status === 'occupied'
-                  ? 'border-amber-200'
-                  : 'border-stone-200/90'
-              }`}
-            >
-              <div>
-                <div className="flex items-start justify-between">
-                  <span className="font-extrabold text-stone-900 text-lg sm:text-2xl">{table.name}</span>
-                  <span
-                    className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
-                    <span>{badge.label}</span>
-                  </span>
-                </div>
-                <div className="flex items-center space-x-1.5 text-stone-400 text-sm mt-1">
-                  <Users className="w-4 h-4" />
-                  <span>{table.seats} Seats</span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-sm">
-                {activeOrder ? (
-                  <div className="text-xs sm:text-sm text-stone-600">
-                    <span className="font-mono font-bold text-stone-800">
-                      {activeOrder.orderNumber}
+            return (
+              <div
+                key={table.id}
+                onClick={() => handleCardClick(table)}
+                className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${
+                  isReady
+                    ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-emerald-50 bg-emerald-50/20'
+                    : isServed
+                    ? 'border-indigo-300 ring-1 ring-indigo-400/20 bg-indigo-50/10'
+                    : table.status === 'occupied'
+                    ? 'border-amber-200'
+                    : 'border-stone-200/90'
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between">
+                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl">{table.name}</span>
+                    <span
+                      className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
+                      <span>{badge.label}</span>
                     </span>
-                    <span className="ml-1 text-stone-400">• ₹{activeOrder.total}</span>
                   </div>
-                ) : (
-                  <span className="text-amber-700 font-bold flex items-center space-x-1.5">
-                    <Plus className="w-4 h-4" />
-                    <span>Take Order</span>
-                  </span>
-                )}
+                  <div className="flex items-center space-x-1.5 text-stone-400 text-sm mt-1">
+                    <Users className="w-4 h-4" />
+                    <span>{table.seats} Seats</span>
+                  </div>
+                </div>
 
-                {/* Direct Action Chips */}
-                {isReady && activeOrder && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleServeTable(activeOrder.id);
-                    }}
-                    className="text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
-                  >
-                    <Utensils className="w-4 h-4" />
-                    <span>Serve</span>
-                  </button>
-                )}
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-sm">
+                  {activeOrder ? (
+                    <div className="text-xs sm:text-sm text-stone-600">
+                      <span className="font-mono font-bold text-stone-800">
+                        {activeOrder.orderNumber}
+                      </span>
+                      <span className="ml-1 text-stone-400">• ₹{activeOrder.total}</span>
+                    </div>
+                  ) : (
+                    <span className="text-amber-700 font-bold flex items-center space-x-1.5">
+                      <Plus className="w-4 h-4" />
+                      <span>Take Order</span>
+                    </span>
+                  )}
 
-                {isServed && activeOrder && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenPayment(activeOrder);
-                    }}
-                    className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
-                  >
-                    <CreditCard className="w-4 h-4 text-amber-400" />
-                    <span>Pay</span>
-                  </button>
-                )}
+                  {/* Direct Action Chips */}
+                  {isReady && activeOrder && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleServeTable(activeOrder.id);
+                      }}
+                      className="text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
+                    >
+                      <Utensils className="w-4 h-4" />
+                      <span>Serve</span>
+                    </button>
+                  )}
+
+                  {isServed && activeOrder && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenPayment(activeOrder);
+                      }}
+                      className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
+                    >
+                      <CreditCard className="w-4 h-4 text-amber-400" />
+                      <span>Pay</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Active Table Details Modal */}
       {activeTableModal && activeOrderInModal && (
