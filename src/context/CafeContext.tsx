@@ -18,20 +18,9 @@ import {
   UpaadRecord,
   SalaryPaymentRecord,
 } from '../types';
-import {
-  INITIAL_USERS,
-  INITIAL_STOCK,
-  INITIAL_MENU,
-  INITIAL_TABLES,
-  INITIAL_EXPENSES,
-  INITIAL_STOCK_USAGE_LOGS,
-  INITIAL_STAFF_MEMBERS,
-  INITIAL_UPAAD_RECORDS,
-  INITIAL_SALARY_HISTORY,
-  generateSampleHistory,
-} from '../data/initialData';
+import { INITIAL_USERS } from '../data/initialData';
 import { db } from '../firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 interface CreateOrderParams {
   tableId: string;
@@ -139,7 +128,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
+  // Clear any stale localStorage cache — we now use Firebase Collections exclusively
+  localStorage.removeItem(STORAGE_KEY);
+
   const saved = loadSavedState();
+
 
   const [users, setUsers] = useState<User[]>(saved?.users || INITIAL_USERS);
   const [currentRole, setCurrentRole] = useState<UserRole>(saved?.currentRole || 'waiter');
@@ -149,36 +142,18 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(saved?.isLoggedIn ?? false);
   const [isMobileFrame, setIsMobileFrame] = useState<boolean>(false);
 
-  const [tables, setTables] = useState<Table[]>(saved?.tables || INITIAL_TABLES);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(saved?.menuItems || INITIAL_MENU);
-  const [stockItems, setStockItems] = useState<StockItem[]>(saved?.stockItems || INITIAL_STOCK);
-  const [orders, setOrders] = useState<Order[]>(saved?.orders || generateSampleHistory());
-  const [expenses, setExpenses] = useState<Expense[]>(saved?.expenses || INITIAL_EXPENSES);
-  const [stockAdditions, setStockAdditions] = useState<StockAddition[]>(saved?.stockAdditions || []);
-  const [materialUsageLogs, setMaterialUsageLogs] = useState<MaterialUsageRecord[]>(
-    saved?.materialUsageLogs || INITIAL_STOCK_USAGE_LOGS
-  );
-  const [staffMembers, setStaffMembers] = useState<StaffMember[]>(saved?.staffMembers || INITIAL_STAFF_MEMBERS);
-  const [upaadRecords, setUpaadRecords] = useState<UpaadRecord[]>(saved?.upaadRecords || INITIAL_UPAAD_RECORDS);
-  const [salaryHistory, setSalaryHistory] = useState<SalaryPaymentRecord[]>(
-    saved?.salaryHistory || INITIAL_SALARY_HISTORY
-  );
-  const [notifications, setNotifications] = useState<CafeNotification[]>(saved?.notifications || [
-    {
-      id: 'notif-welcome',
-      message: 'Welcome to Brew & Bite Café Management Demo',
-      targetRole: 'all',
-      timestamp: 'Just now',
-      read: false,
-    },
-    {
-      id: 'notif-ready-table2',
-      message: 'Table 02: Order #1043 is READY for serving!',
-      targetRole: 'waiter',
-      timestamp: '2 min ago',
-      read: false,
-    },
-  ]);
+  const [tables, setTables] = useState<Table[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [stockAdditions, setStockAdditions] = useState<StockAddition[]>([]);
+  const [materialUsageLogs, setMaterialUsageLogs] = useState<MaterialUsageRecord[]>([]);
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
+  const [upaadRecords, setUpaadRecords] = useState<UpaadRecord[]>([]);
+  const [salaryHistory, setSalaryHistory] = useState<SalaryPaymentRecord[]>([]);
+  const [notifications, setNotifications] = useState<CafeNotification[]>([]);
+
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -195,91 +170,37 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isRemoteUpdate = useRef(false);
   const [isSyncing, setIsSyncing] = useState(true);
 
-  // 1. Listen for Firestore changes
+  // Listen for Firestore changes — one listener per collection
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'cafe', 'mainState'), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        isRemoteUpdate.current = true;
-        
-        if (data.users) setUsers(data.users);
-        if (data.tables) setTables(data.tables);
-        if (data.menuItems) setMenuItems(data.menuItems);
-        if (data.stockItems) setStockItems(data.stockItems);
-        if (data.orders) setOrders(data.orders);
-        if (data.expenses) setExpenses(data.expenses);
-        if (data.stockAdditions) setStockAdditions(data.stockAdditions);
-        if (data.materialUsageLogs) setMaterialUsageLogs(data.materialUsageLogs);
-        if (data.staffMembers) setStaffMembers(data.staffMembers);
-        if (data.upaadRecords) setUpaadRecords(data.upaadRecords);
-        if (data.salaryHistory) setSalaryHistory(data.salaryHistory);
-        if (data.notifications) setNotifications(data.notifications);
-      }
-      setIsSyncing(false);
-    });
+    const unsubs: (() => void)[] = [];
 
-    return () => unsub();
-  }, []);
-
-  // 2. Persist state changes
-  useEffect(() => {
-    if (isSyncing) return;
-    
-    if (isRemoteUpdate.current) {
-      isRemoteUpdate.current = false;
-      return;
-    }
-
-    const stateToSave = {
-      users,
-      tables,
-      menuItems,
-      stockItems,
-      orders,
-      expenses,
-      stockAdditions,
-      materialUsageLogs,
-      staffMembers,
-      upaadRecords,
-      salaryHistory,
-      notifications,
+    const attachListener = (collName: string, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
+      const unsub = onSnapshot(collection(db, collName), (snap) => {
+        setter(snap.docs.map(d => d.data()));
+        setIsSyncing(false);
+      });
+      unsubs.push(unsub);
     };
 
-    // Firebase does not allow undefined values, so we use JSON serialize/deserialize to strip them out
-    const cleanState = JSON.parse(JSON.stringify(stateToSave));
-    setDoc(doc(db, 'cafe', 'mainState'), cleanState).catch(console.error);
+    attachListener('users', setUsers);
+    attachListener('tables', setTables);
+    attachListener('menuItems', setMenuItems);
+    attachListener('stockItems', setStockItems);
+    attachListener('orders', setOrders);
+    attachListener('expenses', setExpenses);
+    attachListener('stockAdditions', setStockAdditions);
+    attachListener('materialUsageLogs', setMaterialUsageLogs);
+    attachListener('staffMembers', setStaffMembers);
+    attachListener('upaadRecords', setUpaadRecords);
+    attachListener('salaryHistory', setSalaryHistory);
+    attachListener('notifications', setNotifications);
 
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          ...stateToSave,
-          currentRole,
-          currentUser,
-          isLoggedIn,
-        })
-      );
-    } catch {
-      // ignore
-    }
-  }, [
-    isSyncing,
-    users,
-    currentRole,
-    currentUser,
-    isLoggedIn,
-    tables,
-    menuItems,
-    stockItems,
-    orders,
-    expenses,
-    stockAdditions,
-    materialUsageLogs,
-    staffMembers,
-    upaadRecords,
-    salaryHistory,
-    notifications,
-  ]);
+    return () => {
+      unsubs.forEach(unsub => unsub());
+    };
+  }, []);
+
+
 
   const addNotification = (message: string, targetRole: UserRole | 'all' = 'all') => {
     const newNotif: CafeNotification = {
@@ -289,7 +210,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       timestamp: 'Just now',
       read: false,
     };
-    setNotifications((prev) => [newNotif, ...prev.slice(0, 19)]);
+    setDoc(doc(db, 'notifications', newNotif.id), newNotif).catch(console.error);
   };
 
   const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -362,27 +283,23 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       tax,
       total,
       status: 'new',
-      notes,
+      notes: notes || null,
       date: new Date().toISOString().split('T')[0],
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setOrders((prev) => [newOrder, ...prev]);
+    // Strip undefined values — Firebase rejects them
+    const cleanOrder = JSON.parse(JSON.stringify(newOrder));
+    setDoc(doc(db, 'orders', newOrder.id), cleanOrder).catch(console.error);
+
 
     // Update Table status to occupied
-    setTables((prev) =>
-      prev.map((t) =>
-        t.id === tableId
-          ? {
-              ...t,
-              status: 'occupied',
-              currentOrderId: newOrder.id,
-              activeWaiterId: newOrder.waiterId,
-              activeWaiterName: newOrder.waiterName,
-            }
-          : t
-      )
-    );
+    updateDoc(doc(db, 'tables', tableId), {
+      status: 'occupied',
+      currentOrderId: newOrder.id,
+      activeWaiterId: newOrder.waiterId,
+      activeWaiterName: newOrder.waiterName,
+    }).catch(console.error);
 
     // Notify Kitchen
     addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
@@ -399,36 +316,26 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
     
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          const nextBatch = Math.max(...ord.items.map(i => i.batch || 1)) + 1;
-          const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
-          const updatedItems = [...ord.items, ...itemsWithBatch];
-          const subtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-          
-          let combinedNotes = ord.notes;
-          if (additionalNotes) {
-            combinedNotes = combinedNotes ? `${combinedNotes} | ${additionalNotes}` : additionalNotes;
-          }
+    const nextBatch = Math.max(...existingOrder.items.map(i => i.batch || 1)) + 1;
+    const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
+    const updatedItems = [...existingOrder.items, ...itemsWithBatch];
+    const subtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    
+    let combinedNotes = existingOrder.notes;
+    if (additionalNotes) {
+      combinedNotes = combinedNotes ? `${combinedNotes} | ${additionalNotes}` : additionalNotes;
+    }
 
-          return {
-            ...ord,
-            items: updatedItems,
-            subtotal,
-            total: subtotal + ord.tax,
-            notes: combinedNotes,
-            status: 'new' // Revert to new so kitchen sees the added items
-          };
-        }
-        return ord;
-      })
-    );
+    updateDoc(doc(db, 'orders', orderId), {
+      items: updatedItems,
+      subtotal,
+      total: subtotal + existingOrder.tax,
+      notes: combinedNotes,
+      status: 'new' // Revert to new so kitchen sees the added items
+    }).catch(console.error);
 
     if (updatedTableId) {
-      setTables((prev) =>
-        prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'occupied' } : t))
-      );
+      updateDoc(doc(db, 'tables', updatedTableId), { status: 'occupied' }).catch(console.error);
     }
 
     // Notify Kitchen
@@ -443,14 +350,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const updatedTableId = existingOrder.tableId;
 
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return { ...ord, status: 'preparing', preparingAt: timeStr };
-        }
-        return ord;
-      })
-    );
+    updateDoc(doc(db, 'orders', orderId), {
+      status: 'preparing',
+      preparingAt: timeStr,
+    }).catch(console.error);
 
     if (updatedTableId) {
       setTables((prev) =>
@@ -470,19 +373,13 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
 
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return { ...ord, status: 'ready', readyAt: timeStr };
-        }
-        return ord;
-      })
-    );
+    updateDoc(doc(db, 'orders', orderId), {
+      status: 'ready',
+      readyAt: timeStr,
+    }).catch(console.error);
 
     if (updatedTableId) {
-      setTables((prev) =>
-        prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'ready' } : t))
-      );
+      updateDoc(doc(db, 'tables', updatedTableId), { status: 'ready' }).catch(console.error);
     }
 
     // High priority notification to Waiter
@@ -499,19 +396,13 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
 
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return { ...ord, status: 'served', servedAt: timeStr };
-        }
-        return ord;
-      })
-    );
+    updateDoc(doc(db, 'orders', orderId), {
+      status: 'served',
+      servedAt: timeStr,
+    }).catch(console.error);
 
     if (updatedTableId) {
-      setTables((prev) =>
-        prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'served' } : t))
-      );
+      updateDoc(doc(db, 'tables', updatedTableId), { status: 'served' }).catch(console.error);
     }
 
     addNotification(`${tableNum} — Order ${ordNum} served to table!`, 'waiter');
@@ -520,21 +411,18 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const toggleItemServed = (orderId: string, itemIndex: number | number[]) => {
     const indices = Array.isArray(itemIndex) ? itemIndex : [itemIndex];
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          const updatedItems = [...ord.items];
-          indices.forEach(idx => {
-            updatedItems[idx] = {
-              ...updatedItems[idx],
-              served: !updatedItems[idx].served,
-            };
-          });
-          return { ...ord, items: updatedItems };
-        }
-        return ord;
-      })
-    );
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+    
+    const updatedItems = [...existingOrder.items];
+    indices.forEach(idx => {
+      updatedItems[idx] = {
+        ...updatedItems[idx],
+        served: !updatedItems[idx].served,
+      };
+    });
+
+    updateDoc(doc(db, 'orders', orderId), { items: updatedItems }).catch(console.error);
   };
 
   const removeItemFromOrder = (orderId: string, itemIndex: number | number[]) => {
@@ -542,26 +430,21 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Sort descending so splicing doesn't shift remaining indices
     const sortedIndices = [...indices].sort((a, b) => b - a);
 
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          const updatedItems = [...ord.items];
-          sortedIndices.forEach(idx => {
-            updatedItems.splice(idx, 1);
-          });
-          
-          const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-          
-          return { 
-            ...ord, 
-            items: updatedItems,
-            subtotal: newSubtotal,
-            total: newSubtotal + ord.tax 
-          };
-        }
-        return ord;
-      })
-    );
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
+    const updatedItems = [...existingOrder.items];
+    sortedIndices.forEach(idx => {
+      updatedItems.splice(idx, 1);
+    });
+    
+    const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    
+    updateDoc(doc(db, 'orders', orderId), {
+      items: updatedItems,
+      subtotal: newSubtotal,
+      total: newSubtotal + existingOrder.tax
+    }).catch(console.error);
     addToast('Item removed from order', 'info');
   };
 
@@ -571,34 +454,19 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (!completedOrder) return;
 
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === orderId) {
-          return {
-            ...ord,
-            status: 'completed',
-            paymentMethod,
-            completedAt: timeStr,
-          };
-        }
-        return ord;
-      })
-    );
+    updateDoc(doc(db, 'orders', orderId), {
+      status: 'completed',
+      paymentMethod,
+      completedAt: timeStr,
+    }).catch(console.error);
 
     // 1. Free Table
-    setTables((prev) =>
-      prev.map((t) =>
-        t.id === completedOrder!.tableId
-          ? {
-              ...t,
-              status: 'available',
-              currentOrderId: undefined,
-              activeWaiterId: undefined,
-              activeWaiterName: undefined,
-            }
-          : t
-      )
-    );
+    updateDoc(doc(db, 'tables', completedOrder.tableId), {
+      status: 'available',
+      currentOrderId: null,
+      activeWaiterId: null,
+      activeWaiterName: null,
+    }).catch(console.error);
 
     // 2. Automatically Deduct Ingredients from Stock
     // Calculate total ingredients used by completed order items
@@ -615,26 +483,23 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Deduct from stockItems
-    setStockItems((prev) =>
-      prev.map((st) => {
-        if (stockDeductions[st.id]) {
-          const deduction = stockDeductions[st.id];
-          const newQty = Math.max(0, Math.round((st.available - deduction) * 100) / 100);
-          const newStatus =
-            newQty <= 0 ? 'out' : newQty <= st.minThreshold ? 'low' : 'good';
-          
-          if (newStatus === 'low' && st.status !== 'low') {
-            addNotification(`Alert: ${st.name} stock is low (${newQty} ${st.unit} remaining)`, 'admin');
-          }
-          return {
-            ...st,
-            available: newQty,
-            status: newStatus,
-          };
+    stockItems.forEach((st) => {
+      if (stockDeductions[st.id]) {
+        const deduction = stockDeductions[st.id];
+        const newQty = Math.max(0, Math.round((st.available - deduction) * 100) / 100);
+        const newStatus =
+          newQty <= 0 ? 'out' : newQty <= st.minThreshold ? 'low' : 'good';
+        
+        if (newStatus === 'low' && st.status !== 'low') {
+          addNotification(`Alert: ${st.name} stock is low (${newQty} ${st.unit} remaining)`, 'admin');
         }
-        return st;
-      })
-    );
+        
+        updateDoc(doc(db, 'stockItems', st.id), {
+          available: newQty,
+          status: newStatus,
+        }).catch(console.error);
+      }
+    });
 
     addNotification(
       `Order ${completedOrder.orderNumber} completed (₹${completedOrder.total} via ${paymentMethod.toUpperCase()})`,
@@ -647,18 +512,15 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ord = orders.find((o) => o.id === orderId);
     if (!ord) return;
 
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: 'cancelled' } : o))
-    );
+    updateDoc(doc(db, 'orders', orderId), { status: 'cancelled' }).catch(console.error);
 
     if (ord.tableId) {
-      setTables((prev) =>
-        prev.map((t) =>
-          t.id === ord.tableId
-            ? { ...t, status: 'available', currentOrderId: undefined, activeWaiterId: undefined, activeWaiterName: undefined }
-            : t
-        )
-      );
+      updateDoc(doc(db, 'tables', ord.tableId), {
+        status: 'available',
+        currentOrderId: null,
+        activeWaiterId: null,
+        activeWaiterName: null
+      }).catch(console.error);
     }
     addNotification(`Order ${ord.orderNumber} was cancelled`, 'all');
     addToast('Order cancelled successfully', 'error');
@@ -679,22 +541,14 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       date: new Date().toISOString().split('T')[0],
     };
 
-    setStockAdditions((prev) => [newAddition, ...prev]);
+    setDoc(doc(db, 'stockAdditions', newAddition.id), newAddition).catch(console.error);
 
     // Update stock item
-    setStockItems((prev) =>
-      prev.map((item) => {
-        if (item.id === stockItemId) {
-          const updatedQty = item.available + quantity;
-          return {
-            ...item,
-            available: updatedQty,
-            status: updatedQty <= item.minThreshold ? 'low' : 'good',
-          };
-        }
-        return item;
-      })
-    );
+    const updatedQty = stockItem.available + quantity;
+    updateDoc(doc(db, 'stockItems', stockItemId), {
+      available: updatedQty,
+      status: updatedQty <= stockItem.minThreshold ? 'low' : 'good'
+    }).catch(console.error);
 
     // Also optionally record as an expense under 'Ingredients'
     if (purchaseCost > 0) {
@@ -735,34 +589,22 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loggedBy: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Staff',
     };
 
-    setMaterialUsageLogs((prev) => [newUsageRecord, ...prev]);
+    setDoc(doc(db, 'materialUsageLogs', newUsageRecord.id), newUsageRecord).catch(console.error);
 
     // Deduct from stock item
-    setStockItems((prev) =>
-      prev.map((item) => {
-        if (item.id === stockItemId) {
-          const updatedQty = Math.max(0, Math.round((item.available - quantity) * 100) / 100);
-          const newStatus =
-            updatedQty <= 0 ? 'out' : updatedQty <= item.minThreshold ? 'low' : 'good';
+    const updatedQty = Math.max(0, Math.round((stockItem.available - quantity) * 100) / 100);
+    const newStatus = updatedQty <= 0 ? 'out' : updatedQty <= stockItem.minThreshold ? 'low' : 'good';
 
-          if (newStatus === 'low' && item.status !== 'low') {
-            addNotification(
-              `Alert: ${item.name} stock is low (${updatedQty} ${item.unit} remaining)`,
-              'admin'
-            );
-          } else if (newStatus === 'out' && item.status !== 'out') {
-            addNotification(`Alert: ${item.name} is OUT OF STOCK!`, 'admin');
-          }
+    if (newStatus === 'low' && stockItem.status !== 'low') {
+      addNotification(`Alert: ${stockItem.name} stock is low (${updatedQty} ${stockItem.unit} remaining)`, 'admin');
+    } else if (newStatus === 'out' && stockItem.status !== 'out') {
+      addNotification(`Alert: ${stockItem.name} is OUT OF STOCK!`, 'admin');
+    }
 
-          return {
-            ...item,
-            available: updatedQty,
-            status: newStatus,
-          };
-        }
-        return item;
-      })
-    );
+    updateDoc(doc(db, 'stockItems', stockItemId), {
+      available: updatedQty,
+      status: newStatus,
+    }).catch(console.error);
 
     addNotification(
       `Recorded usage: ${quantity} ${stockItem.unit} of ${stockItem.name} (${purpose})`,
@@ -822,7 +664,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...exp,
       id: `exp-${Date.now()}`,
     };
-    setExpenses((prev) => [newExp, ...prev]);
+    setDoc(doc(db, 'expenses', newExp.id), newExp).catch(console.error);
     addNotification(`New expense added: ${newExp.name} (₹${newExp.amount})`, 'admin');
     addToast(`Expense added successfully`);
   };
@@ -833,20 +675,21 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...item,
       id: `m-${Date.now()}`,
     };
-    setMenuItems((prev) => [...prev, newItem]);
+    setDoc(doc(db, 'menuItems', newItem.id), newItem).catch(console.error);
     addNotification(`Menu item added: ${newItem.name} (₹${newItem.price})`, 'admin');
     addToast('Menu item added successfully!');
   };
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
-    setMenuItems((prev) => prev.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+    updateDoc(doc(db, 'menuItems', id), updates).catch(console.error);
     addToast('Menu item updated');
   };
 
   const toggleMenuItemAvailability = (id: string) => {
-    setMenuItems((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, available: !m.available } : m))
-    );
+    const target = menuItems.find(m => m.id === id);
+    if (target) {
+      updateDoc(doc(db, 'menuItems', id), { available: !target.available }).catch(console.error);
+    }
     addToast('Availability toggled', 'info');
   };
 
@@ -856,12 +699,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...tbl,
       id: `tbl-${Date.now()}`,
     };
-    setTables((prev) => [...prev, newTable]);
+    setDoc(doc(db, 'tables', newTable.id), newTable).catch(console.error);
     addToast('Table added successfully!');
   };
 
   const updateTable = (id: string, updates: Partial<Table>) => {
-    setTables((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+    updateDoc(doc(db, 'tables', id), updates).catch(console.error);
   };
 
   // User Management
@@ -870,25 +713,26 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...usr,
       id: `u-${Date.now()}`,
     };
-    setUsers((prev) => [...prev, newUser]);
+    setDoc(doc(db, 'users', newUser.id), newUser).catch(console.error);
     addNotification(`New team member added: ${newUser.name} (${newUser.role})`, 'admin');
   };
 
   const toggleUserStatus = (id: string) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === id ? { ...u, status: u.status === 'active' ? 'inactive' : 'active' } : u
-      )
-    );
+    const target = users.find(u => u.id === id);
+    if (target) {
+      updateDoc(doc(db, 'users', id), { status: target.status === 'active' ? 'inactive' : 'active' }).catch(console.error);
+    }
   };
 
   // Notifications
   const dismissNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    deleteDoc(doc(db, 'notifications', id)).catch(console.error);
   };
 
   const clearAllNotifications = () => {
-    setNotifications([]);
+    notifications.forEach(n => {
+      deleteDoc(doc(db, 'notifications', n.id)).catch(console.error);
+    });
   };
 
   // Staff Salary & Upaad Management
@@ -913,16 +757,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...staff,
       id: `staff-${Date.now()}`,
     };
-    setStaffMembers((prev) => [...prev, newStaff]);
+    setDoc(doc(db, 'staffMembers', newStaff.id), newStaff).catch(console.error);
     addNotification(`New staff member added: ${newStaff.name} (${newStaff.role})`, 'admin');
   };
 
   const updateStaffMember = (id: string, updates: Partial<StaffMember>) => {
-    setStaffMembers((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+    updateDoc(doc(db, 'staffMembers', id), updates).catch(console.error);
   };
 
   const deleteStaffMember = (id: string) => {
-    setStaffMembers((prev) => prev.filter((s) => s.id !== id));
+    deleteDoc(doc(db, 'staffMembers', id)).catch(console.error);
     addNotification('Staff member removed', 'admin');
   };
 
@@ -956,7 +800,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
 
-    setUpaadRecords((prev) => [newRecord, ...prev]);
+    setDoc(doc(db, 'upaadRecords', newRecord.id), newRecord).catch(console.error);
 
     // Record as Staff expense
     addExpense({
@@ -993,9 +837,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
-    setUpaadRecords((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, ...updates } : u))
-    );
+    updateDoc(doc(db, 'upaadRecords', id), updates).catch(console.error);
 
     addNotification(`Updated Upaad record for ${target.staffName}`, 'admin');
     return { success: true };
@@ -1004,7 +846,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteUpaad = (id: string) => {
     const target = upaadRecords.find((u) => u.id === id);
     if (target) {
-      setUpaadRecords((prev) => prev.filter((u) => u.id !== id));
+      deleteDoc(doc(db, 'upaadRecords', id)).catch(console.error);
       addNotification(`Deleted Upaad record of ₹${target.amount.toLocaleString()} for ${target.staffName}`, 'admin');
     }
   };
@@ -1040,7 +882,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
 
-    setSalaryHistory((prev) => [paymentRecord, ...prev]);
+    setDoc(doc(db, 'salaryHistory', paymentRecord.id), paymentRecord).catch(console.error);
 
     // Record remaining salary as Staff expense
     if (finalSalary > 0) {
@@ -1055,9 +897,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Start next salary period for this staff member (Section 11)
     const nextPeriod = getNextSalaryPeriod(staff.currentPeriod);
-    setStaffMembers((prev) =>
-      prev.map((s) => (s.id === staff.id ? { ...s, currentPeriod: nextPeriod } : s))
-    );
+    updateDoc(doc(db, 'staffMembers', staff.id), { currentPeriod: nextPeriod }).catch(console.error);
 
     addNotification(
       `Salary of ₹${finalSalary.toLocaleString()} paid to ${staff.name} via ${params.paymentMethod} for ${staff.currentPeriod}`,
@@ -1082,30 +922,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Reset demo data to pristine state
   const resetDemoData = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setUsers(INITIAL_USERS);
-    setCurrentRole('waiter');
-    setCurrentUser(INITIAL_USERS[1]);
-    setIsLoggedIn(true);
-    setTables(INITIAL_TABLES);
-    setMenuItems(INITIAL_MENU);
-    setStockItems(INITIAL_STOCK);
-    setOrders(generateSampleHistory());
-    setExpenses(INITIAL_EXPENSES);
-    setStockAdditions([]);
-    setMaterialUsageLogs(INITIAL_STOCK_USAGE_LOGS);
-    setStaffMembers(INITIAL_STAFF_MEMBERS);
-    setUpaadRecords(INITIAL_UPAAD_RECORDS);
-    setSalaryHistory(INITIAL_SALARY_HISTORY);
-    setNotifications([
-      {
-        id: `notif-${Date.now()}`,
-        message: 'Demo data reset to initial state. Table 04 is ready for ordering!',
-        targetRole: 'all',
-        timestamp: 'Just now',
-        read: false,
-      },
-    ]);
+    addToast('Demo reset is disabled. You are now using live Firebase data!', 'info');
   };
 
   return (
