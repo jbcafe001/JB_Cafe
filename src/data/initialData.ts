@@ -403,6 +403,7 @@ export const INITIAL_ORDERS: Order[] = [
     total: 440,
     status: 'ready',
     notes: 'Serve with ketchup',
+    date: new Date().toISOString().split('T')[0],
     createdAt: new Date(Date.now() - 14 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     readyAt: new Date(Date.now() - 2 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
@@ -421,6 +422,7 @@ export const INITIAL_ORDERS: Order[] = [
     tax: 0,
     total: 420,
     status: 'preparing',
+    date: new Date().toISOString().split('T')[0],
     createdAt: new Date(Date.now() - 8 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     preparingAt: new Date(Date.now() - 5 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
@@ -440,6 +442,7 @@ export const INITIAL_ORDERS: Order[] = [
     total: 300,
     status: 'new',
     notes: 'No spicy paprika on garlic bread',
+    date: new Date().toISOString().split('T')[0],
     createdAt: new Date(Date.now() - 3 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
 ];
@@ -502,6 +505,7 @@ export function generateSampleHistory(): Order[] {
       total: subtotal,
       status: 'completed',
       paymentMethod: paymentMethods[i % paymentMethods.length],
+      date: todayDateStr,
       createdAt: timeStr,
       completedAt: timeStr,
     });
@@ -524,6 +528,7 @@ export function generateSampleHistory(): Order[] {
       total: 140,
       status: 'completed',
       paymentMethod: 'upi',
+      date: yesterdayDateStr,
       createdAt: yesterdayDateStr,
       completedAt: yesterdayDateStr,
     });
