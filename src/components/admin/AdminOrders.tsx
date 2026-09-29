@@ -7,6 +7,8 @@ export const AdminOrders: React.FC = () => {
   const { orders } = useCafe();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -16,27 +18,53 @@ export const AdminOrders: React.FC = () => {
 
     const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    let matchesDate = true;
+    if (fromDate || toDate) {
+      const orderDate = o.date || new Date().toISOString().split('T')[0]; // fallback for old orders
+      if (fromDate && orderDate < fromDate) matchesDate = false;
+      if (toDate && orderDate > toDate) matchesDate = false;
+    }
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">ORDER AUDIT LOG</h2>
           <p className="text-xs text-stone-500">Live order queue, kitchen tickets, and billing histories</p>
         </div>
 
-        {/* Search */}
-        <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-stone-200 w-full sm:w-64">
-          <Search className="w-4 h-4 text-stone-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search order, table, waiter..."
-            className="text-xs text-stone-800 bg-transparent w-full focus:outline-hidden"
-          />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          {/* Date Range Filter */}
+          <div className="flex items-center space-x-2 w-full sm:w-auto bg-white px-3 py-2 rounded-xl border border-stone-200">
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="text-xs text-stone-800 bg-transparent focus:outline-hidden w-full sm:w-[110px]"
+            />
+            <span className="text-xs text-stone-400">to</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="text-xs text-stone-800 bg-transparent focus:outline-hidden w-full sm:w-[110px]"
+            />
+          </div>
+
+          {/* Search */}
+          <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-stone-200 w-full sm:w-64">
+            <Search className="w-4 h-4 text-stone-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search order, table, waiter..."
+              className="text-xs text-stone-800 bg-transparent w-full focus:outline-hidden"
+            />
+          </div>
         </div>
       </div>
 
@@ -63,6 +91,7 @@ export const AdminOrders: React.FC = () => {
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 text-[10px] uppercase tracking-wider text-stone-400 font-bold border-b border-stone-100">
               <tr>
+                <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Order #</th>
                 <th className="px-5 py-3">Table</th>
                 <th className="px-5 py-3">Waiter</th>
@@ -75,6 +104,9 @@ export const AdminOrders: React.FC = () => {
             <tbody className="divide-y divide-stone-100 text-stone-800">
               {filteredOrders.map((ord) => (
                 <tr key={ord.id} className="hover:bg-stone-50/60 transition-colors">
+                  <td className="px-5 py-4 text-stone-600 font-medium whitespace-nowrap">
+                    {ord.date ? new Date(ord.date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
+                  </td>
                   <td className="px-5 py-4 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
                   <td className="px-5 py-4 font-semibold text-stone-700">{ord.tableNumber}</td>
                   <td className="px-5 py-4 text-stone-600">{ord.waiterName}</td>

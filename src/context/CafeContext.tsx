@@ -363,6 +363,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       total,
       status: 'new',
       notes,
+      date: new Date().toISOString().split('T')[0],
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 

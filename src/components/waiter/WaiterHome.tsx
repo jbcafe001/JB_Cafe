@@ -313,16 +313,29 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                   )}
 
                   {isServed && activeOrder && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenPayment(activeOrder);
-                      }}
-                      className="w-full py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors"
-                    >
-                      <CreditCard className="w-4 h-4 text-amber-400" />
-                      <span>Pay ₹{activeOrder.total}</span>
-                    </button>
+                    <div className="flex items-center space-x-2 w-full">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectTable(table);
+                        }}
+                        className="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Order More</span>
+                      </button>
+                      
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenPayment(activeOrder);
+                        }}
+                        className="flex-1 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1 transition-colors"
+                      >
+                        <CreditCard className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Pay ₹{activeOrder.total}</span>
+                      </button>
+                    </div>
                   )}
 
                   {table.status === 'preparing' && activeOrder && (

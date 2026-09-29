@@ -48,12 +48,12 @@ export const KitchenView: React.FC = () => {
     activeTab === 'new'
       ? newOrders
       : activeTab === 'preparing'
-      ? preparingOrders
-      : activeTab === 'ready'
-      ? readyOrders
-      : activeTab === 'served'
-      ? servedOrders
-      : completedOrders;
+        ? preparingOrders
+        : activeTab === 'ready'
+          ? readyOrders
+          : activeTab === 'served'
+            ? servedOrders
+            : completedOrders;
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
@@ -62,130 +62,124 @@ export const KitchenView: React.FC = () => {
       <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
         {/* Compact KDS Header */}
         <header className="bg-white border-b border-stone-100 px-4 sm:px-6 py-2 flex items-center justify-between">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#B45309] flex items-center justify-center text-white shadow-xs">
-            <ChefHat className="w-4 h-4" />
+          <div className="flex items-center space-x-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#B45309] flex items-center justify-center text-white shadow-xs">
+              <ChefHat className="w-4 h-4" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-sm sm:text-base font-bold tracking-tight text-stone-900">
+                KITCHEN DISPLAY (KDS)
+              </h1>
+              <span className="bg-stone-100 text-stone-600 border border-stone-200 text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
+                Live Terminal
+              </span>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-sm sm:text-base font-bold tracking-tight text-stone-900">
-              KITCHEN DISPLAY (KDS)
-            </h1>
-            <span className="bg-stone-100 text-stone-600 border border-stone-200 text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
-              Live Terminal
+
+          {/* Live Clock & Actions */}
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-max">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs flex items-center justify-center transition-colors ${soundEnabled
+                  ? 'bg-amber-50 border-amber-200 text-[#B45309]'
+                  : 'bg-stone-50 border-stone-200 text-stone-400'
+                }`}
+              title="Toggle Kitchen Chime"
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            </button>
+
+            <div className="bg-stone-50 px-2.5 py-1.5 rounded-lg border border-stone-200 font-mono text-xs font-bold text-stone-800">
+              {currentTime}
+            </div>
+
+            <button
+              onClick={logout}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 bg-stone-50 border border-stone-200 hover:border-red-200 transition-colors"
+              title="Log Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </header>
+
+        {/* Status Bar / Filter Tabs */}
+        <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar">
+          <button
+            id="kds-tab-new"
+            onClick={() => setActiveTab('new')}
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'new'
+                ? 'bg-[#B45309] text-white shadow-xs'
+                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              }`}
+          >
+            <Clock className="w-4 h-4" />
+            <span>NEW ORDERS</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+              {newOrders.length}
             </span>
-          </div>
-        </div>
-
-        {/* Live Clock & Actions */}
-        <div className="flex items-center space-x-2 sm:space-x-3 min-w-max">
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-2.5 py-1.5 rounded-lg border text-xs flex items-center justify-center transition-colors ${
-              soundEnabled
-                ? 'bg-amber-50 border-amber-200 text-[#B45309]'
-                : 'bg-stone-50 border-stone-200 text-stone-400'
-            }`}
-            title="Toggle Kitchen Chime"
-          >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
 
-          <div className="bg-stone-50 px-2.5 py-1.5 rounded-lg border border-stone-200 font-mono text-xs font-bold text-stone-800">
-            {currentTime}
-          </div>
+          <button
+            id="kds-tab-preparing"
+            onClick={() => setActiveTab('preparing')}
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'preparing'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              }`}
+          >
+            <Flame className="w-4 h-4" />
+            <span>PREPARING</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+              {preparingOrders.length}
+            </span>
+          </button>
 
           <button
-            onClick={logout}
-            className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 bg-stone-50 border border-stone-200 hover:border-red-200 transition-colors"
-            title="Log Out"
+            id="kds-tab-ready"
+            onClick={() => setActiveTab('ready')}
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'ready'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              }`}
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <CheckCircle2 className="w-4 h-4" />
+            <span>READY</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+              {readyOrders.length}
+            </span>
+          </button>
+
+          <button
+            id="kds-tab-served"
+            onClick={() => setActiveTab('served')}
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'served'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              }`}
+          >
+            <Utensils className="w-4 h-4" />
+            <span>SERVED</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+              {servedOrders.length}
+            </span>
+          </button>
+
+          <button
+            id="kds-tab-completed"
+            onClick={() => setActiveTab('completed')}
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'completed'
+                ? 'bg-stone-700 text-white shadow-xs'
+                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              }`}
+          >
+            <Check className="w-4 h-4" />
+            <span>COMPLETED</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+              {completedOrders.length}
+            </span>
           </button>
         </div>
-      </header>
-
-      {/* Status Bar / Filter Tabs */}
-      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar">
-        <button
-          id="kds-tab-new"
-          onClick={() => setActiveTab('new')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
-            activeTab === 'new'
-              ? 'bg-[#B45309] text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          <span>NEW ORDERS</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-            {newOrders.length}
-          </span>
-        </button>
-
-        <button
-          id="kds-tab-preparing"
-          onClick={() => setActiveTab('preparing')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
-            activeTab === 'preparing'
-              ? 'bg-stone-900 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-          }`}
-        >
-          <Flame className="w-4 h-4" />
-          <span>PREPARING</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-            {preparingOrders.length}
-          </span>
-        </button>
-
-        <button
-          id="kds-tab-ready"
-          onClick={() => setActiveTab('ready')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
-            activeTab === 'ready'
-              ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-          }`}
-        >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>READY</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-            {readyOrders.length}
-          </span>
-        </button>
-
-        <button
-          id="kds-tab-served"
-          onClick={() => setActiveTab('served')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
-            activeTab === 'served'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-          }`}
-        >
-          <Utensils className="w-4 h-4" />
-          <span>SERVED</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-            {servedOrders.length}
-          </span>
-        </button>
-
-        <button
-          id="kds-tab-completed"
-          onClick={() => setActiveTab('completed')}
-          className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
-            activeTab === 'completed'
-              ? 'bg-stone-700 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-          }`}
-        >
-          <Check className="w-4 h-4" />
-          <span>COMPLETED</span>
-          <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-            {completedOrders.length}
-          </span>
-        </button>
-      </div>
       </div>
 
       {/* Main KDS Grid */}
@@ -211,15 +205,14 @@ export const KitchenView: React.FC = () => {
                 <div
                   key={order.id}
                   id={`kds-card-${order.orderNumber.replace('#', '')}`}
-                  className={`bg-white border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${
-                    isNew
+                  className={`bg-white border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${isNew
                       ? 'border-amber-400 ring-2 ring-amber-400/20'
                       : isPrep
-                      ? 'border-stone-800 ring-2 ring-stone-800/15'
-                      : isRdy
-                      ? 'border-emerald-500 ring-2 ring-emerald-500/25'
-                      : 'border-stone-200 opacity-80'
-                  }`}
+                        ? 'border-stone-800 ring-2 ring-stone-800/15'
+                        : isRdy
+                          ? 'border-emerald-500 ring-2 ring-emerald-500/25'
+                          : 'border-stone-200 opacity-80'
+                    }`}
                 >
                   {/* Card Header */}
                   <div>
@@ -261,23 +254,23 @@ export const KitchenView: React.FC = () => {
                           )}
                           <div className="space-y-2.5">
                             {order.items.filter(i => (i.batch || 1) === batchNum).map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between text-sm sm:text-base"
-                        >
-                          <div className="flex items-center space-x-2.5">
-                            <span className="w-7 h-7 rounded-lg bg-stone-100 border border-stone-200 font-bold text-stone-800 flex items-center justify-center text-xs">
-                              {item.quantity}×
-                            </span>
-                            <span className="font-bold text-stone-900">{item.name}</span>
-                          </div>
-                          {item.notes && (
-                            <span className="text-xs text-[#B45309] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">
-                              {item.notes}
-                            </span>
-                          )}
-                        </div>
-                      ))}
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between text-sm sm:text-base"
+                              >
+                                <div className="flex items-center space-x-2.5">
+                                  <span className="w-7 h-7 rounded-lg bg-stone-100 border border-stone-200 font-bold text-stone-800 flex items-center justify-center text-xs">
+                                    {item.quantity}×
+                                  </span>
+                                  <span className="font-bold text-stone-900">{item.name}</span>
+                                </div>
+                                {item.notes && (
+                                  <span className="text-xs text-[#B45309] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200">
+                                    {item.notes}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ))}

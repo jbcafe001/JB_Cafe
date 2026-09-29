@@ -75,6 +75,7 @@ export interface Order {
   total: number;
   status: OrderStatus;
   notes?: string;
+  date: string;          // ISO date YYYY-MM-DD
   createdAt: string;     // ISO or readable
   preparingAt?: string;
   readyAt?: string;

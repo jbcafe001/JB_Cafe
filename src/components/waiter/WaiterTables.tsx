@@ -249,16 +249,29 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                   )}
 
                   {isServed && activeOrder && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenPayment(activeOrder);
-                      }}
-                      className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
-                    >
-                      <CreditCard className="w-4 h-4 text-amber-400" />
-                      <span>Pay</span>
-                    </button>
+                    <div className="flex items-center space-x-1.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectTable(table);
+                        }}
+                        className="text-xs sm:text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Order More</span>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenPayment(activeOrder);
+                        }}
+                        className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
+                      >
+                        <CreditCard className="w-4 h-4 text-amber-400" />
+                        <span>Pay</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
