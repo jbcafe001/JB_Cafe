@@ -55,8 +55,10 @@ export const KitchenView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
 
-      {/* Compact KDS Header */}
-      <header className="bg-white border-b border-stone-100 px-4 sm:px-6 py-2 flex items-center justify-between sticky top-0 z-20">
+      {/* Fixed Header & Tabs Container */}
+      <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
+        {/* Compact KDS Header */}
+        <header className="bg-white border-b border-stone-100 px-4 sm:px-6 py-2 flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
           <div className="w-7 h-7 rounded-lg bg-[#B45309] flex items-center justify-center text-white shadow-xs">
             <ChefHat className="w-4 h-4" />
@@ -100,7 +102,7 @@ export const KitchenView: React.FC = () => {
       </header>
 
       {/* Status Bar / Filter Tabs */}
-      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar shadow-2xs">
+      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar">
         <button
           id="kds-tab-new"
           onClick={() => setActiveTab('new')}
@@ -164,6 +166,7 @@ export const KitchenView: React.FC = () => {
             {completedOrders.length}
           </span>
         </button>
+      </div>
       </div>
 
       {/* Main KDS Grid */}
