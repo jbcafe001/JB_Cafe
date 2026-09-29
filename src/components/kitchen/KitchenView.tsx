@@ -14,12 +14,13 @@ import {
   Volume2,
   VolumeX,
   Utensils,
+  LogOut,
 } from 'lucide-react';
 
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'completed';
 
 export const KitchenView: React.FC = () => {
-  const { orders, startPreparingOrder, markOrderReady } = useCafe();
+  const { orders, startPreparingOrder, markOrderReady, logout } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [currentTime, setCurrentTime] = useState(
@@ -52,9 +53,9 @@ export const KitchenView: React.FC = () => {
       : completedOrders;
 
   return (
-    <div className="min-h-[calc(100vh-57px)] bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
+    <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
       {/* KDS Header */}
-      <header className="bg-white border-b border-stone-200 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-[57px] z-20 shadow-2xs">
+      <header className="bg-white border-b border-stone-200 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20 shadow-2xs">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-[#B45309] flex items-center justify-center text-white shadow-xs">
             <ChefHat className="w-5 h-5" />
@@ -90,6 +91,14 @@ export const KitchenView: React.FC = () => {
           <div className="bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 font-mono text-xs font-bold text-stone-800">
             {currentTime}
           </div>
+
+          <button
+            onClick={logout}
+            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 bg-stone-50 border border-stone-200 hover:border-stone-300 transition-colors"
+            title="Log Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 

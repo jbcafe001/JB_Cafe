@@ -1,23 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
+import { Coffee, LogIn, Key, Mail, ShieldAlert } from 'lucide-react';
+import { loginUser, createDemoUsers } from '../../services/auth';
 import { UserRole } from '../../types';
-import { Coffee, ShieldCheck, Smartphone, ChefHat, LogIn, Key, Mail } from 'lucide-react';
 
 export const LoginView: React.FC = () => {
   const { login } = useCafe();
-  const [email, setEmail] = useState('waiter@cafe.demo');
-  const [password, setPassword] = useState('••••••');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('waiter');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Optional: Automatically seed users on component mount (for development)
+  useEffect(() => {
+    // createDemoUsers();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, selectedRole);
-  };
+    setLoading(true);
+    setError('');
 
-  const handleQuickLogin = (role: UserRole, demoEmail: string) => {
-    setSelectedRole(role);
-    setEmail(demoEmail);
-    login(demoEmail, role);
+    try {
+      const user = await loginUser(email, password);
+      // login via CafeContext with the fetched user role
+      login(user.email, user.role as UserRole, user.name, user.uid);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to login. Please check credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,69 +43,23 @@ export const LoginView: React.FC = () => {
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white">BREW & BITE</h1>
           <p className="text-xs text-amber-300/80 tracking-wide font-medium uppercase mt-1">
-            Simple Café & Order Management
+            Staff Portal Login
           </p>
         </div>
 
         {/* Form Body */}
         <div className="p-6 sm:p-8 space-y-6">
-          {/* Quick Demo Login Badges */}
-          <div>
-            <label className="block text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2.5">
-              1-Click Demo Login
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                id="demo-login-waiter"
-                onClick={() => handleQuickLogin('waiter', 'waiter@cafe.demo')}
-                className={`p-2.5 rounded-xl border flex flex-col items-center text-center transition-all ${
-                  selectedRole === 'waiter'
-                    ? 'border-amber-500 bg-amber-50/70 text-amber-900 shadow-xs'
-                    : 'border-stone-200 hover:border-stone-300 bg-stone-50/50 text-stone-600'
-                }`}
-              >
-                <Smartphone className="w-5 h-5 text-amber-600 mb-1" />
-                <span className="font-bold text-xs">Waiter</span>
-                <span className="text-[10px] text-stone-400">Mobile</span>
-              </button>
-
-              <button
-                type="button"
-                id="demo-login-kitchen"
-                onClick={() => handleQuickLogin('kitchen', 'kitchen@cafe.demo')}
-                className={`p-2.5 rounded-xl border flex flex-col items-center text-center transition-all ${
-                  selectedRole === 'kitchen'
-                    ? 'border-amber-500 bg-amber-50/70 text-amber-900 shadow-xs'
-                    : 'border-stone-200 hover:border-stone-300 bg-stone-50/50 text-stone-600'
-                }`}
-              >
-                <ChefHat className="w-5 h-5 text-amber-600 mb-1" />
-                <span className="font-bold text-xs">Kitchen</span>
-                <span className="text-[10px] text-stone-400">KDS Display</span>
-              </button>
-
-              <button
-                type="button"
-                id="demo-login-admin"
-                onClick={() => handleQuickLogin('admin', 'admin@cafe.demo')}
-                className={`p-2.5 rounded-xl border flex flex-col items-center text-center transition-all ${
-                  selectedRole === 'admin'
-                    ? 'border-amber-500 bg-amber-50/70 text-amber-900 shadow-xs'
-                    : 'border-stone-200 hover:border-stone-300 bg-stone-50/50 text-stone-600'
-                }`}
-              >
-                <ShieldCheck className="w-5 h-5 text-amber-600 mb-1" />
-                <span className="font-bold text-xs">Admin</span>
-                <span className="text-[10px] text-stone-400">Full Portal</span>
-              </button>
+          {error && (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm flex items-start space-x-2">
+              <ShieldAlert className="w-5 h-5 shrink-0" />
+              <span>{error}</span>
             </div>
-          </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-stone-600 mb-1">
-                Email / Staff ID
+                Email
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
@@ -101,7 +68,7 @@ export const LoginView: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@cafe.demo"
+                  placeholder="Enter your email"
                   className="w-full pl-9 pr-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-stone-800"
                 />
               </div>
@@ -109,15 +76,16 @@ export const LoginView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-stone-600 mb-1">
-                Password / Staff PIN
+                Password
               </label>
               <div className="relative">
                 <Key className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
                 <input
                   type="password"
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter PIN"
+                  placeholder="Enter your password"
                   className="w-full pl-9 pr-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-stone-800"
                 />
               </div>
@@ -125,18 +93,22 @@ export const LoginView: React.FC = () => {
 
             <button
               type="submit"
-              id="login-submit-btn"
-              className="w-full mt-2 py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2"
+              disabled={loading}
+              className="w-full mt-2 py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               <LogIn className="w-4 h-4" />
-              <span>Log In to Café System</span>
+              <span>{loading ? 'Authenticating...' : 'Log In to Café System'}</span>
             </button>
           </form>
 
-          <div className="text-center pt-2 border-t border-stone-100">
-            <p className="text-[11px] text-stone-400">
-              Demo credentials auto-filled. Tap any role card above for instant access.
-            </p>
+          <div className="text-center pt-4 border-t border-stone-100">
+            <button 
+              type="button" 
+              onClick={() => createDemoUsers()}
+              className="text-[11px] text-stone-400 hover:text-stone-600 underline"
+            >
+              Initialize Demo Users (Admin)
+            </button>
           </div>
         </div>
       </div>

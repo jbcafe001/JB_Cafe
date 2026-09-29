@@ -66,7 +66,7 @@ interface CafeContextType {
   paySalary: (params: { staffId: string; paymentMethod: 'Cash' | 'UPI' | 'Bank Transfer'; paymentDate: string; note?: string }) => void;
 
   // Auth & Roles
-  login: (email: string, role?: UserRole) => boolean;
+  login: (email: string, role: UserRole, name: string, uid: string) => boolean;
   logout: () => void;
   switchRole: (role: UserRole) => void;
 
@@ -222,23 +222,29 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Auth & Roles
-  const login = (email: string, roleOverride?: UserRole): boolean => {
-    let matchedUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    if (!matchedUser && roleOverride) {
-      matchedUser = users.find((u) => u.role === roleOverride);
-    }
-    if (!matchedUser) {
-      matchedUser = users[0];
-    }
+  const login = (email: string, role: UserRole, name: string, uid: string) => {
+    const matchedUser: User = {
+      id: uid,
+      name,
+      email,
+      role,
+      status: 'active'
+    };
+    
     setCurrentUser(matchedUser);
-    setCurrentRole(matchedUser.role);
+    setCurrentRole(role);
     setIsLoggedIn(true);
     addNotification(`Logged in as ${matchedUser.name} (${matchedUser.role})`, matchedUser.role);
     return true;
   };
 
   const logout = () => {
-    setIsLoggedIn(false);
+    import('../services/auth').then(({ logoutUser }) => {
+      logoutUser().then(() => {
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      }).catch(console.error);
+    });
   };
 
   const switchRole = (role: UserRole) => {
@@ -299,7 +305,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
 
     // Notify Kitchen
-    addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'kitchen');
+    addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
 
     return newOrder;
   };

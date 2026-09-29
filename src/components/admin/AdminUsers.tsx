@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { User, UserRole } from '../../types';
-import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight, User as UserIcon } from 'lucide-react';
 
 export const AdminUsers: React.FC = () => {
   const { users, addUser, toggleUserStatus } = useCafe();
@@ -38,11 +38,17 @@ export const AdminUsers: React.FC = () => {
           icon: <Shield className="w-3.5 h-3.5" />,
           cls: 'bg-purple-50 text-purple-800 border-purple-200',
         };
-      case 'kitchen':
+      case 'cook':
         return {
-          label: 'Kitchen',
+          label: 'Cook',
           icon: <ChefHat className="w-3.5 h-3.5" />,
           cls: 'bg-amber-50 text-amber-800 border-amber-200',
+        };
+      case 'others':
+        return {
+          label: 'Others',
+          icon: <UserIcon className="w-3.5 h-3.5" />, // Note: Need to import UserIcon or use a generic one
+          cls: 'bg-stone-50 text-stone-800 border-stone-200',
         };
       case 'waiter':
         return {
@@ -191,8 +197,9 @@ export const AdminUsers: React.FC = () => {
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                 >
                   <option value="waiter">Waiter (Mobile Terminal)</option>
-                  <option value="kitchen">Kitchen (KDS Display)</option>
+                  <option value="cook">Cook (KDS Display)</option>
                   <option value="admin">Admin (Full Management)</option>
+                  <option value="others">Others (Limited Access)</option>
                 </select>
               </div>
 

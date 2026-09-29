@@ -19,34 +19,7 @@ export const WaiterProfile: React.FC = () => {
         <p className="text-xs text-stone-400">{currentUser?.phone}</p>
       </div>
 
-      <div className="bg-white border border-stone-200/80 rounded-2xl p-4 shadow-xs space-y-3">
-        <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
-          Quick Demo Switching
-        </h3>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => switchRole('kitchen')}
-            className="p-3 rounded-xl border border-stone-200 hover:border-amber-400 bg-stone-50 flex items-center space-x-2 text-left"
-          >
-            <ChefHat className="w-5 h-5 text-amber-600" />
-            <div>
-              <p className="font-bold text-xs text-stone-800">Switch to Kitchen</p>
-              <p className="text-[10px] text-stone-400">Tablet / KDS</p>
-            </div>
-          </button>
 
-          <button
-            onClick={() => switchRole('admin')}
-            className="p-3 rounded-xl border border-stone-200 hover:border-amber-400 bg-stone-50 flex items-center space-x-2 text-left"
-          >
-            <Shield className="w-5 h-5 text-amber-600" />
-            <div>
-              <p className="font-bold text-xs text-stone-800">Switch to Admin</p>
-              <p className="text-[10px] text-stone-400">Full Dashboard</p>
-            </div>
-          </button>
-        </div>
-      </div>
 
       <div className="bg-white border border-stone-200/80 rounded-2xl p-4 shadow-xs">
         <div className="flex items-center space-x-3 text-xs text-stone-600">

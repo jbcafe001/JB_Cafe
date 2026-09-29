@@ -130,7 +130,7 @@ export const WaiterView: React.FC = () => {
   // If in simulated mobile frame on desktop
   if (isMobileFrame) {
     return (
-      <div className="min-h-[calc(100vh-57px)] bg-[#F9F8F6] flex flex-col items-center justify-center p-2 sm:p-6">
+      <div className="min-h-screen bg-[#F9F8F6] flex flex-col items-center justify-center p-2 sm:p-6">
         <div className="w-full max-w-[420px] h-[780px] max-h-[92vh] bg-white rounded-[38px] shadow-2xl border-[9px] border-stone-900 overflow-hidden relative flex flex-col">
           {/* Phone Speaker Notch */}
           <div className="w-28 h-4 bg-stone-900 rounded-b-xl mx-auto absolute top-0 left-1/2 -translate-x-1/2 z-40 flex items-center justify-center">
@@ -144,7 +144,7 @@ export const WaiterView: React.FC = () => {
 
   // Full-width (default responsive mobile-first container)
   return (
-    <div className="min-h-[calc(100vh-57px)] w-full flex flex-col bg-[#F9F8F6] relative">
+    <div className="min-h-screen w-full flex flex-col bg-[#F9F8F6] relative">
       {waiterContent}
     </div>
   );

@@ -85,9 +85,9 @@ export const AdminView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-57px)] bg-[#F9F8F6] flex flex-col md:flex-row select-none">
+    <div className="min-h-screen bg-[#F9F8F6] flex flex-col md:flex-row select-none">
       {/* Mobile Top bar */}
-      <div className="md:hidden bg-white border-b border-stone-200 text-stone-900 px-4 py-3 flex items-center justify-between sticky top-[57px] z-30 shadow-2xs">
+      <div className="md:hidden bg-white border-b border-stone-200 text-stone-900 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
         <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#B45309] flex items-center justify-center text-white shadow-xs">
             <Coffee className="w-4 h-4" />
@@ -108,7 +108,7 @@ export const AdminView: React.FC = () => {
 
       {/* Clean Minimalism Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-[57px] left-0 z-40 h-[calc(100vh-57px)] w-60 bg-white text-stone-700 border-r border-stone-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
+        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-60 bg-white text-stone-700 border-r border-stone-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
