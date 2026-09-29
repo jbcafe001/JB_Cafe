@@ -11,10 +11,17 @@ export const LoginView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Optional: Automatically seed users on component mount (for development)
-  useEffect(() => {
-    // createDemoUsers();
-  }, []);
+  const handleInitDemoUsers = async () => {
+    try {
+      setLoading(true);
+      await createDemoUsers();
+      alert("Demo users initialized successfully! You can now log in.");
+    } catch (e: any) {
+      alert("Error initializing demo users: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +111,9 @@ export const LoginView: React.FC = () => {
           <div className="text-center pt-4 border-t border-stone-100">
             <button 
               type="button" 
-              onClick={() => createDemoUsers()}
-              className="text-[11px] text-stone-400 hover:text-stone-600 underline"
+              onClick={handleInitDemoUsers}
+              disabled={loading}
+              className="text-[11px] text-stone-400 hover:text-stone-600 underline disabled:opacity-50"
             >
               Initialize Demo Users (Admin)
             </button>
