@@ -56,6 +56,12 @@ export const AdminUsers: React.FC = () => {
           icon: <Smartphone className="w-3.5 h-3.5" />,
           cls: 'bg-blue-50 text-blue-800 border-blue-200',
         };
+      default:
+        return {
+          label: userRole || 'Unknown',
+          icon: <UserIcon className="w-3.5 h-3.5" />,
+          cls: 'bg-stone-50 text-stone-800 border-stone-200',
+        };
     }
   };
 
