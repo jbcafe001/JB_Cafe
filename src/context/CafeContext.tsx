@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import {
   UserRole,
   User,
@@ -28,6 +28,8 @@ import {
   INITIAL_SALARY_HISTORY,
   generateSampleHistory,
 } from '../data/initialData';
+import { db } from '../firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 interface CreateOrderParams {
   tableId: string;
@@ -166,33 +168,76 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   ]);
 
-  // Persist state changes
+  const isRemoteUpdate = useRef(false);
+  const [isSyncing, setIsSyncing] = useState(true);
+
+  // 1. Listen for Firestore changes
   useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'cafe', 'mainState'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        isRemoteUpdate.current = true;
+        
+        if (data.users) setUsers(data.users);
+        if (data.tables) setTables(data.tables);
+        if (data.menuItems) setMenuItems(data.menuItems);
+        if (data.stockItems) setStockItems(data.stockItems);
+        if (data.orders) setOrders(data.orders);
+        if (data.expenses) setExpenses(data.expenses);
+        if (data.stockAdditions) setStockAdditions(data.stockAdditions);
+        if (data.materialUsageLogs) setMaterialUsageLogs(data.materialUsageLogs);
+        if (data.staffMembers) setStaffMembers(data.staffMembers);
+        if (data.upaadRecords) setUpaadRecords(data.upaadRecords);
+        if (data.salaryHistory) setSalaryHistory(data.salaryHistory);
+        if (data.notifications) setNotifications(data.notifications);
+      }
+      setIsSyncing(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  // 2. Persist state changes
+  useEffect(() => {
+    if (isSyncing) return;
+    
+    if (isRemoteUpdate.current) {
+      isRemoteUpdate.current = false;
+      return;
+    }
+
+    const stateToSave = {
+      users,
+      tables,
+      menuItems,
+      stockItems,
+      orders,
+      expenses,
+      stockAdditions,
+      materialUsageLogs,
+      staffMembers,
+      upaadRecords,
+      salaryHistory,
+      notifications,
+    };
+
+    setDoc(doc(db, 'cafe', 'mainState'), stateToSave).catch(console.error);
+
     try {
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
-          users,
+          ...stateToSave,
           currentRole,
           currentUser,
           isLoggedIn,
-          tables,
-          menuItems,
-          stockItems,
-          orders,
-          expenses,
-          stockAdditions,
-          materialUsageLogs,
-          staffMembers,
-          upaadRecords,
-          salaryHistory,
-          notifications,
         })
       );
     } catch {
       // ignore
     }
   }, [
+    isSyncing,
     users,
     currentRole,
     currentUser,
