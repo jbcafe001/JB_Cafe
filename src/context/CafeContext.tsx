@@ -999,6 +999,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startPreparingOrder,
         markOrderReady,
         serveOrder,
+        toggleItemServed,
         completeOrder,
         cancelOrder,
         addStock,
