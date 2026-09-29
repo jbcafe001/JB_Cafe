@@ -235,104 +235,123 @@ export const DemoSwitcherBar: React.FC = () => {
 
       {/* 11-Step Interactive Walkthrough Guide Modal */}
       {showGuide && (
-        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-5 border-b border-stone-100 flex items-center justify-between bg-stone-50/70">
-              <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-[#B45309] flex items-center justify-center text-white shadow-xs">
-                  <Sparkles className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2rem] max-w-3xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+            {/* Modal Header */}
+            <div className="px-6 py-5 sm:px-8 sm:py-6 border-b border-stone-100 flex items-center justify-between bg-gradient-to-r from-stone-50 to-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+              
+              <div className="flex items-center space-x-4 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-[#B45309] flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
+                  <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-stone-900 text-base">
-                    Brew & Bite 11-Step Demo Walkthrough
+                  <h3 className="font-black text-stone-900 text-lg sm:text-xl tracking-tight">
+                    Brew & Bite Walkthrough
                   </h3>
-                  <p className="text-stone-400 text-xs">
-                    Experience the complete synchronized café flow
+                  <p className="text-stone-500 text-sm font-medium">
+                    Experience the complete synchronized café flow in 4 phases
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowGuide(false)}
-                className="text-stone-400 hover:text-stone-600 p-1.5 rounded-lg hover:bg-stone-100 transition-colors"
+                className="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition-colors relative z-10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-3.5 text-xs sm:text-sm text-stone-700">
-              <div className="p-3.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 text-xs">
-                💡 <strong className="text-[#B45309]">How to test:</strong> Use the top bar pill buttons (
-                <span className="font-bold text-stone-900">Waiter</span>,{' '}
-                <span className="font-bold text-stone-900">Kitchen</span>,{' '}
-                <span className="font-bold text-stone-900">Admin</span>) anytime to jump between
-                roles and watch real-time updates!
+            {/* Modal Body */}
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-sm text-stone-700 bg-stone-50/30">
+              <div className="p-4 bg-amber-50 border border-amber-200/60 rounded-2xl text-stone-800 text-sm flex items-start space-x-3 shadow-sm">
+                <div className="text-amber-600 mt-0.5">💡</div>
+                <p className="leading-relaxed">
+                  <strong className="text-[#B45309] font-bold">How to test:</strong> Use the top bar pill buttons (
+                  <span className="font-bold text-stone-900">Waiter</span>,{' '}
+                  <span className="font-bold text-stone-900">Kitchen</span>,{' '}
+                  <span className="font-bold text-stone-900">Admin</span>) anytime to jump between
+                  roles and watch the live synchronization in action!
+                </p>
               </div>
 
-              <ol className="space-y-3">
-                <li className="flex items-start gap-3 p-3 rounded-xl bg-stone-50/60 border border-stone-200/80">
-                  <span className="w-6 h-6 rounded-full bg-[#B45309] text-white font-bold flex items-center justify-center shrink-0 text-xs shadow-xs">
-                    1-4
-                  </span>
-                  <div>
-                    <strong className="text-stone-900 block">Step 1 to 4: Waiter takes order</strong>
-                    <span className="text-stone-500 text-xs">
+              <div className="space-y-4">
+                {/* Phase 1 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#B45309]" />
+                  <div className="px-3 py-1.5 rounded-lg bg-orange-100 text-[#B45309] font-black text-xs tracking-wider shrink-0 shadow-xs border border-orange-200">
+                    PHASE 1
+                  </div>
+                  <div className="flex-1">
+                    <strong className="text-stone-900 text-base block font-bold mb-1 group-hover:text-[#B45309] transition-colors">Waiter takes the order</strong>
+                    <span className="text-stone-500 text-sm leading-relaxed block">
                       Switch to <strong>Waiter</strong> role → Tap <strong>Table 04</strong> → Add{' '}
                       <strong>2 × Cappuccino</strong> and <strong>1 × Veg Sandwich</strong> → Tap{' '}
                       <strong>"SEND TO KITCHEN"</strong>.
                     </span>
                   </div>
-                </li>
+                </div>
 
-                <li className="flex items-start gap-3 p-3 rounded-xl bg-stone-50/60 border border-stone-200/80">
-                  <span className="w-6 h-6 rounded-full bg-[#B45309] text-white font-bold flex items-center justify-center shrink-0 text-xs shadow-xs">
-                    5-7
-                  </span>
-                  <div>
-                    <strong className="text-stone-900 block">Step 5 to 7: Kitchen prepares</strong>
-                    <span className="text-stone-500 text-xs">
+                {/* Phase 2 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-stone-800" />
+                  <div className="px-3 py-1.5 rounded-lg bg-stone-100 text-stone-800 font-black text-xs tracking-wider shrink-0 shadow-xs border border-stone-200">
+                    PHASE 2
+                  </div>
+                  <div className="flex-1">
+                    <strong className="text-stone-900 text-base block font-bold mb-1 group-hover:text-stone-700 transition-colors">Kitchen prepares the food</strong>
+                    <span className="text-stone-500 text-sm leading-relaxed block">
                       Switch to <strong>Kitchen</strong> role → See order under <strong>New Orders</strong> → Click{' '}
                       <strong>"START PREPARING"</strong> → Click <strong>"MARK READY"</strong>.
                     </span>
                   </div>
-                </li>
+                </div>
 
-                <li className="flex items-start gap-3 p-3 rounded-xl bg-stone-50/60 border border-stone-200/80">
-                  <span className="w-6 h-6 rounded-full bg-[#B45309] text-white font-bold flex items-center justify-center shrink-0 text-xs shadow-xs">
-                    8-10
-                  </span>
-                  <div>
-                    <strong className="text-stone-900 block">Step 8 to 10: Waiter serves & settles</strong>
-                    <span className="text-stone-500 text-xs">
+                {/* Phase 3 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500" />
+                  <div className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-black text-xs tracking-wider shrink-0 shadow-xs border border-emerald-200">
+                    PHASE 3
+                  </div>
+                  <div className="flex-1">
+                    <strong className="text-stone-900 text-base block font-bold mb-1 group-hover:text-emerald-600 transition-colors">Waiter serves & settles</strong>
+                    <span className="text-stone-500 text-sm leading-relaxed block">
                       Switch to <strong>Waiter</strong> role → Notice Table 04 is{' '}
-                      <span className="text-green-700 font-semibold uppercase">ORDER READY</span> → Tap order → Click{' '}
+                      <span className="text-emerald-600 font-bold uppercase">ORDER READY</span> → Tap order → Click{' '}
                       <strong>"COMPLETE ORDER"</strong> → Select <strong>UPI</strong>.
                     </span>
                   </div>
-                </li>
+                </div>
 
-                <li className="flex items-start gap-3 p-3 rounded-xl bg-stone-50/60 border border-stone-200/80">
-                  <span className="w-6 h-6 rounded-full bg-[#B45309] text-white font-bold flex items-center justify-center shrink-0 text-xs shadow-xs">
-                    11
-                  </span>
-                  <div>
-                    <strong className="text-stone-900 block">Step 11: Admin dashboard reflects automatically</strong>
-                    <span className="text-stone-500 text-xs">
+                {/* Phase 4 */}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-stone-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500" />
+                  <div className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-black text-xs tracking-wider shrink-0 shadow-xs border border-indigo-200">
+                    PHASE 4
+                  </div>
+                  <div className="flex-1">
+                    <strong className="text-stone-900 text-base block font-bold mb-1 group-hover:text-indigo-600 transition-colors">Admin dashboard updates automatically</strong>
+                    <span className="text-stone-500 text-sm leading-relaxed block">
                       Switch to <strong>Admin</strong> role → Watch Today's Sales (+₹440), Order Count (+1), UPI
                       Sales breakdown, and automatic ingredient stock deduction (Coffee Beans -36g, Milk -300ml,
                       Bread -0.25 packs)!
                     </span>
                   </div>
-                </li>
-              </ol>
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 border-t border-stone-100 bg-stone-50/70 flex items-center justify-between">
-              <span className="text-xs text-stone-500">Current Role: <span className="font-semibold text-[#B45309] capitalize">{currentRole} ({currentUser?.name})</span></span>
+            {/* Modal Footer */}
+            <div className="px-6 py-5 sm:px-8 border-t border-stone-100 bg-white flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span className="text-sm text-stone-500">
+                Current Role: <span className="font-bold text-stone-800 capitalize bg-stone-100 px-2.5 py-1 rounded-lg ml-1">{currentRole} ({currentUser?.name})</span>
+              </span>
               <button
                 onClick={() => setShowGuide(false)}
-                className="px-5 py-2 bg-[#B45309] hover:bg-amber-800 text-white font-semibold rounded-xl text-xs transition-colors shadow-xs"
+                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-600 to-[#B45309] hover:from-amber-500 hover:to-amber-700 text-white font-extrabold rounded-xl text-sm transition-all shadow-lg shadow-amber-600/30 hover:shadow-amber-600/50 active:scale-95 flex items-center justify-center space-x-2"
               >
-                Got It, Let's Try!
+                <span>Got It, Let's Try!</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
