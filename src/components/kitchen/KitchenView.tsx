@@ -229,7 +229,7 @@ export const KitchenView: React.FC = () => {
 
                     {/* Ordered Items List */}
                     <div className="py-4">
-                      {Array.from(new Set(order.items.map(i => i.batch || 1))).sort((a,b) => a-b).map((batchNum, batchIdx) => (
+                      {Array.from(new Set(order.items.map(i => i.batch || 1))).sort((a: number, b: number) => a - b).map((batchNum, batchIdx) => (
                         <div key={`batch-${batchNum}`} className={batchIdx > 0 ? "mt-4" : ""}>
                           {batchIdx > 0 && (
                             <div className="flex items-center space-x-2 mb-3">
