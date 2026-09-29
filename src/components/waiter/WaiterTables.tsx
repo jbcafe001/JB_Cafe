@@ -155,7 +155,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       </div>
 
       {/* Table Cards Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredTables.map((table) => {
           const badge = getStatusBadge(table.status);
           const isReady = table.status === 'ready';
@@ -166,7 +166,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             <div
               key={table.id}
               onClick={() => handleCardClick(table)}
-              className={`bg-white rounded-2xl border p-4 cursor-pointer transition-all shadow-xs hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[135px] ${
+              className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${
                 isReady
                   ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-emerald-50 bg-emerald-50/20'
                   : isServed
@@ -178,31 +178,31 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             >
               <div>
                 <div className="flex items-start justify-between">
-                  <span className="font-extrabold text-stone-900 text-lg">{table.name}</span>
+                  <span className="font-extrabold text-stone-900 text-lg sm:text-2xl">{table.name}</span>
                   <span
-                    className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg}`}
+                    className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                    <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
                     <span>{badge.label}</span>
                   </span>
                 </div>
-                <div className="flex items-center space-x-1 text-stone-400 text-xs mt-1">
-                  <Users className="w-3.5 h-3.5" />
+                <div className="flex items-center space-x-1.5 text-stone-400 text-sm mt-1">
+                  <Users className="w-4 h-4" />
                   <span>{table.seats} Seats</span>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs">
+              <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-sm">
                 {activeOrder ? (
-                  <div className="text-[11px] text-stone-600">
+                  <div className="text-xs sm:text-sm text-stone-600">
                     <span className="font-mono font-bold text-stone-800">
                       {activeOrder.orderNumber}
                     </span>
                     <span className="ml-1 text-stone-400">• ₹{activeOrder.total}</span>
                   </div>
                 ) : (
-                  <span className="text-amber-700 font-bold flex items-center space-x-1">
-                    <Plus className="w-3.5 h-3.5" />
+                  <span className="text-amber-700 font-bold flex items-center space-x-1.5">
+                    <Plus className="w-4 h-4" />
                     <span>Take Order</span>
                   </span>
                 )}
@@ -214,9 +214,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                       e.stopPropagation();
                       handleServeTable(activeOrder.id);
                     }}
-                    className="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold shadow-xs flex items-center space-x-1"
+                    className="text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
                   >
-                    <Utensils className="w-3 h-3" />
+                    <Utensils className="w-4 h-4" />
                     <span>Serve</span>
                   </button>
                 )}
@@ -227,9 +227,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                       e.stopPropagation();
                       handleOpenPayment(activeOrder);
                     }}
-                    className="text-[10px] bg-stone-900 hover:bg-stone-800 text-white px-2.5 py-1 rounded-lg font-bold shadow-xs flex items-center space-x-1"
+                    className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
                   >
-                    <CreditCard className="w-3 h-3 text-amber-400" />
+                    <CreditCard className="w-4 h-4 text-amber-400" />
                     <span>Pay</span>
                   </button>
                 )}

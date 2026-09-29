@@ -63,7 +63,7 @@ export const WaiterView: React.FC = () => {
           {/* Fixed Bottom Navigation (Mobile First Clean Minimalism) */}
           <nav
             id="waiter-bottom-nav"
-            className="fixed sm:absolute bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-sm px-2 py-1.5 flex items-center justify-around"
+            className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-sm px-2 py-1.5 flex items-center justify-around"
           >
             <button
               id="waiter-nav-home"
@@ -144,10 +144,8 @@ export const WaiterView: React.FC = () => {
 
   // Full-width (default responsive mobile-first container)
   return (
-    <div className="min-h-[calc(100vh-57px)] flex justify-center bg-[#F9F8F6]">
-      <div className="w-full max-w-lg min-h-[calc(100vh-57px)] bg-[#F9F8F6] flex flex-col relative shadow-md">
-        {waiterContent}
-      </div>
+    <div className="min-h-[calc(100vh-57px)] w-full flex flex-col bg-[#F9F8F6] relative">
+      {waiterContent}
     </div>
   );
 };

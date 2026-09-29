@@ -223,7 +223,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         </div>
 
         {/* Tables Grid */}
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {tables.map((table) => {
             const badge = getTableBadge(table.status);
             const isReady = table.status === 'ready';
@@ -235,7 +235,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 key={table.id}
                 id={`table-card-${table.number}`}
                 onClick={() => handleTableCardClick(table)}
-                className={`bg-white rounded-2xl border p-3.5 cursor-pointer transition-all shadow-xs hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[125px] ${
+                className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${
                   isReady
                     ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20'
                     : isServed
@@ -247,28 +247,28 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="font-extrabold text-stone-900 text-base block">
+                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl block">
                       {table.name}
                     </span>
-                    <div className="flex items-center space-x-1 text-stone-400 text-xs mt-0.5">
-                      <Users className="w-3.5 h-3.5" />
+                    <div className="flex items-center space-x-1.5 text-stone-400 text-sm mt-1">
+                      <Users className="w-4 h-4" />
                       <span>{table.seats} Guests</span>
                     </div>
                   </div>
 
                   <span
-                    className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg}`}
+                    className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                    <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
                     <span>{badge.label}</span>
                   </span>
                 </div>
 
                 {/* Bottom action hint */}
-                <div className="mt-3 pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-sm">
                   {table.status === 'available' && (
-                    <span className="text-amber-700 font-bold flex items-center space-x-1">
-                      <Plus className="w-3.5 h-3.5" />
+                    <span className="text-amber-700 font-bold flex items-center space-x-1.5">
+                      <Plus className="w-4 h-4" />
                       <span>New Order</span>
                     </span>
                   )}
@@ -279,9 +279,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                         e.stopPropagation();
                         handleServeFromModal(activeOrder.id);
                       }}
-                      className="w-full py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-lg shadow-xs flex items-center justify-center space-x-1 transition-colors"
+                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors"
                     >
-                      <Utensils className="w-3 h-3" />
+                      <Utensils className="w-4 h-4" />
                       <span>Serve Now</span>
                     </button>
                   )}
@@ -292,22 +292,22 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                         e.stopPropagation();
                         handleOpenPayment(activeOrder);
                       }}
-                      className="w-full py-1 bg-stone-900 hover:bg-stone-800 text-white font-bold text-[11px] rounded-lg shadow-xs flex items-center justify-center space-x-1 transition-colors"
+                      className="w-full py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors"
                     >
-                      <CreditCard className="w-3 h-3 text-amber-400" />
+                      <CreditCard className="w-4 h-4 text-amber-400" />
                       <span>Pay ₹{activeOrder.total}</span>
                     </button>
                   )}
 
                   {table.status === 'preparing' && activeOrder && (
-                    <span className="text-blue-700 text-[11px] font-bold flex items-center space-x-1">
-                      <Flame className="w-3 h-3 animate-pulse" />
+                    <span className="text-blue-700 text-xs sm:text-sm font-bold flex items-center space-x-1.5">
+                      <Flame className="w-4 h-4 animate-pulse" />
                       <span>In Kitchen</span>
                     </span>
                   )}
 
                   {table.status === 'occupied' && !isReady && !isServed && (
-                    <span className="text-stone-500 text-[11px] font-medium">
+                    <span className="text-stone-500 text-xs sm:text-sm font-medium">
                       Manage Order &rarr;
                     </span>
                   )}
