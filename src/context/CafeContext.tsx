@@ -222,7 +222,9 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       notifications,
     };
 
-    setDoc(doc(db, 'cafe', 'mainState'), stateToSave).catch(console.error);
+    // Firebase does not allow undefined values, so we use JSON serialize/deserialize to strip them out
+    const cleanState = JSON.parse(JSON.stringify(stateToSave));
+    setDoc(doc(db, 'cafe', 'mainState'), cleanState).catch(console.error);
 
     try {
       localStorage.setItem(
