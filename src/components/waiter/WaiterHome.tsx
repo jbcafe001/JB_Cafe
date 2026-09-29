@@ -15,6 +15,7 @@ import {
   Banknote,
   Copy,
   Check,
+  Trash2,
 } from 'lucide-react';
 
 interface WaiterHomeProps {
@@ -28,7 +29,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onNavigateToOrders,
   onNavigateToTables,
 }) => {
-  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed } = useCafe();
+  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm } = useCafe();
 
   // Selected table for quick order status / actions
   const [selectedTableForAction, setSelectedTableForAction] = useState<Table | null>(null);
@@ -359,7 +360,16 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       {i.quantity}× {i.name}
                     </span>
                   </div>
-                  <span className="font-bold">₹{i.price * i.quantity}</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="font-bold">₹{i.price * i.quantity}</span>
+                    <button 
+                      onClick={() => removeItemFromOrder(activeModalOrder.id, idx)}
+                      className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                      title="Remove Item"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
               <div className="pt-2 border-t border-stone-200 flex justify-between font-black text-sm text-stone-900">
@@ -405,15 +415,33 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 <span>Add More Items</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setSelectedTableForAction(null);
-                  onNavigateToOrders();
-                }}
-                className="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl transition-all"
-              >
-                Go to Orders Feed
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => {
+                    showConfirm(
+                      'Cancel Order?',
+                      'Are you sure you want to cancel this order? This action cannot be undone.',
+                      () => {
+                        cancelOrder(activeModalOrder.id);
+                        setSelectedTableForAction(null);
+                      },
+                      { isDestructive: true, confirmText: 'Yes, Cancel Order' }
+                    );
+                  }}
+                  className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all border border-red-100"
+                >
+                  Cancel Order
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedTableForAction(null);
+                    onNavigateToOrders();
+                  }}
+                  className="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl transition-all"
+                >
+                  Go to Orders Feed
+                </button>
+              </div>
             </div>
           </div>
         </div>

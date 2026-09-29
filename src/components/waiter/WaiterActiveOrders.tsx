@@ -15,6 +15,7 @@ import {
   Copy,
   Check,
   Sparkles,
+  Trash2,
 } from 'lucide-react';
 
 interface WaiterActiveOrdersProps {
@@ -24,7 +25,7 @@ interface WaiterActiveOrdersProps {
 type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
 
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, completeOrder, serveOrder, toggleItemServed } = useCafe();
+  const { orders, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder } = useCafe();
 
   const [activeTabFilter, setActiveTabFilter] = useState<OrderTabFilter>('all');
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
@@ -292,9 +293,18 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                             </span>
                           )}
                         </div>
-                        <span className="text-stone-700 font-bold">
-                          ₹{item.price * item.quantity}
-                        </span>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-stone-700 font-bold">
+                            ₹{item.price * item.quantity}
+                          </span>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); removeItemFromOrder(order.id, idx); }}
+                            className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                            title="Remove Item"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     ))}
 

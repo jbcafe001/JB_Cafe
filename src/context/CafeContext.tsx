@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 import {
   UserRole,
   User,
@@ -79,6 +80,7 @@ interface CafeContextType {
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
   toggleItemServed: (orderId: string, itemIndex: number) => void;
+  removeItemFromOrder: (orderId: string, itemIndex: number) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
   cancelOrder: (orderId: string) => void;
 
@@ -106,6 +108,12 @@ interface CafeContextType {
   // Notification
   dismissNotification: (id: string) => void;
   clearAllNotifications: () => void;
+  showConfirm: (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    options?: { confirmText?: string; cancelText?: string; isDestructive?: boolean }
+  ) => void;
 
   // Demo Controls
   resetDemoData: () => void;
@@ -169,6 +177,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       read: false,
     },
   ]);
+
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    isDestructive?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
 
   const isRemoteUpdate = useRef(false);
   const [isSyncing, setIsSyncing] = useState(true);
@@ -362,12 +380,14 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string) => {
     let tableNumStr = 'Table';
     let ordNum = '';
+    let updatedTableId: string | undefined;
     
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
           tableNumStr = ord.tableNumber;
           ordNum = ord.orderNumber;
+          updatedTableId = ord.tableId;
           
           const nextBatch = Math.max(...ord.items.map(i => i.batch || 1)) + 1;
           const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
@@ -391,6 +411,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return ord;
       })
     );
+
+    if (updatedTableId) {
+      setTables((prev) =>
+        prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'occupied' } : t))
+      );
+    }
 
     // Notify Kitchen
     addNotification(`Additional items added to ${ordNum} for ${tableNumStr}`, 'cook');
@@ -488,6 +514,27 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const removeItemFromOrder = (orderId: string, itemIndex: number) => {
+    setOrders((prev) =>
+      prev.map((ord) => {
+        if (ord.id === orderId) {
+          const updatedItems = [...ord.items];
+          updatedItems.splice(itemIndex, 1);
+          
+          const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+          
+          return { 
+            ...ord, 
+            items: updatedItems,
+            subtotal: newSubtotal,
+            total: newSubtotal + ord.tax 
+          };
+        }
+        return ord;
+      })
+    );
+  };
+
   const completeOrder = (orderId: string, paymentMethod: PaymentMethod) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     let completedOrder: Order | undefined;
@@ -578,7 +625,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setTables((prev) =>
         prev.map((t) =>
           t.id === ord.tableId
-            ? { ...t, status: 'available', currentOrderId: undefined }
+            ? { ...t, status: 'available', currentOrderId: undefined, activeWaiterId: undefined, activeWaiterName: undefined }
             : t
         )
       );
@@ -982,6 +1029,21 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const showConfirm = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    options?: { confirmText?: string; cancelText?: string; isDestructive?: boolean }
+  ) => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+      ...options,
+    });
+  };
+
   // Reset demo data to pristine state
   const resetDemoData = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -1039,6 +1101,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         markOrderReady,
         serveOrder,
         toggleItemServed,
+        removeItemFromOrder,
         completeOrder,
         cancelOrder,
         addStock,
@@ -1061,10 +1124,21 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         paySalary,
         dismissNotification,
         clearAllNotifications,
+        showConfirm,
         resetDemoData,
       }}
     >
       {children}
+      <ConfirmModal 
+        isOpen={confirmConfig?.isOpen || false}
+        title={confirmConfig?.title || ''}
+        message={confirmConfig?.message || ''}
+        confirmText={confirmConfig?.confirmText}
+        cancelText={confirmConfig?.cancelText}
+        isDestructive={confirmConfig?.isDestructive}
+        onConfirm={() => confirmConfig?.onConfirm()}
+        onCancel={() => setConfirmConfig(prev => prev ? { ...prev, isOpen: false } : null)}
+      />
     </CafeContext.Provider>
   );
 };
