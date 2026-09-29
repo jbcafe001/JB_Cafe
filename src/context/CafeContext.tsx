@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
 import { ConfirmModal } from '../components/common/ConfirmModal';
 import { ToastContainer } from '../components/common/ToastContainer';
 import {
@@ -20,7 +22,7 @@ import {
 } from '../types';
 import { INITIAL_USERS } from '../data/initialData';
 import { db } from '../firebase';
-import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
 interface CreateOrderParams {
   tableId: string;
@@ -34,6 +36,7 @@ interface CafeContextType {
   currentUser: User | null;
   currentRole: UserRole;
   isLoggedIn: boolean;
+  isAuthLoading: boolean;
   isMobileFrame: boolean;
   setIsMobileFrame: (val: boolean) => void;
   users: User[];
@@ -169,6 +172,41 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isRemoteUpdate = useRef(false);
   const [isSyncing, setIsSyncing] = useState(true);
+  // Stays true until Firebase Auth resolves — prevents login-page flash on refresh
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+
+  // Restore login session on refresh via Firebase Auth state
+  useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            const restoredUser = {
+              id: firebaseUser.uid,
+              name: data.name,
+              email: firebaseUser.email!,
+              role: data.role,
+              status: 'active' as const,
+            };
+            setCurrentUser(restoredUser);
+            setCurrentRole(data.role);
+            setIsLoggedIn(true);
+          }
+        } catch (err) {
+          console.error('Failed to restore session:', err);
+        }
+      } else {
+        // No Firebase session — ensure logged-out state
+        setIsLoggedIn(false);
+        setCurrentUser(null);
+      }
+      // Auth check is complete — allow UI to render
+      setIsAuthLoading(false);
+    });
+    return () => unsubAuth();
+  }, []);
 
   // Listen for Firestore changes — one listener per collection
   useEffect(() => {
@@ -356,9 +394,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }).catch(console.error);
 
     if (updatedTableId) {
-      setTables((prev) =>
-        prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'preparing' } : t))
-      );
+      // Write to Firebase so all clients (waiter) see the updated table status
+      updateDoc(doc(db, 'tables', updatedTableId), { status: 'preparing' }).catch(console.error);
     }
     
     addToast('Started preparing order', 'info');
@@ -931,6 +968,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         currentRole,
         isLoggedIn,
+        isAuthLoading,
         isMobileFrame,
         setIsMobileFrame,
         users,

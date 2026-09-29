@@ -251,10 +251,17 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         {/* Tables Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {tables.map((table) => {
-            const badge = getTableBadge(table.status);
-            const isReady = table.status === 'ready';
-            const isServed = table.status === 'served';
             const activeOrder = getActiveOrderForTable(table.id);
+            // Derive the real status from the active order when table record is stale
+            const effectiveStatus: typeof table.status =
+              activeOrder && table.status === 'occupied'
+                ? (activeOrder.status === 'preparing' || activeOrder.status === 'new' || activeOrder.status === 'ready' || activeOrder.status === 'served'
+                    ? activeOrder.status
+                    : table.status)
+                : table.status;
+            const badge = getTableBadge(effectiveStatus);
+            const isReady = effectiveStatus === 'ready';
+            const isServed = effectiveStatus === 'served';
 
             return (
               <div

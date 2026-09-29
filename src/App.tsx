@@ -6,7 +6,31 @@ import { KitchenView } from './components/kitchen/KitchenView';
 import { AdminView } from './components/admin/AdminView';
 
 const MainAppContent: React.FC = () => {
-  const { isLoggedIn, currentRole } = useCafe();
+  const { isLoggedIn, isAuthLoading, currentRole } = useCafe();
+
+  // Wait for Firebase Auth to resolve before rendering anything
+  // This prevents the login-page flash when the user is already logged in
+  if (isAuthLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#F9F8F6',
+      }}>
+        <div style={{
+          width: 40,
+          height: 40,
+          border: '4px solid #E7E5E4',
+          borderTop: '4px solid #D97706',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex flex-col font-sans text-[#1C1917] selection:bg-[#B45309] selection:text-white antialiased">
