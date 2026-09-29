@@ -24,7 +24,7 @@ interface WaiterActiveOrdersProps {
 type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
 
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, completeOrder, serveOrder } = useCafe();
+  const { orders, completeOrder, serveOrder, toggleItemServed } = useCafe();
 
   const [activeTabFilter, setActiveTabFilter] = useState<OrderTabFilter>('all');
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
@@ -273,12 +273,19 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                   {/* Order Items List */}
                   <div className="py-3 space-y-1.5 text-xs sm:text-sm">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-stone-800">
+                      <div key={idx} className={`flex justify-between items-center text-stone-800 ${item.served ? 'opacity-60' : ''}`}>
                         <div className="flex items-center space-x-2">
-                          <span className="w-6 h-6 rounded-md bg-stone-100 border border-stone-200 font-bold text-xs text-stone-700 flex items-center justify-center">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); toggleItemServed(order.id, idx); }}
+                            className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${item.served ? 'bg-emerald-500 text-white' : 'border border-stone-300 bg-white'}`}
+                            title="Mark as Served"
+                          >
+                            {item.served && <Check className="w-3.5 h-3.5" />}
+                          </button>
+                          <span className={`w-6 h-6 rounded-md border flex items-center justify-center font-bold text-xs ${item.served ? 'bg-stone-50 border-stone-200 text-stone-400' : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
                             {item.quantity}×
                           </span>
-                          <span className="font-semibold">{item.name}</span>
+                          <span className={`font-semibold ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
                           {item.notes && (
                             <span className="text-[10px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                               {item.notes}

@@ -55,6 +55,7 @@ export interface OrderItem {
   price: number;
   quantity: number;
   notes?: string;
+  served?: boolean;
 }
 
 export type OrderStatus = 'new' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled';

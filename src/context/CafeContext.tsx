@@ -77,6 +77,7 @@ interface CafeContextType {
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
+  toggleItemServed: (orderId: string, itemIndex: number) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
   cancelOrder: (orderId: string) => void;
 
@@ -429,6 +430,22 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     addNotification(`${tableNum} — Order ${ordNum} served to table!`, 'waiter');
+  };
+
+  const toggleItemServed = (orderId: string, itemIndex: number) => {
+    setOrders((prev) =>
+      prev.map((ord) => {
+        if (ord.id === orderId) {
+          const updatedItems = [...ord.items];
+          updatedItems[itemIndex] = {
+            ...updatedItems[itemIndex],
+            served: !updatedItems[itemIndex].served,
+          };
+          return { ...ord, items: updatedItems };
+        }
+        return ord;
+      })
+    );
   };
 
   const completeOrder = (orderId: string, paymentMethod: PaymentMethod) => {

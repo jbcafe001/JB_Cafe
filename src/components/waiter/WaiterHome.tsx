@@ -28,7 +28,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onNavigateToOrders,
   onNavigateToTables,
 }) => {
-  const { tables, orders, currentUser, serveOrder, completeOrder } = useCafe();
+  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed } = useCafe();
 
   // Selected table for quick order status / actions
   const [selectedTableForAction, setSelectedTableForAction] = useState<Table | null>(null);
@@ -346,10 +346,19 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 Ordered Items
               </span>
               {activeModalOrder.items.map((i, idx) => (
-                <div key={idx} className="flex justify-between text-stone-800">
-                  <span>
-                    {i.quantity}× {i.name}
-                  </span>
+                <div key={idx} className={`flex items-center justify-between text-stone-800 ${i.served ? 'opacity-60' : ''}`}>
+                  <div className="flex items-center space-x-2">
+                    <button 
+                      onClick={() => toggleItemServed(activeModalOrder.id, idx)}
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${i.served ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-stone-300 bg-white'}`}
+                      title="Mark as Served"
+                    >
+                      {i.served && <Check className="w-3 h-3" />}
+                    </button>
+                    <span className={i.served ? 'line-through text-stone-500' : ''}>
+                      {i.quantity}× {i.name}
+                    </span>
+                  </div>
                   <span className="font-bold">₹{i.price * i.quantity}</span>
                 </div>
               ))}
