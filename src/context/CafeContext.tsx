@@ -391,17 +391,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string) => {
-    let tableNumStr = 'Table';
-    let ordNum = '';
-    let updatedTableId: string | undefined;
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
+    const tableNumStr = existingOrder.tableNumber;
+    const ordNum = existingOrder.orderNumber;
+    const updatedTableId = existingOrder.tableId;
     
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
-          tableNumStr = ord.tableNumber;
-          ordNum = ord.orderNumber;
-          updatedTableId = ord.tableId;
-          
           const nextBatch = Math.max(...ord.items.map(i => i.batch || 1)) + 1;
           const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
           const updatedItems = [...ord.items, ...itemsWithBatch];
@@ -437,13 +436,15 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const startPreparingOrder = (orderId: string) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let updatedTableId: string | undefined;
+    const updatedTableId = existingOrder.tableId;
 
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
-          updatedTableId = ord.tableId;
           return { ...ord, status: 'preparing', preparingAt: timeStr };
         }
         return ord;
@@ -460,17 +461,17 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const markOrderReady = (orderId: string) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let tableNum = 'Table';
-    let ordNum = '';
-    let updatedTableId: string | undefined;
+    const tableNum = existingOrder.tableNumber;
+    const ordNum = existingOrder.orderNumber;
+    const updatedTableId = existingOrder.tableId;
 
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
-          tableNum = ord.tableNumber;
-          ordNum = ord.orderNumber;
-          updatedTableId = ord.tableId;
           return { ...ord, status: 'ready', readyAt: timeStr };
         }
         return ord;
@@ -489,17 +490,17 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const serveOrder = (orderId: string) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let tableNum = 'Table';
-    let ordNum = '';
-    let updatedTableId: string | undefined;
+    const tableNum = existingOrder.tableNumber;
+    const ordNum = existingOrder.orderNumber;
+    const updatedTableId = existingOrder.tableId;
 
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
-          tableNum = ord.tableNumber;
-          ordNum = ord.orderNumber;
-          updatedTableId = ord.tableId;
           return { ...ord, status: 'served', servedAt: timeStr };
         }
         return ord;
@@ -565,24 +566,23 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const completeOrder = (orderId: string, paymentMethod: PaymentMethod) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let completedOrder: Order | undefined;
+    const completedOrder = orders.find(o => o.id === orderId);
+    
+    if (!completedOrder) return;
 
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
-          completedOrder = {
+          return {
             ...ord,
             status: 'completed',
             paymentMethod,
             completedAt: timeStr,
           };
-          return completedOrder;
         }
         return ord;
       })
     );
-
-    if (!completedOrder) return;
 
     // 1. Free Table
     setTables((prev) =>
