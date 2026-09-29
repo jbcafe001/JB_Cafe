@@ -54,56 +54,11 @@ export const KitchenView: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
-      {/* KDS Header */}
-      <header className="bg-white border-b border-stone-200 px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20 shadow-2xs">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-[#B45309] flex items-center justify-center text-white shadow-xs">
-            <ChefHat className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-base sm:text-lg font-bold tracking-tight text-stone-900">
-                KITCHEN DISPLAY (KDS)
-              </h1>
-              <span className="bg-stone-100 text-stone-600 border border-stone-200 text-[10px] font-mono px-2 py-0.5 rounded-md uppercase font-bold">
-                Live Terminal
-              </span>
-            </div>
-            <p className="text-xs text-stone-500">Brew & Bite Kitchen Management</p>
-          </div>
-        </div>
 
-        {/* Live Clock & Audio Toggle */}
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-3 py-1.5 rounded-xl border text-xs flex items-center space-x-1.5 transition-colors ${
-              soundEnabled
-                ? 'bg-amber-50 border-amber-200 text-[#B45309] font-semibold'
-                : 'bg-stone-50 border-stone-200 text-stone-400'
-            }`}
-            title="Toggle Kitchen Chime"
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden sm:inline">Chime {soundEnabled ? 'ON' : 'OFF'}</span>
-          </button>
-
-          <div className="bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 font-mono text-xs font-bold text-stone-800">
-            {currentTime}
-          </div>
-
-          <button
-            onClick={logout}
-            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 bg-stone-50 border border-stone-200 hover:border-stone-300 transition-colors"
-            title="Log Out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </header>
-
-      {/* Status Bar / Filter Tabs */}
-      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2.5 flex items-center space-x-2 sm:space-x-3 overflow-x-auto no-scrollbar">
+      {/* Minimal Header (Tabs + Actions) */}
+      <div className="bg-white border-b border-stone-200 px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-20 shadow-2xs overflow-x-auto no-scrollbar gap-4">
+        
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-max">
         <button
           id="kds-tab-new"
           onClick={() => setActiveTab('new')}
@@ -167,6 +122,34 @@ export const KitchenView: React.FC = () => {
             {completedOrders.length}
           </span>
         </button>
+        </div>
+
+        {/* Live Clock & Actions */}
+        <div className="flex items-center space-x-3 min-w-max">
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`px-3 py-1.5 rounded-xl border text-xs flex items-center justify-center transition-colors ${
+              soundEnabled
+                ? 'bg-amber-50 border-amber-200 text-[#B45309]'
+                : 'bg-stone-50 border-stone-200 text-stone-400'
+            }`}
+            title="Toggle Kitchen Chime"
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
+          <div className="bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 font-mono text-xs font-bold text-stone-800">
+            {currentTime}
+          </div>
+
+          <button
+            onClick={logout}
+            className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 bg-stone-50 border border-stone-200 hover:border-red-200 transition-colors"
+            title="Log Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Main KDS Grid */}
