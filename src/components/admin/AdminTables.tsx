@@ -99,7 +99,7 @@ export const AdminTables: React.FC = () => {
                     table.status
                   )}`}
                 >
-                  {table.status}
+                  {table.status === 'occupied' ? 'Order Taken' : table.status}
                 </span>
               </div>
 

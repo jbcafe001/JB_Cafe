@@ -43,7 +43,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
         };
       case 'occupied':
         return {
-          label: 'Occupied',
+          label: 'Order Taken',
           bg: 'bg-amber-50 text-amber-800 border-amber-200',
           dot: 'bg-amber-500',
         };
@@ -147,6 +147,8 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
               ? 'All Tables'
               : st === 'ready'
               ? 'Ready to Serve'
+              : st === 'occupied'
+              ? 'Order Taken'
               : st === 'served'
               ? 'Served / Dining'
               : st}

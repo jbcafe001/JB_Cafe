@@ -52,7 +52,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         };
       case 'occupied':
         return {
-          label: 'Occupied',
+          label: 'Order Taken',
           bg: 'bg-amber-50 text-amber-800 border-amber-200',
           dot: 'bg-amber-500',
         };
