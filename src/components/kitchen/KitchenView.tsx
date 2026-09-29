@@ -17,7 +17,7 @@ import {
   LogOut,
 } from 'lucide-react';
 
-type KitchenTab = 'new' | 'preparing' | 'ready' | 'completed';
+type KitchenTab = 'new' | 'preparing' | 'ready' | 'served' | 'completed';
 
 export const KitchenView: React.FC = () => {
   const { orders, startPreparingOrder, markOrderReady, logout } = useCafe();
@@ -41,7 +41,8 @@ export const KitchenView: React.FC = () => {
   const newOrders = orders.filter((o) => o.status === 'new');
   const preparingOrders = orders.filter((o) => o.status === 'preparing');
   const readyOrders = orders.filter((o) => o.status === 'ready');
-  const completedOrders = orders.filter((o) => o.status === 'completed' || o.status === 'served').slice(0, 15);
+  const servedOrders = orders.filter((o) => o.status === 'served').slice(0, 15);
+  const completedOrders = orders.filter((o) => o.status === 'completed').slice(0, 15);
 
   const displayedOrders =
     activeTab === 'new'
@@ -50,6 +51,8 @@ export const KitchenView: React.FC = () => {
       ? preparingOrders
       : activeTab === 'ready'
       ? readyOrders
+      : activeTab === 'served'
+      ? servedOrders
       : completedOrders;
 
   return (
