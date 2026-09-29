@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import { ConfirmModal } from '../components/common/ConfirmModal';
+import { ToastContainer } from '../components/common/ToastContainer';
 import {
   UserRole,
   User,
@@ -108,6 +109,7 @@ interface CafeContextType {
   // Notification
   dismissNotification: (id: string) => void;
   clearAllNotifications: () => void;
+  addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   showConfirm: (
     title: string,
     message: string,
@@ -187,6 +189,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isDestructive?: boolean;
     onConfirm: () => void;
   } | null>(null);
+
+  const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   const isRemoteUpdate = useRef(false);
   const [isSyncing, setIsSyncing] = useState(true);
@@ -288,6 +292,14 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNotifications((prev) => [newNotif, ...prev.slice(0, 19)]);
   };
 
+  const addToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  };
+
   // Auth & Roles
   const login = (email: string, role: UserRole, name: string, uid: string) => {
     const matchedUser: User = {
@@ -373,6 +385,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Notify Kitchen
     addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
+    addToast('New order created successfully!');
 
     return newOrder;
   };
@@ -420,6 +433,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Notify Kitchen
     addNotification(`Additional items added to ${ordNum} for ${tableNumStr}`, 'cook');
+    addToast('Items added to order successfully!');
   };
 
   const startPreparingOrder = (orderId: string) => {
@@ -441,6 +455,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         prev.map((t) => (t.id === updatedTableId ? { ...t, status: 'preparing' } : t))
       );
     }
+    
+    addToast('Started preparing order', 'info');
   };
 
   const markOrderReady = (orderId: string) => {
@@ -469,6 +485,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // High priority notification to Waiter
     addNotification(`${tableNum} — Order ${ordNum} is READY!`, 'waiter');
+    addToast('Order marked as ready for serving!', 'success');
   };
 
   const serveOrder = (orderId: string) => {
@@ -496,6 +513,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     addNotification(`${tableNum} — Order ${ordNum} served to table!`, 'waiter');
+    addToast('Order served successfully!');
   };
 
   const toggleItemServed = (orderId: string, itemIndex: number) => {
@@ -533,6 +551,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return ord;
       })
     );
+    addToast('Item removed from order', 'info');
   };
 
   const completeOrder = (orderId: string, paymentMethod: PaymentMethod) => {
@@ -611,6 +630,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `Order ${completedOrder.orderNumber} completed (₹${completedOrder.total} via ${paymentMethod.toUpperCase()})`,
       'admin'
     );
+    addToast(`Payment of ₹${completedOrder.total} received via ${paymentMethod.toUpperCase()}`, 'success');
   };
 
   const cancelOrder = (orderId: string) => {
@@ -631,6 +651,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
     }
     addNotification(`Order ${ord.orderNumber} was cancelled`, 'all');
+    addToast('Order cancelled successfully', 'error');
   };
 
   // Stock Management
@@ -793,6 +814,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setExpenses((prev) => [newExp, ...prev]);
     addNotification(`New expense added: ${newExp.name} (₹${newExp.amount})`, 'admin');
+    addToast(`Expense added successfully`);
   };
 
   // Menu Management
@@ -803,16 +825,19 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setMenuItems((prev) => [...prev, newItem]);
     addNotification(`Menu item added: ${newItem.name} (₹${newItem.price})`, 'admin');
+    addToast('Menu item added successfully!');
   };
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
     setMenuItems((prev) => prev.map((m) => (m.id === id ? { ...m, ...updates } : m)));
+    addToast('Menu item updated');
   };
 
   const toggleMenuItemAvailability = (id: string) => {
     setMenuItems((prev) =>
       prev.map((m) => (m.id === id ? { ...m, available: !m.available } : m))
     );
+    addToast('Availability toggled', 'info');
   };
 
   // Table Management
@@ -822,6 +847,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: `tbl-${Date.now()}`,
     };
     setTables((prev) => [...prev, newTable]);
+    addToast('Table added successfully!');
   };
 
   const updateTable = (id: string, updates: Partial<Table>) => {
@@ -1125,6 +1151,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dismissNotification,
         clearAllNotifications,
         showConfirm,
+        addToast,
         resetDemoData,
       }}
     >
@@ -1139,6 +1166,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         onConfirm={() => confirmConfig?.onConfirm()}
         onCancel={() => setConfirmConfig(prev => prev ? { ...prev, isOpen: false } : null)}
       />
+      <ToastContainer toasts={toasts} removeToast={(id) => setToasts(prev => prev.filter(t => t.id !== id))} />
     </CafeContext.Provider>
   );
 };
