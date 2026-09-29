@@ -80,8 +80,8 @@ interface CafeContextType {
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
-  toggleItemServed: (orderId: string, itemIndex: number) => void;
-  removeItemFromOrder: (orderId: string, itemIndex: number) => void;
+  toggleItemServed: (orderId: string, itemIndex: number | number[]) => void;
+  removeItemFromOrder: (orderId: string, itemIndex: number | number[]) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
   cancelOrder: (orderId: string) => void;
 
@@ -516,15 +516,18 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addToast('Order served successfully!');
   };
 
-  const toggleItemServed = (orderId: string, itemIndex: number) => {
+  const toggleItemServed = (orderId: string, itemIndex: number | number[]) => {
+    const indices = Array.isArray(itemIndex) ? itemIndex : [itemIndex];
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
           const updatedItems = [...ord.items];
-          updatedItems[itemIndex] = {
-            ...updatedItems[itemIndex],
-            served: !updatedItems[itemIndex].served,
-          };
+          indices.forEach(idx => {
+            updatedItems[idx] = {
+              ...updatedItems[idx],
+              served: !updatedItems[idx].served,
+            };
+          });
           return { ...ord, items: updatedItems };
         }
         return ord;
@@ -532,12 +535,18 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const removeItemFromOrder = (orderId: string, itemIndex: number) => {
+  const removeItemFromOrder = (orderId: string, itemIndex: number | number[]) => {
+    const indices = Array.isArray(itemIndex) ? itemIndex : [itemIndex];
+    // Sort descending so splicing doesn't shift remaining indices
+    const sortedIndices = [...indices].sort((a, b) => b - a);
+
     setOrders((prev) =>
       prev.map((ord) => {
         if (ord.id === orderId) {
           const updatedItems = [...ord.items];
-          updatedItems.splice(itemIndex, 1);
+          sortedIndices.forEach(idx => {
+            updatedItems.splice(idx, 1);
+          });
           
           const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
           

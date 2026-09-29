@@ -24,6 +24,31 @@ interface WaiterHomeProps {
   onNavigateToTables: () => void;
 }
 
+const getGroupedItems = (items: any[]) => {
+  const grouped: any[] = [];
+  
+  items.forEach((item, idx) => {
+    const existingGroup = grouped.find(g => 
+      g.menuItemId === item.menuItemId && 
+      g.name === item.name && 
+      g.notes === item.notes && 
+      g.served === item.served
+    );
+
+    if (existingGroup) {
+      existingGroup.quantity += item.quantity;
+      existingGroup.originalIndices.push(idx);
+    } else {
+      grouped.push({
+        ...item,
+        originalIndices: [idx]
+      });
+    }
+  });
+
+  return grouped;
+};
+
 export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onSelectTable,
   onNavigateToOrders,
@@ -346,24 +371,24 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
               <span className="font-bold text-stone-400 uppercase text-[10px] block">
                 Ordered Items
               </span>
-              {activeModalOrder.items.map((i, idx) => (
-                <div key={idx} className={`flex items-center justify-between text-stone-800 ${i.served ? 'opacity-60' : ''}`}>
+              {getGroupedItems(activeModalOrder.items).map((group, groupIdx) => (
+                <div key={groupIdx} className={`flex items-center justify-between text-stone-800 ${group.served ? 'opacity-60' : ''}`}>
                   <div className="flex items-center space-x-2">
                     <button 
-                      onClick={() => toggleItemServed(activeModalOrder.id, idx)}
-                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${i.served ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-stone-300 bg-white'}`}
+                      onClick={() => toggleItemServed(activeModalOrder.id, group.originalIndices)}
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${group.served ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-stone-300 bg-white'}`}
                       title="Mark as Served"
                     >
-                      {i.served && <Check className="w-3 h-3" />}
+                      {group.served && <Check className="w-3 h-3" />}
                     </button>
-                    <span className={i.served ? 'line-through text-stone-500' : ''}>
-                      {i.quantity}× {i.name}
+                    <span className={group.served ? 'line-through text-stone-500' : ''}>
+                      {group.quantity}× {group.name}
                     </span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <span className="font-bold">₹{i.price * i.quantity}</span>
+                    <span className="font-bold">₹{group.price * group.quantity}</span>
                     <button 
-                      onClick={() => removeItemFromOrder(activeModalOrder.id, idx)}
+                      onClick={() => removeItemFromOrder(activeModalOrder.id, group.originalIndices)}
                       className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                       title="Remove Item"
                     >

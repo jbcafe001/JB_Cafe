@@ -24,6 +24,31 @@ interface WaiterActiveOrdersProps {
 
 type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
 
+const getGroupedItems = (items: any[]) => {
+  const grouped: any[] = [];
+  
+  items.forEach((item, idx) => {
+    const existingGroup = grouped.find(g => 
+      g.menuItemId === item.menuItemId && 
+      g.name === item.name && 
+      g.notes === item.notes && 
+      g.served === item.served
+    );
+
+    if (existingGroup) {
+      existingGroup.quantity += item.quantity;
+      existingGroup.originalIndices.push(idx);
+    } else {
+      grouped.push({
+        ...item,
+        originalIndices: [idx]
+      });
+    }
+  });
+
+  return grouped;
+};
+
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
   const { orders, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder } = useCafe();
 
@@ -273,32 +298,32 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
 
                   {/* Order Items List */}
                   <div className="py-3 space-y-1.5 text-xs sm:text-sm">
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className={`flex justify-between items-center text-stone-800 ${item.served ? 'opacity-60' : ''}`}>
+                    {getGroupedItems(order.items).map((group, groupIdx) => (
+                      <div key={groupIdx} className={`flex justify-between items-center text-stone-800 ${group.served ? 'opacity-60' : ''}`}>
                         <div className="flex items-center space-x-2">
                           <button 
-                            onClick={(e) => { e.stopPropagation(); toggleItemServed(order.id, idx); }}
-                            className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${item.served ? 'bg-emerald-500 text-white' : 'border border-stone-300 bg-white'}`}
+                            onClick={(e) => { e.stopPropagation(); toggleItemServed(order.id, group.originalIndices); }}
+                            className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${group.served ? 'bg-emerald-500 text-white' : 'border border-stone-300 bg-white'}`}
                             title="Mark as Served"
                           >
-                            {item.served && <Check className="w-3.5 h-3.5" />}
+                            {group.served && <Check className="w-3.5 h-3.5" />}
                           </button>
-                          <span className={`w-6 h-6 rounded-md border flex items-center justify-center font-bold text-xs ${item.served ? 'bg-stone-50 border-stone-200 text-stone-400' : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
-                            {item.quantity}×
+                          <span className={`w-6 h-6 rounded-md border flex items-center justify-center font-bold text-xs ${group.served ? 'bg-stone-50 border-stone-200 text-stone-400' : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
+                            {group.quantity}×
                           </span>
-                          <span className={`font-semibold ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
-                          {item.notes && (
+                          <span className={`font-semibold ${group.served ? 'line-through text-stone-500' : ''}`}>{group.name}</span>
+                          {group.notes && (
                             <span className="text-[10px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                              {item.notes}
+                              {group.notes}
                             </span>
                           )}
                         </div>
                         <div className="flex items-center space-x-3">
                           <span className="text-stone-700 font-bold">
-                            ₹{item.price * item.quantity}
+                            ₹{group.price * group.quantity}
                           </span>
                           <button 
-                            onClick={(e) => { e.stopPropagation(); removeItemFromOrder(order.id, idx); }}
+                            onClick={(e) => { e.stopPropagation(); removeItemFromOrder(order.id, group.originalIndices); }}
                             className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                             title="Remove Item"
                           >
