@@ -47,21 +47,28 @@ export const createDemoUsers = async () => {
 
   for (const u of demoUsers) {
     try {
-      // Create auth user
-      const userCred = await createUserWithEmailAndPassword(auth, u.email, u.password);
-      // Create firestore document
-      await setDoc(doc(db, 'users', userCred.user.uid), {
+      let uid = '';
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, u.email, u.password);
+        uid = userCred.user.uid;
+      } catch (authError: any) {
+        if (authError.code === 'auth/email-already-in-use') {
+          const loginCred = await signInWithEmailAndPassword(auth, u.email, u.password);
+          uid = loginCred.user.uid;
+        } else {
+          throw authError;
+        }
+      }
+      
+      await setDoc(doc(db, 'users', uid), {
         name: u.name,
         role: u.role,
         email: u.email
       });
-      console.log(`Created user: ${u.email}`);
+      console.log(`Created/Updated user: ${u.email}`);
     } catch (e: any) {
-      if (e.code === 'auth/email-already-in-use') {
-        console.log(`User ${u.email} already exists.`);
-      } else {
-        console.error('Error creating user:', e);
-      }
+      console.error(`Error processing user ${u.email}:`, e);
+      throw e;
     }
   }
 };
