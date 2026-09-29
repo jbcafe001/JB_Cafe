@@ -74,6 +74,7 @@ interface CafeContextType {
 
   // Order Flow
   createOrder: (params: CreateOrderParams) => Order;
+  addItemsToOrder: (orderId: string, newItems: OrderItem[], additionalNotes?: string) => void;
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
@@ -326,7 +327,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       tableNumber: tableNumStr,
       waiterId: waiterId || currentUser?.id || 'u-waiter-1',
       waiterName: waiterName || currentUser?.name || 'Rahul Sharma',
-      items,
+      items: items.map(i => ({ ...i, batch: 1 })),
       subtotal,
       tax,
       total,
@@ -356,6 +357,43 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
 
     return newOrder;
+  };
+
+  const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string) => {
+    let tableNumStr = 'Table';
+    let ordNum = '';
+    
+    setOrders((prev) =>
+      prev.map((ord) => {
+        if (ord.id === orderId) {
+          tableNumStr = ord.tableNumber;
+          ordNum = ord.orderNumber;
+          
+          const nextBatch = Math.max(...ord.items.map(i => i.batch || 1)) + 1;
+          const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
+          const updatedItems = [...ord.items, ...itemsWithBatch];
+          const subtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+          
+          let combinedNotes = ord.notes;
+          if (additionalNotes) {
+            combinedNotes = combinedNotes ? `${combinedNotes} | ${additionalNotes}` : additionalNotes;
+          }
+
+          return {
+            ...ord,
+            items: updatedItems,
+            subtotal,
+            total: subtotal + ord.tax,
+            notes: combinedNotes,
+            status: 'new' // Revert to new so kitchen sees the added items
+          };
+        }
+        return ord;
+      })
+    );
+
+    // Notify Kitchen
+    addNotification(`Additional items added to ${ordNum} for ${tableNumStr}`, 'cook');
   };
 
   const startPreparingOrder = (orderId: string) => {
@@ -996,6 +1034,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         switchRole,
         createOrder,
+        addItemsToOrder,
         startPreparingOrder,
         markOrderReady,
         serveOrder,

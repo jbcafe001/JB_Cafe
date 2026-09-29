@@ -395,6 +395,18 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
               <button
                 onClick={() => {
+                  const tableToPass = selectedTableForAction;
+                  setSelectedTableForAction(null);
+                  if (tableToPass) onSelectTable(tableToPass);
+                }}
+                className="w-full py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-sm rounded-xl flex items-center justify-center space-x-2 transition-all active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add More Items</span>
+              </button>
+
+              <button
+                onClick={() => {
                   setSelectedTableForAction(null);
                   onNavigateToOrders();
                 }}

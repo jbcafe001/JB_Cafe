@@ -228,8 +228,20 @@ export const KitchenView: React.FC = () => {
                     </div>
 
                     {/* Ordered Items List */}
-                    <div className="py-4 space-y-2.5">
-                      {order.items.map((item, idx) => (
+                    <div className="py-4">
+                      {Array.from(new Set(order.items.map(i => i.batch || 1))).sort((a,b) => a-b).map((batchNum, batchIdx) => (
+                        <div key={`batch-${batchNum}`} className={batchIdx > 0 ? "mt-4" : ""}>
+                          {batchIdx > 0 && (
+                            <div className="flex items-center space-x-2 mb-3">
+                              <div className="h-px bg-amber-200 flex-1"></div>
+                              <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                                NEW ADDITION {batchIdx}
+                              </span>
+                              <div className="h-px bg-amber-200 flex-1"></div>
+                            </div>
+                          )}
+                          <div className="space-y-2.5">
+                            {order.items.filter(i => (i.batch || 1) === batchNum).map((item, idx) => (
                         <div
                           key={idx}
                           className="flex items-center justify-between text-sm sm:text-base"
@@ -245,6 +257,9 @@ export const KitchenView: React.FC = () => {
                               {item.notes}
                             </span>
                           )}
+                        </div>
+                      ))}
+                          </div>
                         </div>
                       ))}
 

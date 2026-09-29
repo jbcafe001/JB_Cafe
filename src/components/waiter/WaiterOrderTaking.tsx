@@ -33,7 +33,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   onBack,
   onOrderSent,
 }) => {
-  const { menuItems, createOrder, currentUser } = useCafe();
+  const { menuItems, createOrder, currentUser, addItemsToOrder } = useCafe();
 
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,7 +63,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
       }
       return {
         ...prev,
-        [itemId]: { menuItemId: itemId, name, price, quantity: 1 },
+        [itemId]: { menuItemId: itemId, name, price, quantity: 1, served: false },
       };
     });
   };
@@ -91,13 +91,19 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const handleSendToKitchen = () => {
     if (cartItemsList.length === 0) return;
 
-    createOrder({
-      tableId: table.id,
-      items: cartItemsList,
-      notes: notes.trim() ? notes.trim() : undefined,
-      waiterId: currentUser?.id,
-      waiterName: currentUser?.name,
-    });
+    if (table.currentOrderId) {
+      // Append to existing active order
+      addItemsToOrder(table.currentOrderId, cartItemsList, notes.trim() ? notes.trim() : undefined);
+    } else {
+      // Create new order
+      createOrder({
+        tableId: table.id,
+        items: cartItemsList,
+        notes: notes.trim() ? notes.trim() : undefined,
+        waiterId: currentUser?.id,
+        waiterName: currentUser?.name,
+      });
+    }
 
     setIsSuccess(true);
     setTimeout(() => {
