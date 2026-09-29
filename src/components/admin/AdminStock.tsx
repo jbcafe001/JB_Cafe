@@ -136,7 +136,7 @@ export const AdminStock: React.FC = () => {
             className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
           >
             <Minus className="w-3.5 h-3.5 text-stone-600" />
-            <span>− Use Stock</span>
+            <span>Use Stock</span>
           </button>
 
           {/* Add Stock Button */}
@@ -153,7 +153,7 @@ export const AdminStock: React.FC = () => {
             className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>+ Add Stock</span>
+            <span>Add Stock</span>
           </button>
         </div>
       </div>
@@ -676,7 +676,7 @@ export const AdminStock: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
-              <h3 className="font-extrabold text-stone-900 text-base">+ Replenish Stock Item</h3>
+              <h3 className="font-extrabold text-stone-900 text-base">Replenish Stock Item</h3>
               <button
                 onClick={() => setShowAddStockModal(false)}
                 className="p-1 rounded-lg text-stone-400 hover:text-stone-700"

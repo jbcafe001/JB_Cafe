@@ -80,7 +80,7 @@ export const AdminUsers: React.FC = () => {
           className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Add User</span>
+          <span>Add User</span>
         </button>
       </div>
 
@@ -161,7 +161,7 @@ export const AdminUsers: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
-              <h3 className="font-extrabold text-stone-900 text-base">+ Add Team Member</h3>
+              <h3 className="font-extrabold text-stone-900 text-base">Add Team Member</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="p-1 rounded-lg text-stone-400 hover:text-stone-700"

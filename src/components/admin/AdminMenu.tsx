@@ -89,7 +89,7 @@ export const AdminMenu: React.FC = () => {
           className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Add Menu Item</span>
+          <span>Add Menu Item</span>
         </button>
       </div>
 
