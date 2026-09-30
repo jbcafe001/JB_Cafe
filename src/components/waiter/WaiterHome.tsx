@@ -363,39 +363,48 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
             </div>
 
             {/* Items summary */}
-            <div className="bg-stone-50 rounded-2xl p-3 space-y-1.5 text-xs">
-              <span className="font-bold text-stone-400 uppercase text-[10px] block">
+            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 shadow-inner">
+              <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-2 block">
                 Ordered Items
               </span>
-              {activeModalOrder.items.map((item, idx) => (
-                <div key={idx} className={`flex items-center justify-between text-stone-800 ${item.served ? 'opacity-60' : ''}`}>
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => toggleItemServed(activeModalOrder.id, idx)}
-                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${item.served ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-stone-300 bg-white'}`}
-                      title="Mark as Served"
-                    >
-                      {item.served && <Check className="w-3 h-3" />}
-                    </button>
-                    <span className={item.served ? 'line-through text-stone-500' : ''}>
-                      {item.quantity}× {item.name}
-                    </span>
+              <div className="space-y-0 divide-y divide-stone-200/60">
+                {activeModalOrder.items.map((item, idx) => (
+                  <div key={idx} className={`flex items-center justify-between py-2.5 transition-opacity ${item.served ? 'opacity-60' : ''}`}>
+                    <div className="flex items-center space-x-3">
+                      <button 
+                        onClick={() => toggleItemServed(activeModalOrder.id, idx)}
+                        className={`w-5 h-5 rounded-md border shadow-sm flex items-center justify-center transition-all ${item.served ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20' : 'bg-white border-stone-300 text-transparent hover:border-emerald-400'}`}
+                        title="Mark as Served"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="flex items-center space-x-2">
+                        <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${item.served ? 'text-stone-400' : 'text-stone-700'}`}>
+                          {item.quantity}×
+                        </span>
+                        <span className={`font-semibold text-sm ${item.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
+                          {item.name}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className={`font-bold text-sm ${item.served ? 'text-stone-500' : 'text-stone-900'}`}>
+                        ₹{item.price * item.quantity}
+                      </span>
+                      <button 
+                        onClick={() => removeItemFromOrder(activeModalOrder.id, idx)}
+                        className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="font-bold">₹{item.price * item.quantity}</span>
-                    <button 
-                      onClick={() => removeItemFromOrder(activeModalOrder.id, idx)}
-                      className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                      title="Remove Item"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <div className="pt-2 border-t border-stone-200 flex justify-between font-black text-sm text-stone-900">
-                <span>Total Amount</span>
-                <span className="text-amber-700">₹{activeModalOrder.total}</span>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
+                <span className="font-bold text-stone-500 text-sm uppercase tracking-wider">Total Amount</span>
+                <span className="text-lg font-black text-[#B45309]">₹{activeModalOrder.total}</span>
               </div>
             </div>
 
@@ -436,7 +445,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 <span>Add More Items</span>
               </button>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 mt-2">
                 <button
                   onClick={() => {
                     showConfirm(
@@ -449,7 +458,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       { isDestructive: true, confirmText: 'Yes, Cancel Order' }
                     );
                   }}
-                  className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-xl transition-all border border-red-100"
+                  className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl transition-all border border-red-100 flex items-center justify-center"
                 >
                   Cancel Order
                 </button>
@@ -458,9 +467,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                     setSelectedTableForAction(null);
                     onNavigateToOrders();
                   }}
-                  className="w-full py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl transition-all"
+                  className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-sm rounded-xl transition-all flex items-center justify-center"
                 >
-                  Go to Orders Feed
+                  Orders Feed
                 </button>
               </div>
             </div>

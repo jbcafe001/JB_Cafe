@@ -308,21 +308,28 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             </div>
 
             {/* Items */}
-            <div className="bg-stone-50 rounded-2xl p-3 space-y-1.5 text-xs">
-              <span className="font-bold text-stone-400 uppercase text-[10px] block">
+            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 shadow-inner">
+              <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-2 block">
                 Ordered Items
               </span>
-              {activeOrderInModal.items.map((i, idx) => (
-                <div key={idx} className="flex justify-between text-stone-800">
-                  <span>
-                    {i.quantity}× {i.name}
-                  </span>
-                  <span className="font-bold">₹{i.price * i.quantity}</span>
-                </div>
-              ))}
-              <div className="pt-2 border-t border-stone-200 flex justify-between font-black text-sm text-stone-900">
-                <span>Total Amount</span>
-                <span className="text-amber-700">₹{activeOrderInModal.total}</span>
+              <div className="space-y-0 divide-y divide-stone-200/60">
+                {activeOrderInModal.items.map((i, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-2 text-stone-800">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs text-stone-700">
+                        {i.quantity}×
+                      </span>
+                      <span className="font-semibold text-sm text-stone-800">
+                        {i.name}
+                      </span>
+                    </div>
+                    <span className="font-bold text-sm text-stone-900">₹{i.price * i.quantity}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
+                <span className="font-bold text-stone-500 text-sm uppercase tracking-wider">Total Amount</span>
+                <span className="text-lg font-black text-[#B45309]">₹{activeOrderInModal.total}</span>
               </div>
             </div>
 

@@ -262,10 +262,10 @@ export const KitchenView: React.FC = () => {
                                   <span className={`w-7 h-7 rounded-lg border font-bold flex items-center justify-center text-xs ${item.served ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
                                     {item.quantity}×
                                   </span>
-                                  <span className={`font-bold flex items-center space-x-2 ${item.served ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}`}>
-                                    <span>{item.name}</span>
+                                  <span className="font-bold flex items-center space-x-2">
+                                    <span className={item.served ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
                                     {item.served && (
-                                      <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200 no-underline">
+                                      <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200">
                                         <Check className="w-3 h-3" />
                                         <span>Already Served</span>
                                       </span>

@@ -271,6 +271,11 @@ export const AdminOrders: React.FC = () => {
     }
 
     return matchesSearch && matchesStatus && matchesDate;
+  }).sort((a, b) => {
+    // Extract numerical part from orderNumber (e.g. #1044 -> 1044) to sort descending
+    const numA = parseInt(a.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
+    const numB = parseInt(b.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
+    return numB - numA;
   });
 
   return (

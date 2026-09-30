@@ -37,7 +37,12 @@ export const AdminSales: React.FC = () => {
     }
     // 'This Week' or 'This Month'
     return completed;
-  }, [orders, selectedFilter, customDate, todayStr, yesterdayStr]);
+  }, [orders, selectedFilter, customDate, todayStr, yesterdayStr])
+  .sort((a, b) => {
+    const numA = parseInt(a.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
+    const numB = parseInt(b.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
+    return numB - numA;
+  });
 
   // Aggregations
   const totalSales = filteredOrders.reduce((sum, o) => sum + o.total, 0);
