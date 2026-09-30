@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { MenuItem, MenuItemCategory } from '../../types';
 import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee } from 'lucide-react';
+import { CustomSelect } from '../common/CustomSelect';
+import { useModalClose } from '../../hooks/useModalClose';
 
 const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Coffee',
@@ -23,6 +25,9 @@ export const AdminMenu: React.FC = () => {
   const [category, setCategory] = useState<Exclude<MenuItemCategory, 'All'>>('Coffee');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
+
+  const handleCloseModal = () => setShowAddModal(false);
+  useModalClose(handleCloseModal, showAddModal);
 
   const filteredItems = menuItems.filter(
     (item) => activeCategory === 'All' || item.category === activeCategory
@@ -179,8 +184,8 @@ export const AdminMenu: React.FC = () => {
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
               <h3 className="font-extrabold text-stone-900 text-base">
                 {editingItem ? 'Edit Menu Item' : '+ Add New Menu Item'}
@@ -209,19 +214,11 @@ export const AdminMenu: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Category</label>
-                  <select
+                  <CustomSelect
                     value={category}
-                    onChange={(e) =>
-                      setCategory(e.target.value as Exclude<MenuItemCategory, 'All'>)
-                    }
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setCategory(val as Exclude<MenuItemCategory, 'All'>)}
+                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                  />
                 </div>
 
                 <div>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { User, UserRole } from '../../types';
 import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight, User as UserIcon } from 'lucide-react';
+import { CustomSelect } from '../common/CustomSelect';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminUsers: React.FC = () => {
   const { users, addUser, toggleUserStatus } = useCafe();
@@ -10,6 +12,9 @@ export const AdminUsers: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+
+  const handleCloseModal = () => setShowAddModal(false);
+  useModalClose(handleCloseModal, showAddModal);
   const [role, setRole] = useState<UserRole>('waiter');
 
   const handleAddSubmit = (e: React.FormEvent) => {
@@ -158,8 +163,8 @@ export const AdminUsers: React.FC = () => {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
               <h3 className="font-extrabold text-stone-900 text-base">Add Team Member</h3>
               <button
@@ -197,16 +202,16 @@ export const AdminUsers: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Assigned Role *</label>
-                <select
+                <CustomSelect
                   value={role}
-                  onChange={(e) => setRole(e.target.value as UserRole)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                >
-                  <option value="waiter">Waiter (Mobile Terminal)</option>
-                  <option value="cook">Cook (KDS Display)</option>
-                  <option value="admin">Admin (Full Management)</option>
-                  <option value="others">Others (Limited Access)</option>
-                </select>
+                  onChange={(val) => setRole(val as UserRole)}
+                  options={[
+                    { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
+                    { value: 'cook', label: 'Cook (KDS Display)' },
+                    { value: 'admin', label: 'Admin (Full Management)' },
+                    { value: 'others', label: 'Others (Limited Access)' },
+                  ]}
+                />
               </div>
 
               <div>

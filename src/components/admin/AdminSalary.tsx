@@ -25,6 +25,8 @@ import {
   Users,
   Check,
 } from 'lucide-react';
+import { CustomSelect } from '../common/CustomSelect';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminSalary: React.FC = () => {
   const {
@@ -102,6 +104,12 @@ export const AdminSalary: React.FC = () => {
   });
 
   // Helper calculation for staff stats
+  useModalClose(() => setSelectedStaff(null), !!selectedStaff);
+  useModalClose(() => setShowUpaadModal(false), showUpaadModal);
+  useModalClose(() => setShowPaySalaryModal(false), showPaySalaryModal);
+  useModalClose(() => setShowAddStaffModal(false), showAddStaffModal);
+  useModalClose(() => setSelectedSalaryRecord(null), !!selectedSalaryRecord);
+
   const getStaffUpaadTotal = (staffId: string, period: string) => {
     return upaadRecords
       .filter((u) => u.staffId === staffId && u.salaryPeriod === period)
@@ -777,8 +785,8 @@ export const AdminSalary: React.FC = () => {
 
       {/* 5. EMPLOYEE DETAIL MODAL (Section 5 & Section 13) */}
       {selectedStaff && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-stone-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedStaff(null)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-stone-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="p-5 border-b border-stone-100 flex items-start justify-between bg-stone-50/60">
               <div className="flex items-center space-x-3.5">
@@ -1021,8 +1029,8 @@ export const AdminSalary: React.FC = () => {
 
       {/* 6. GIVE UPAAD / SALARY ADVANCE MODAL (Section 6 & Section 19) */}
       {showUpaadModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowUpaadModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
@@ -1046,28 +1054,37 @@ export const AdminSalary: React.FC = () => {
                 <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">
                   Employee
                 </label>
-                <select
-                  id="upaad-staff-select"
-                  value={upaadForm.staffId}
-                  disabled={!!editingUpaadRecord}
-                  onChange={(e) => {
-                    const st = staffMembers.find((s) => s.id === e.target.value);
-                    setUpaadForm({ ...upaadForm, staffId: e.target.value });
-                    setTargetStaffForAction(st || null);
-                    setUpaadError(null);
-                  }}
-                  className="w-full px-3 py-2 text-xs bg-white border border-stone-200 rounded-xl focus:outline-hidden focus:ring-1 focus:ring-amber-500 font-medium"
-                >
-                  {staffMembers.map((s) => {
-                    const upaad = getStaffUpaadTotal(s.id, s.currentPeriod);
-                    const remaining = s.monthlySalary - upaad;
-                    return (
-                      <option key={s.id} value={s.id}>
-                        {s.name} ({s.role} — Max Advance: ₹{remaining.toLocaleString()})
-                      </option>
-                    );
-                  })}
-                </select>
+                {editingUpaadRecord ? (
+                  // When editing, show disabled-style display (not interactive)
+                  <div className="w-full px-3 py-2 bg-stone-100 border border-stone-200 rounded-xl text-xs font-medium text-stone-500 cursor-not-allowed">
+                    {(() => {
+                      const st = staffMembers.find((s) => s.id === upaadForm.staffId);
+                      if (!st) return 'Select employee';
+                      const upaad = getStaffUpaadTotal(st.id, st.currentPeriod);
+                      const remaining = st.monthlySalary - upaad;
+                      return `${st.name} (${st.role} — Max Advance: ₹${remaining.toLocaleString()})`;
+                    })()}
+                  </div>
+                ) : (
+                  <CustomSelect
+                    id="upaad-staff-select"
+                    value={upaadForm.staffId}
+                    onChange={(val) => {
+                      const st = staffMembers.find((s) => s.id === val);
+                      setUpaadForm({ ...upaadForm, staffId: val });
+                      setTargetStaffForAction(st || null);
+                      setUpaadError(null);
+                    }}
+                    options={staffMembers.map((s) => {
+                      const upaad = getStaffUpaadTotal(s.id, s.currentPeriod);
+                      const remaining = s.monthlySalary - upaad;
+                      return {
+                        value: s.id,
+                        label: `${s.name} (${s.role} — Max Advance: ₹${remaining.toLocaleString()})`,
+                      };
+                    })}
+                  />
+                )}
               </div>
 
               {/* Remaining Salary Context Box (Section 19) */}
@@ -1192,8 +1209,8 @@ export const AdminSalary: React.FC = () => {
 
       {/* 9. SALARY PAYMENT CONFIRMATION MODAL (Section 9) */}
       {showPaySalaryModal && targetStaffForAction && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowPaySalaryModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-[#B45309] text-white flex items-center justify-center font-bold">
@@ -1323,8 +1340,8 @@ export const AdminSalary: React.FC = () => {
 
       {/* 4. ADD / EDIT STAFF MODAL (Section 4) */}
       {showAddStaffModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowAddStaffModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
               <h3 className="font-bold text-stone-900 text-sm">
                 {staffForm.id ? 'Edit Staff Member' : 'Add New Staff Member'}
@@ -1359,17 +1376,17 @@ export const AdminSalary: React.FC = () => {
                 <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">
                   Role
                 </label>
-                <select
+                <CustomSelect
                   id="staff-role-select"
                   value={staffForm.role}
-                  onChange={(e) => setStaffForm({ ...staffForm, role: e.target.value as StaffRole })}
-                  className="w-full px-3 py-2 text-xs bg-white border border-stone-200 rounded-xl focus:outline-hidden focus:ring-1 focus:ring-amber-500 font-medium"
-                >
-                  <option value="Waiter">Waiter</option>
-                  <option value="Kitchen">Kitchen</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Other Staff">Other Staff</option>
-                </select>
+                  onChange={(val) => setStaffForm({ ...staffForm, role: val as StaffRole })}
+                  options={[
+                    { value: 'Waiter', label: 'Waiter' },
+                    { value: 'Kitchen', label: 'Kitchen' },
+                    { value: 'Admin', label: 'Admin' },
+                    { value: 'Other Staff', label: 'Other Staff' },
+                  ]}
+                />
               </div>
 
               {/* Monthly Salary */}
@@ -1511,8 +1528,8 @@ export const AdminSalary: React.FC = () => {
 
       {/* Salary Settlement Receipt Modal */}
       {selectedSalaryRecord && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-stone-200 p-5 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedSalaryRecord(null)}>
+          <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-stone-200 p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div className="flex items-center space-x-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />

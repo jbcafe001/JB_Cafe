@@ -599,6 +599,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     addNotification(`Restocked ${quantity} ${stockItem.unit} of ${stockItem.name}`, 'admin');
+    addToast(`Restocked ${quantity} ${stockItem.unit} of ${stockItem.name}`, 'success');
   };
 
   const useStock = (
@@ -647,6 +648,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `Recorded usage: ${quantity} ${stockItem.unit} of ${stockItem.name} (${purpose})`,
       'admin'
     );
+    addToast(`Used ${quantity} ${stockItem.unit} of ${stockItem.name}`, 'info');
   };
 
   // Stock Usage calculations from all today's orders and manual usage logs
@@ -742,6 +744,13 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateTable = (id: string, updates: Partial<Table>) => {
     updateDoc(doc(db, 'tables', id), updates).catch(console.error);
+    if (updates.number !== undefined) {
+      addToast(`Table updated to Table ${updates.number}`, 'success');
+    } else if (updates.seats !== undefined) {
+      addToast('Table seating capacity updated', 'success');
+    } else if (updates.status === 'available' && updates.currentOrderId === undefined) {
+      addToast('Table freed and set to Available', 'info');
+    }
   };
 
   // User Management
@@ -752,12 +761,15 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setDoc(doc(db, 'users', newUser.id), newUser).catch(console.error);
     addNotification(`New team member added: ${newUser.name} (${newUser.role})`, 'admin');
+    addToast(`User "${newUser.name}" added successfully!`, 'success');
   };
 
   const toggleUserStatus = (id: string) => {
     const target = users.find(u => u.id === id);
     if (target) {
-      updateDoc(doc(db, 'users', id), { status: target.status === 'active' ? 'inactive' : 'active' }).catch(console.error);
+      const newStatus = target.status === 'active' ? 'inactive' : 'active';
+      updateDoc(doc(db, 'users', id), { status: newStatus }).catch(console.error);
+      addToast(`${target.name} marked as ${newStatus}`, newStatus === 'active' ? 'success' : 'info');
     }
   };
 
@@ -796,15 +808,20 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setDoc(doc(db, 'staffMembers', newStaff.id), newStaff).catch(console.error);
     addNotification(`New staff member added: ${newStaff.name} (${newStaff.role})`, 'admin');
+    addToast(`Staff member "${newStaff.name}" added successfully!`, 'success');
   };
 
   const updateStaffMember = (id: string, updates: Partial<StaffMember>) => {
+    const target = staffMembers.find(s => s.id === id);
     updateDoc(doc(db, 'staffMembers', id), updates).catch(console.error);
+    addToast(`${target ? target.name : 'Staff member'} details updated`, 'success');
   };
 
   const deleteStaffMember = (id: string) => {
+    const target = staffMembers.find(s => s.id === id);
     deleteDoc(doc(db, 'staffMembers', id)).catch(console.error);
     addNotification('Staff member removed', 'admin');
+    addToast(`${target ? target.name : 'Staff member'} removed from records`, 'error');
   };
 
   const giveUpaad = (params: { staffId: string; amount: number; date: string; note?: string }) => {
@@ -852,6 +869,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `₹${params.amount.toLocaleString()} Upaad advance recorded for ${staff.name}`,
       'admin'
     );
+    addToast(`₹${params.amount.toLocaleString()} Upaad given to ${staff.name}`, 'success');
     return { success: true };
   };
 
@@ -877,6 +895,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateDoc(doc(db, 'upaadRecords', id), updates).catch(console.error);
 
     addNotification(`Updated Upaad record for ${target.staffName}`, 'admin');
+    addToast(`Upaad record updated for ${target.staffName}`, 'success');
     return { success: true };
   };
 
@@ -885,6 +904,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (target) {
       deleteDoc(doc(db, 'upaadRecords', id)).catch(console.error);
       addNotification(`Deleted Upaad record of ₹${target.amount.toLocaleString()} for ${target.staffName}`, 'admin');
+      addToast(`Upaad record of ₹${target.amount.toLocaleString()} deleted`, 'error');
     }
   };
 
@@ -940,6 +960,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `Salary of ₹${finalSalary.toLocaleString()} paid to ${staff.name} via ${params.paymentMethod} for ${staff.currentPeriod}`,
       'admin'
     );
+    addToast(`₹${finalSalary.toLocaleString()} salary paid to ${staff.name} via ${params.paymentMethod}`, 'success');
   };
 
   const showConfirm = (

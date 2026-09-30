@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   ArrowLeft,
 } from 'lucide-react';
+import { useModalClose } from '../../hooks/useModalClose';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -41,6 +42,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [notes, setNotes] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  useModalClose(() => setShowReviewModal(false), showReviewModal);
 
   // Filter items
   const filteredItems = menuItems.filter((item) => {
@@ -278,8 +280,8 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
       {/* Order Review & Send to Kitchen Modal */}
       {showReviewModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowReviewModal(false)}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
               <div>

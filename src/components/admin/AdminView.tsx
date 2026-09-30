@@ -46,7 +46,9 @@ type AdminTab =
 
 export const AdminView: React.FC = () => {
   const { currentUser, logout, stockItems, orders } = useCafe();
-  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<AdminTab>(
+    () => (localStorage.getItem('adminActiveTab') as AdminTab) || 'dashboard'
+  );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Badge indicators
@@ -81,6 +83,7 @@ export const AdminView: React.FC = () => {
 
   const handleTabSelect = (tab: AdminTab) => {
     setActiveTab(tab);
+    localStorage.setItem('adminActiveTab', tab);
     setMobileMenuOpen(false);
   };
 

@@ -6,6 +6,7 @@ import {
   UtensilsCrossed, Hash, Table, CheckCircle2, ChefHat,
   ShoppingBag, Banknote, Smartphone,
 } from 'lucide-react';
+import { useModalClose } from '../../hooks/useModalClose';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -38,7 +39,7 @@ const StatusBadge: React.FC<{ status: string; size?: 'sm' | 'md' }> = ({ status,
 
 const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ order, onClose }) => {
   const dateStr = order.date
-    ? new Date(order.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    ? new Date(order.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
     : '—';
 
   const paymentKey = (order.paymentMethod || 'cash').toLowerCase();
@@ -51,6 +52,8 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
     batches[b].push(item);
   });
   const batchNums = Object.keys(batches).map(Number).sort((a, b) => a - b);
+
+  useModalClose(onClose);
 
   return (
     <>
@@ -395,7 +398,9 @@ export const AdminOrders: React.FC = () => {
                       className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
                     >
                       <td className="px-5 py-4 text-stone-600 font-medium whitespace-nowrap">
-                        {ord.date ? new Date(ord.date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
+                        {ord.date 
+                          ? new Date(ord.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) 
+                          : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-5 py-4 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
                       <td className="px-5 py-4 font-semibold text-stone-700">{ord.tableNumber}</td>

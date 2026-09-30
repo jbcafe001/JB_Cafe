@@ -17,6 +17,7 @@ import {
   Check,
   Trash2,
 } from 'lucide-react';
+import { useModalClose } from '../../hooks/useModalClose';
 
 interface WaiterHomeProps {
   onSelectTable: (table: Table) => void;
@@ -63,6 +64,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+
+  useModalClose(() => setSelectedTableForAction(null), !!selectedTableForAction);
+  useModalClose(() => setPaymentModalOrder(null), !!paymentModalOrder);
 
   // Ready orders for immediate serving notification
   const readyOrders = orders.filter((o) => o.status === 'ready');
@@ -366,8 +370,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
       {/* Table Detail & Action Modal (When clicking active table) */}
       {selectedTableForAction && activeModalOrder && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedTableForAction(null)}>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between border-b border-stone-100 pb-3">
               <div>
                 <span className="text-xs font-mono font-bold text-[#B45309]">
@@ -494,8 +498,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
       {/* Payment Modal */}
       {paymentModalOrder && (
-        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200">
+        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setPaymentModalOrder(null)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200" onClick={e => e.stopPropagation()}>
             {paymentSuccess ? (
               <div className="p-8 text-center flex flex-col items-center justify-center space-y-3">
                 <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center animate-bounce">

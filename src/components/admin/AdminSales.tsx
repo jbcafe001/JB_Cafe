@@ -177,8 +177,8 @@ export const AdminSales: React.FC = () => {
             <tbody className="divide-y divide-stone-100 text-stone-800">
               {filteredOrders.map((ord) => {
                 const dateDisplay = ord.createdAt.includes('-')
-                  ? ord.createdAt
-                  : 'Today';
+                  ? new Date(ord.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                  : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
                 const timeDisplay = ord.completedAt || ord.createdAt;
 
                 return (

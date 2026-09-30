@@ -20,6 +20,8 @@ import {
   User,
   Info,
 } from 'lucide-react';
+import { CustomSelect } from '../common/CustomSelect';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminStock: React.FC = () => {
   const { stockItems, addStock, useStock, todayStockUsage, materialUsageLogs } = useCafe();
@@ -40,6 +42,9 @@ export const AdminStock: React.FC = () => {
 
   // Material Usage Log filter
   const [selectedMaterialFilter, setSelectedMaterialFilter] = useState('all');
+
+  useModalClose(() => setShowUseStockModal(false), showUseStockModal);
+  useModalClose(() => setShowAddStockModal(false), showAddStockModal);
 
   // Overview metrics
   const totalItems = stockItems.length;
@@ -426,18 +431,15 @@ export const AdminStock: React.FC = () => {
           {/* Filter by Material */}
           <div className="flex items-center space-x-2">
             <Filter className="w-3.5 h-3.5 text-stone-400" />
-            <select
+            <CustomSelect
               value={selectedMaterialFilter}
-              onChange={(e) => setSelectedMaterialFilter(e.target.value)}
-              className="text-xs font-semibold px-2.5 py-1.5 bg-stone-50 border border-stone-200 rounded-xl focus:outline-hidden focus:ring-1 focus:ring-amber-500"
-            >
-              <option value="all">All Materials ({materialUsageLogs.length})</option>
-              {stockItems.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setSelectedMaterialFilter(val)}
+              options={[
+                { value: 'all', label: `All Materials (${materialUsageLogs.length})` },
+                ...stockItems.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+              className="w-44"
+            />
           </div>
         </div>
 
@@ -500,8 +502,8 @@ export const AdminStock: React.FC = () => {
 
       {/* − Record Material Used Modal */}
       {showUseStockModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowUseStockModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-stone-200 flex items-center justify-center text-stone-700">
@@ -524,17 +526,14 @@ export const AdminStock: React.FC = () => {
               {/* Select Material */}
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Select Material *</label>
-                <select
+                <CustomSelect
                   value={selectedStockItemId}
-                  onChange={(e) => handleStockSelectChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden font-medium"
-                >
-                  {stockItems.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} (Available: {s.available} {s.unit})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleStockSelectChange(val)}
+                  options={stockItems.map((s) => ({
+                    value: s.id,
+                    label: `${s.name} (Available: ${s.available} ${s.unit})`,
+                  }))}
+                />
               </div>
 
               {/* Quantity Used with Quick Chips */}
@@ -585,19 +584,19 @@ export const AdminStock: React.FC = () => {
                 <label className="block font-semibold text-stone-700 mb-1">
                   Purpose / Where Material Was Used *
                 </label>
-                <select
+                <CustomSelect
                   value={usePurpose}
-                  onChange={(e) => setUsePurpose(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden font-medium"
-                >
-                  <option value="Kitchen Cooking & Prep">🍳 Kitchen Cooking & Prep</option>
-                  <option value="Espresso & Beverage Bar">☕ Espresso & Beverage Bar</option>
-                  <option value="Sandwich & Bakery Station">🥪 Sandwich & Bakery Station</option>
-                  <option value="Spillage / Wastage / Expired">🥄 Spillage / Wastage / Expired</option>
-                  <option value="Staff Tasting / Shift Meal">👥 Staff Tasting / Shift Meal</option>
-                  <option value="Inventory Adjustment / Shrinkage">📦 Inventory Adjustment / Shrinkage</option>
-                  <option value="Custom Note">📝 Custom Purpose</option>
-                </select>
+                  onChange={(val) => setUsePurpose(val)}
+                  options={[
+                    { value: 'Kitchen Cooking & Prep', label: '🍳 Kitchen Cooking & Prep' },
+                    { value: 'Espresso & Beverage Bar', label: '☕ Espresso & Beverage Bar' },
+                    { value: 'Sandwich & Bakery Station', label: '🥪 Sandwich & Bakery Station' },
+                    { value: 'Spillage / Wastage / Expired', label: '🥄 Spillage / Wastage / Expired' },
+                    { value: 'Staff Tasting / Shift Meal', label: '👥 Staff Tasting / Shift Meal' },
+                    { value: 'Inventory Adjustment / Shrinkage', label: '📦 Inventory Adjustment / Shrinkage' },
+                    { value: 'Custom Note', label: '📝 Custom Purpose' },
+                  ]}
+                />
               </div>
 
               {/* Optional Notes */}
@@ -673,8 +672,8 @@ export const AdminStock: React.FC = () => {
 
       {/* + Add Stock Modal (Restock) */}
       {showAddStockModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowAddStockModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
               <h3 className="font-extrabold text-stone-900 text-base">Replenish Stock Item</h3>
               <button
@@ -688,17 +687,14 @@ export const AdminStock: React.FC = () => {
             <form onSubmit={handleAddStockSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Select Item *</label>
-                <select
+                <CustomSelect
                   value={selectedStockItemId}
-                  onChange={(e) => handleStockSelectChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                >
-                  {stockItems.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} (Current: {s.available} {s.unit})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleStockSelectChange(val)}
+                  options={stockItems.map((s) => ({
+                    value: s.id,
+                    label: `${s.name} (Current: ${s.available} ${s.unit})`,
+                  }))}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
