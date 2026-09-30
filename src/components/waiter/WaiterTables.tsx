@@ -190,12 +190,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           {filteredTables.map((table) => {
             const activeOrder = getActiveOrderForTable(table.id);
             // Derive the real status from the active order when table record is stale
-            const effectiveStatus: typeof table.status =
-              activeOrder && table.status === 'occupied'
-                ? (activeOrder.status === 'preparing' || activeOrder.status === 'new' || activeOrder.status === 'ready' || activeOrder.status === 'served'
-                    ? activeOrder.status
-                    : table.status)
-                : table.status;
+            const effectiveStatus: typeof table.status = activeOrder
+              ? (activeOrder.status === 'new' ? 'occupied' : activeOrder.status as typeof table.status)
+              : table.status;
             const badge = getStatusBadge(effectiveStatus);
             const isReady = effectiveStatus === 'ready';
             const isServed = effectiveStatus === 'served';
@@ -232,12 +229,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
                 <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-sm">
                   {activeOrder ? (
-                    <div className="text-xs sm:text-sm text-stone-600">
-                      <span className="font-mono font-bold text-stone-800">
-                        {activeOrder.orderNumber}
-                      </span>
-                      <span className="ml-1 text-stone-400">• ₹{activeOrder.total}</span>
-                    </div>
+                    <span className="text-stone-500 font-medium text-xs sm:text-sm">
+                      {isServed ? 'Dining in progress' : 'Order in progress'}
+                    </span>
                   ) : (
                     <span className="text-amber-700 font-bold flex items-center space-x-1.5">
                       <Plus className="w-4 h-4" />

@@ -475,6 +475,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updatedItems.splice(idx, 1);
     });
     
+    if (updatedItems.length === 0) {
+      cancelOrder(orderId);
+      addToast('Order auto-cancelled as all items were removed', 'info');
+      return;
+    }
+
     const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     
     updateDoc(doc(db, 'orders', orderId), {

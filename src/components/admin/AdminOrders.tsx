@@ -39,7 +39,7 @@ const StatusBadge: React.FC<{ status: string; size?: 'sm' | 'md' }> = ({ status,
 
 const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ order, onClose }) => {
   const dateStr = order.date
-    ? new Date(order.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+    ? new Date(order.date).toLocaleDateString('en-GB')
     : '—';
 
   const paymentKey = (order.paymentMethod || 'cash').toLowerCase();
@@ -399,8 +399,8 @@ export const AdminOrders: React.FC = () => {
                     >
                       <td className="px-5 py-4 text-stone-600 font-medium whitespace-nowrap">
                         {ord.date 
-                          ? new Date(ord.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) 
-                          : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          ? new Date(ord.date).toLocaleDateString('en-GB') 
+                          : new Date().toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-5 py-4 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
                       <td className="px-5 py-4 font-semibold text-stone-700">{ord.tableNumber}</td>
