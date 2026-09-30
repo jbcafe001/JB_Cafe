@@ -364,16 +364,23 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       combinedNotes = combinedNotes ? `${combinedNotes} | ${additionalNotes}` : additionalNotes;
     }
 
+    let nextStatus = existingOrder.status;
+    // Only revert to 'new' if the kitchen had already finished the previous items
+    if (['ready', 'served', 'completed'].includes(existingOrder.status)) {
+      nextStatus = 'new';
+    }
+
     updateDoc(doc(db, 'orders', orderId), {
       items: updatedItems,
       subtotal,
       total: subtotal + existingOrder.tax,
       notes: combinedNotes,
-      status: 'new' // Revert to new so kitchen sees the added items
+      status: nextStatus
     }).catch(console.error);
 
     if (updatedTableId) {
-      updateDoc(doc(db, 'tables', updatedTableId), { status: 'occupied' }).catch(console.error);
+      const tableStatus = nextStatus === 'new' ? 'occupied' : nextStatus;
+      updateDoc(doc(db, 'tables', updatedTableId), { status: tableStatus }).catch(console.error);
     }
 
     // Notify Kitchen

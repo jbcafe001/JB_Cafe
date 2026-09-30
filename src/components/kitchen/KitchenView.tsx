@@ -17,7 +17,7 @@ import {
   LogOut,
 } from 'lucide-react';
 
-type KitchenTab = 'new' | 'preparing' | 'ready' | 'served' | 'completed';
+type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
 export const KitchenView: React.FC = () => {
   const { orders, startPreparingOrder, markOrderReady, logout } = useCafe();
@@ -42,7 +42,6 @@ export const KitchenView: React.FC = () => {
   const preparingOrders = orders.filter((o) => o.status === 'preparing');
   const readyOrders = orders.filter((o) => o.status === 'ready');
   const servedOrders = orders.filter((o) => o.status === 'served').slice(0, 15);
-  const completedOrders = orders.filter((o) => o.status === 'completed').slice(0, 15);
 
   const displayedOrders =
     activeTab === 'new'
@@ -51,9 +50,7 @@ export const KitchenView: React.FC = () => {
         ? preparingOrders
         : activeTab === 'ready'
           ? readyOrders
-          : activeTab === 'served'
-            ? servedOrders
-            : completedOrders;
+          : servedOrders;
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
@@ -165,20 +162,6 @@ export const KitchenView: React.FC = () => {
             </span>
           </button>
 
-          <button
-            id="kds-tab-completed"
-            onClick={() => setActiveTab('completed')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'completed'
-                ? 'bg-stone-700 text-white shadow-xs'
-                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
-              }`}
-          >
-            <Check className="w-4 h-4" />
-            <span>COMPLETED</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
-              {completedOrders.length}
-            </span>
-          </button>
         </div>
       </div>
 

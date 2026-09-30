@@ -288,8 +288,8 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       {/* Active Table Details Modal */}
       {activeTableModal && activeOrderInModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setActiveTableModal(null)}>
-          <div className="bg-white rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-            <div className="flex items-start justify-between border-b border-stone-100 pb-3">
+          <div className="bg-white rounded-3xl w-full max-w-md p-4 shadow-2xl space-y-3 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between border-b border-stone-100 pb-2.5">
               <div>
                 <span className="text-xs font-mono font-bold text-[#B45309]">
                   {activeOrderInModal.orderNumber}
@@ -308,13 +308,13 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             </div>
 
             {/* Items */}
-            <div className="bg-stone-50 rounded-2xl p-4 border border-stone-100 shadow-inner">
-              <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-2 block">
+            <div className="bg-stone-50 rounded-2xl p-3 border border-stone-100 shadow-inner max-h-[50vh] overflow-y-auto">
+              <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-1.5 block">
                 Ordered Items
               </span>
               <div className="space-y-0 divide-y divide-stone-200/60">
                 {activeOrderInModal.items.map((i, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-2 text-stone-800">
+                  <div key={idx} className="flex items-center justify-between py-1.5 text-stone-800">
                     <div className="flex items-center space-x-2">
                       <span className="w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs text-stone-700">
                         {i.quantity}×
@@ -327,21 +327,21 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                   </div>
                 ))}
               </div>
-              <div className="mt-3 pt-3 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
+              <div className="mt-2 pt-2 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
                 <span className="font-bold text-stone-500 text-sm uppercase tracking-wider">Total Amount</span>
                 <span className="text-lg font-black text-[#B45309]">₹{activeOrderInModal.total}</span>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2">
               {activeOrderInModal.status === 'ready' && (
                 <button
                   onClick={() => {
                     handleServeTable(activeOrderInModal.id);
                     setActiveTableModal(null);
                   }}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <Utensils className="w-4 h-4" />
                   <span>Serve to {activeTableModal.name}</span>
@@ -351,7 +351,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
               {activeOrderInModal.status === 'served' && (
                 <button
                   onClick={() => handleOpenPayment(activeOrderInModal)}
-                  className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                  className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <CreditCard className="w-4 h-4 text-amber-400" />
                   <span>Settle Bill & Collect Payment</span>
