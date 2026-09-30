@@ -308,7 +308,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             </div>
 
             {/* Items */}
-            <div className="bg-stone-50 rounded-2xl p-3 space-y-1.5 text-xs max-h-40 overflow-y-auto">
+            <div className="bg-stone-50 rounded-2xl p-3 space-y-1.5 text-xs">
               <span className="font-bold text-stone-400 uppercase text-[10px] block">
                 Ordered Items
               </span>
