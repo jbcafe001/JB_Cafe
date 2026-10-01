@@ -21,7 +21,7 @@ import {
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
 export const KitchenView: React.FC = () => {
-  const { orders, startPreparingOrder, markOrderReady, logout, currentUser, settings } = useCafe();
+  const { orders, startPreparingOrder, markOrderReady, logout, currentUser, settings, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('jb_cafe_kds_sound') !== 'false';
@@ -132,7 +132,14 @@ export const KitchenView: React.FC = () => {
                 {initials}
               </div>
               <button
-                onClick={logout}
+                onClick={() => {
+                  showConfirm(
+                    'Logout',
+                    'Are you sure you want to log out?',
+                    () => logout(),
+                    { isDestructive: true, confirmText: 'Logout' }
+                  );
+                }}
                 className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/10 border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors ml-1"
                 title="Log Out"
               >

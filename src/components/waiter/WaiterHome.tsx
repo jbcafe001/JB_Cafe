@@ -220,7 +220,12 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 <button
                   onClick={() => {
                     setIsAvatarMenuOpen(false);
-                    logout();
+                    showConfirm(
+                      'Logout',
+                      'Are you sure you want to log out?',
+                      () => logout(),
+                      { isDestructive: true, confirmText: 'Logout' }
+                    );
                   }}
                   className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
                 >

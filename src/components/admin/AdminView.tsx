@@ -45,7 +45,7 @@ type AdminTab =
   | 'settings';
 
 export const AdminView: React.FC = () => {
-  const { currentUser, logout, stockItems, orders } = useCafe();
+  const { currentUser, logout, stockItems, orders, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<AdminTab>(
     () => (localStorage.getItem('adminActiveTab') as AdminTab) || 'dashboard'
   );
@@ -174,7 +174,14 @@ export const AdminView: React.FC = () => {
             </div>
 
             <button
-              onClick={logout}
+              onClick={() => {
+                showConfirm(
+                  'Logout',
+                  'Are you sure you want to sign out?',
+                  () => logout(),
+                  { isDestructive: true, confirmText: 'Sign Out' }
+                );
+              }}
               className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
               title="Sign Out"
             >

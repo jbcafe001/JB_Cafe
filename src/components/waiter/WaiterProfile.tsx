@@ -3,7 +3,7 @@ import { useCafe } from '../../context/CafeContext';
 import { User, LogOut, Coffee, Shield, ChefHat, Smartphone } from 'lucide-react';
 
 export const WaiterProfile: React.FC = () => {
-  const { currentUser, logout, switchRole } = useCafe();
+  const { currentUser, logout, switchRole, showConfirm } = useCafe();
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 bg-[#F8F6F0]">
@@ -29,7 +29,14 @@ export const WaiterProfile: React.FC = () => {
       </div>
 
       <button
-        onClick={logout}
+        onClick={() => {
+          showConfirm(
+            'Logout',
+            'Are you sure you want to log out of your shift?',
+            () => logout(),
+            { isDestructive: true, confirmText: 'Logout' }
+          );
+        }}
         className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors"
       >
         <LogOut className="w-4 h-4" />
