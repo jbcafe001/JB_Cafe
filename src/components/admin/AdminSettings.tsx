@@ -12,6 +12,22 @@ export const AdminSettings: React.FC = () => {
     setTimeout(() => setResetDone(false), 3000);
   };
 
+  const [profile, setProfile] = useState({
+    cafeName: 'BREW & BITE Café',
+    currencySymbol: 'INR (₹)',
+    outletTerminal: 'Main Dining Floor — POS #01',
+    taxConfig: '5% Inclusive CGST + SGST'
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveProfile = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      setIsSaving(false);
+      alert('Settings saved successfully!');
+    }, 600);
+  };
+
   return (
     <div className="max-w-2xl space-y-6">
       <div>
@@ -21,19 +37,28 @@ export const AdminSettings: React.FC = () => {
 
       {/* Café Profile Card */}
       <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs space-y-4">
-        <h3 className="font-extrabold text-stone-900 text-sm flex items-center space-x-2">
-          <Coffee className="w-4 h-4 text-amber-600" />
-          <span>Café Profile</span>
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-extrabold text-stone-900 text-sm flex items-center space-x-2">
+            <Coffee className="w-4 h-4 text-amber-600" />
+            <span>Café Profile</span>
+          </h3>
+          <button
+            onClick={handleSaveProfile}
+            disabled={isSaving}
+            className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+          >
+            {isSaving ? 'Saving...' : 'Save Settings'}
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
             <label className="block text-stone-500 font-semibold mb-1">Café Name</label>
             <input
               type="text"
-              readOnly
-              value="BREW & BITE Café"
-              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-bold text-stone-800 focus:outline-hidden"
+              value={profile.cafeName}
+              onChange={(e) => setProfile({ ...profile, cafeName: e.target.value })}
+              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-bold text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
 
@@ -41,9 +66,9 @@ export const AdminSettings: React.FC = () => {
             <label className="block text-stone-500 font-semibold mb-1">Currency Symbol</label>
             <input
               type="text"
-              readOnly
-              value="INR (₹)"
-              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-bold text-stone-800 focus:outline-hidden"
+              value={profile.currencySymbol}
+              onChange={(e) => setProfile({ ...profile, currencySymbol: e.target.value })}
+              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-bold text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
 
@@ -51,9 +76,9 @@ export const AdminSettings: React.FC = () => {
             <label className="block text-stone-500 font-semibold mb-1">Outlet Terminal</label>
             <input
               type="text"
-              readOnly
-              value="Main Dining Floor — POS #01"
-              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-medium text-stone-700 focus:outline-hidden"
+              value={profile.outletTerminal}
+              onChange={(e) => setProfile({ ...profile, outletTerminal: e.target.value })}
+              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-medium text-stone-700 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
 
@@ -61,9 +86,9 @@ export const AdminSettings: React.FC = () => {
             <label className="block text-stone-500 font-semibold mb-1">Tax / GST Configuration</label>
             <input
               type="text"
-              readOnly
-              value="5% Inclusive CGST + SGST"
-              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-medium text-stone-700 focus:outline-hidden"
+              value={profile.taxConfig}
+              onChange={(e) => setProfile({ ...profile, taxConfig: e.target.value })}
+              className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-medium text-stone-700 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
             />
           </div>
         </div>
