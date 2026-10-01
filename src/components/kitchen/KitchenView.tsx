@@ -15,12 +15,13 @@ import {
   VolumeX,
   Utensils,
   LogOut,
+  Coffee,
 } from 'lucide-react';
 
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
 export const KitchenView: React.FC = () => {
-  const { orders, startPreparingOrder, markOrderReady, logout } = useCafe();
+  const { orders, startPreparingOrder, markOrderReady, logout, currentUser, settings } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('jb_cafe_kds_sound') !== 'false';
@@ -59,51 +60,85 @@ export const KitchenView: React.FC = () => {
           ? readyOrders
           : servedOrders;
 
+  const cafeName = settings?.cafeName || 'BREW & BITE Café';
+
+  const initials = (currentUser?.name || 'Cook')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
-
       {/* Fixed Header & Tabs Container */}
       <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
-        {/* Compact KDS Header */}
-        <header className="bg-white border-b border-stone-100 px-4 sm:px-6 py-2 flex items-center justify-between">
+        {/* Custom Kitchen Header */}
+        <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+          
+          {/* Left: Cafe Name & Logo */}
           <div className="flex items-center space-x-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#B45309] flex items-center justify-center text-white shadow-xs">
-              <ChefHat className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner shrink-0">
+              {settings?.logoUrl ? (
+                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-lg" />
+              ) : (
+                <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-sm sm:text-base font-bold tracking-tight text-stone-900">
-                KITCHEN DISPLAY (KDS)
+            <div className="flex flex-col">
+              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight leading-tight">
+                {cafeName}
               </h1>
-              <span className="bg-stone-100 text-stone-600 border border-stone-200 text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
-                Live Terminal
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] sm:text-xs text-white/80 font-medium tracking-wide uppercase">
+                  Kitchen Display (KDS)
+                </span>
+                <span className="bg-white/20 text-white border border-white/30 text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
+                  Live
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Live Clock & Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-max">
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`px-2.5 py-1.5 rounded-lg border text-xs flex items-center justify-center transition-colors ${soundEnabled
-                  ? 'bg-amber-50 border-amber-200 text-[#B45309]'
-                  : 'bg-stone-50 border-stone-200 text-stone-400'
+          {/* Right: Actions, Clock, Profile */}
+          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3 sm:space-x-4">
+            {/* KDS Controls */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${
+                  soundEnabled
+                    ? 'bg-white text-[#B45309] border-transparent'
+                    : 'bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white'
                 }`}
-              title="Toggle Kitchen Chime"
-            >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            </button>
+                title="Toggle Kitchen Chime"
+              >
+                {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              </button>
 
-            <div className="bg-stone-50 px-2.5 py-1.5 rounded-lg border border-stone-200 font-mono text-xs font-bold text-stone-800">
-              {currentTime}
+              <div className="bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/20 font-mono text-xs font-bold text-white hidden sm:block">
+                {currentTime}
+              </div>
             </div>
 
-            <button
-              onClick={logout}
-              className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 bg-stone-50 border border-stone-200 hover:border-red-200 transition-colors"
-              title="Log Out"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
+            <div className="w-px h-6 bg-white/20 hidden sm:block"></div>
+
+            {/* Profile Avatar & Name */}
+            <div className="flex items-center space-x-2.5">
+              <span className="text-sm font-medium hidden sm:inline-block">
+                Hello, {currentUser?.name || 'Cook'}
+              </span>
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] shrink-0">
+                {initials}
+              </div>
+              <button
+                onClick={logout}
+                className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/10 border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors ml-1"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </header>
 
