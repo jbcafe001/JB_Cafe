@@ -542,21 +542,11 @@ export const AdminSalary: React.FC = () => {
                     >
                       {/* Employee Name */}
                       <td className="px-5 py-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-9 h-9 rounded-xl bg-stone-100 border border-stone-200 font-black text-stone-700 flex items-center justify-center text-xs">
-                            {staff.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')
-                              .slice(0, 2)}
-                          </div>
-                          <div>
-                            <p className="font-bold text-stone-900 flex items-center space-x-1.5">
-                              <span>{staff.name}</span>
-                              <ChevronRight className="w-3 h-3 text-stone-300 group-hover:text-amber-600 transition-colors" />
-                            </p>
-                            <p className="text-[11px] text-stone-400">{staff.phone}</p>
-                          </div>
+                        <div>
+                          <p className="font-bold text-stone-900 flex items-center space-x-1.5">
+                            <span>{staff.name}</span>
+                          </p>
+                          <p className="text-[11px] text-stone-400">{staff.phone}</p>
                         </div>
                       </td>
 
@@ -568,8 +558,21 @@ export const AdminSalary: React.FC = () => {
                       </td>
 
                       {/* Monthly Salary */}
-                      <td className="px-4 py-4 font-semibold text-stone-800">
-                        ₹{staff.monthlySalary.toLocaleString()}
+                      <td className="px-4 py-4 font-semibold text-stone-800" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-stone-500">₹</span>
+                          <input 
+                            type="number"
+                            defaultValue={staff.monthlySalary}
+                            onBlur={(e) => {
+                              const val = parseInt(e.target.value);
+                              if(!isNaN(val) && val >= 0 && val !== staff.monthlySalary) {
+                                updateStaffMember(staff.id, { ...staff, monthlySalary: val });
+                              }
+                            }}
+                            className="w-20 bg-transparent border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-hidden text-stone-800 font-bold px-1"
+                          />
+                        </div>
                       </td>
 
                       {/* Upaad Taken */}
@@ -632,7 +635,7 @@ export const AdminSalary: React.FC = () => {
                               className="px-3 py-1.5 bg-[#B45309] hover:bg-amber-800 text-white text-xs font-bold rounded-lg shadow-2xs transition-all active:scale-95 flex items-center space-x-1"
                             >
                               <CreditCard className="w-3 h-3" />
-                              <span>Pay Salary</span>
+                              <span>Pay</span>
                             </button>
                           ) : (
                             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">

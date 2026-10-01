@@ -22,7 +22,14 @@ type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 export const KitchenView: React.FC = () => {
   const { orders, startPreparingOrder, markOrderReady, logout } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return localStorage.getItem('jb_cafe_kds_sound') !== 'false';
+  });
+
+  // Keep localStorage in sync when soundEnabled changes
+  useEffect(() => {
+    localStorage.setItem('jb_cafe_kds_sound', String(soundEnabled));
+  }, [soundEnabled]);
   const [currentTime, setCurrentTime] = useState(
     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   );
