@@ -27,6 +27,52 @@ import {
 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
+// Helper component for inline editable salary
+const EditableSalary: React.FC<{
+  staff: StaffMember;
+  onUpdate: (id: string, val: number) => void;
+}> = ({ staff, onUpdate }) => {
+  const [val, setVal] = useState(staff.monthlySalary.toString());
+  const [isEditing, setIsEditing] = useState(false);
+
+  React.useEffect(() => {
+    setVal(staff.monthlySalary.toString());
+  }, [staff.monthlySalary]);
+
+  const handleBlur = () => {
+    setIsEditing(false);
+    const parsed = parseInt(val, 10);
+    if (!isNaN(parsed) && parsed >= 0 && parsed !== staff.monthlySalary) {
+      onUpdate(staff.id, parsed);
+    } else {
+      setVal(staff.monthlySalary.toString());
+    }
+  };
+
+  return (
+    <div 
+      className={`flex items-center space-x-1 border-b transition-colors px-1 max-w-fit ${isEditing ? 'border-amber-500 bg-amber-50 rounded-t-md' : 'border-stone-300 hover:border-amber-400'}`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <span className="text-stone-500 select-none">₹</span>
+      <input
+        type="number"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onFocus={() => setIsEditing(true)}
+        onBlur={handleBlur}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.currentTarget.blur();
+          }
+        }}
+        title="Click to edit salary"
+        className="w-20 bg-transparent focus:outline-hidden text-stone-800 font-bold"
+      />
+      <Edit2 className={`w-3 h-3 text-stone-400 transition-opacity ${isEditing ? 'opacity-0' : 'opacity-100 group-hover:text-amber-600'}`} />
+    </div>
+  );
+};
 
 export const AdminSalary: React.FC = () => {
   const {
@@ -558,21 +604,11 @@ export const AdminSalary: React.FC = () => {
                       </td>
 
                       {/* Monthly Salary */}
-                      <td className="px-4 py-4 font-semibold text-stone-800" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center space-x-1">
-                          <span className="text-stone-500">₹</span>
-                          <input 
-                            type="number"
-                            defaultValue={staff.monthlySalary}
-                            onBlur={(e) => {
-                              const val = parseInt(e.target.value);
-                              if(!isNaN(val) && val >= 0 && val !== staff.monthlySalary) {
-                                updateStaffMember(staff.id, { ...staff, monthlySalary: val });
-                              }
-                            }}
-                            className="w-20 bg-transparent border-b border-transparent hover:border-stone-300 focus:border-amber-500 focus:outline-hidden text-stone-800 font-bold px-1"
-                          />
-                        </div>
+                      <td className="px-4 py-4 font-semibold text-stone-800">
+                        <EditableSalary 
+                          staff={staff} 
+                          onUpdate={(id, val) => updateStaffMember(id, { ...staff, monthlySalary: val })}
+                        />
                       </td>
 
                       {/* Upaad Taken */}

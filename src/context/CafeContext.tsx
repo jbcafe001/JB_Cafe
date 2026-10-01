@@ -19,6 +19,7 @@ import {
   StaffMember,
   UpaadRecord,
   SalaryPaymentRecord,
+  CafeSettings,
 } from '../types';
 import { INITIAL_USERS } from '../data/initialData';
 import { db } from '../firebase';
@@ -111,6 +112,10 @@ interface CafeContextType {
 
   // Demo Controls
   resetDemoData: () => void;
+
+  // Settings
+  settings: CafeSettings;
+  updateSettings: (updates: Partial<CafeSettings>) => void;
 }
 
 const STORAGE_KEY = 'brew_and_bite_cafe_state_v1';
@@ -156,7 +161,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [upaadRecords, setUpaadRecords] = useState<UpaadRecord[]>([]);
   const [salaryHistory, setSalaryHistory] = useState<SalaryPaymentRecord[]>([]);
   const [notifications, setNotifications] = useState<CafeNotification[]>([]);
-
+  const [settings, setSettings] = useState<CafeSettings>({
+    cafeName: 'BREW & BITE Café',
+    currencySymbol: 'INR (₹)',
+    outletTerminal: 'Main Dining Floor — POS #01',
+    taxConfig: '5% Inclusive CGST + SGST'
+  });
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -232,6 +242,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     attachListener('upaadRecords', setUpaadRecords);
     attachListener('salaryHistory', setSalaryHistory);
     attachListener('notifications', setNotifications);
+
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'cafeProfile'), (snap) => {
+      if (snap.exists()) {
+        setSettings(snap.data() as CafeSettings);
+      } else {
+        // Create initial settings document if it doesn't exist
+        setDoc(doc(db, 'settings', 'cafeProfile'), settings).catch(console.error);
+      }
+    });
+    unsubs.push(unsubSettings);
 
     return () => {
       unsubs.forEach(unsub => unsub());
@@ -996,6 +1016,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addToast('Demo reset is disabled. You are now using live Firebase data!', 'info');
   };
 
+  const updateSettings = (updates: Partial<CafeSettings>) => {
+    updateDoc(doc(db, 'settings', 'cafeProfile'), updates).catch(console.error);
+    addToast('Settings saved successfully!', 'success');
+  };
+
   return (
     <CafeContext.Provider
       value={{
@@ -1017,6 +1042,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         upaadRecords,
         salaryHistory,
         notifications,
+        settings,
+        updateSettings,
         login,
         logout,
         switchRole,

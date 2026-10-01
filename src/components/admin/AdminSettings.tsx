@@ -3,7 +3,7 @@ import { useCafe } from '../../context/CafeContext';
 import { Coffee, RotateCcw, Shield, Check, Info } from 'lucide-react';
 
 export const AdminSettings: React.FC = () => {
-  const { resetDemoData, addToast } = useCafe();
+  const { resetDemoData, settings, updateSettings } = useCafe();
   const [resetDone, setResetDone] = useState(false);
 
   const handleReset = () => {
@@ -12,30 +12,20 @@ export const AdminSettings: React.FC = () => {
     setTimeout(() => setResetDone(false), 3000);
   };
 
-  const [profile, setProfile] = useState(() => {
-    const saved = localStorage.getItem('jb_cafe_settings_profile');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        // ignore JSON parse error
-      }
-    }
-    return {
-      cafeName: 'BREW & BITE Café',
-      currencySymbol: 'INR (₹)',
-      outletTerminal: 'Main Dining Floor — POS #01',
-      taxConfig: '5% Inclusive CGST + SGST'
-    };
-  });
+  const [profile, setProfile] = useState(settings);
+  
+  // Sync profile when settings from DB changes (e.g. initial load)
+  React.useEffect(() => {
+    if (settings) setProfile(settings);
+  }, [settings]);
+
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveProfile = () => {
     setIsSaving(true);
-    localStorage.setItem('jb_cafe_settings_profile', JSON.stringify(profile));
+    updateSettings(profile);
     setTimeout(() => {
       setIsSaving(false);
-      addToast('Settings saved successfully!', 'success');
     }, 600);
   };
 

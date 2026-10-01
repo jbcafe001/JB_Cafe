@@ -201,3 +201,10 @@ export interface ApiResponse<T = any> {
   data?: T;
 }
 
+export interface CafeSettings {
+  cafeName: string;
+  currencySymbol: string;
+  outletTerminal: string;
+  taxConfig: string;
+  logoUrl?: string;
+}

@@ -30,7 +30,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onNavigateToOrders,
   onNavigateToTables,
 }) => {
-  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm } = useCafe();
+  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm, settings } = useCafe();
 
   // Selected table for quick order status / actions
   const [selectedTableForAction, setSelectedTableForAction] = useState<Table | null>(null);
@@ -155,20 +155,40 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   const currentCash = typeof cashTendered === 'number' ? cashTendered : 0;
   const changeToReturn = paymentModalOrder ? currentCash - paymentModalOrder.total : 0;
 
+  const cafeName = settings?.cafeName || 'BREW & BITE Café';
+
+  const initials = (currentUser?.name || 'Rahul')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-28 bg-[#F9F8F6]">
-      {/* Waiter Greeting */}
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-xs text-stone-500 uppercase tracking-wider font-semibold">
-            Shift Active
-          </span>
-          <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">
-            Hi, {currentUser?.name || 'Rahul'} 👋
-          </h2>
+      {/* Custom Waiter Header */}
+      <div className="bg-[#B45309] text-white px-4 py-3.5 sm:py-4 -mx-4 -mt-4 flex items-center justify-between shadow-md">
+        {/* Left: Cafe Name & Logo */}
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner">
+            <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">
+            {cafeName}
+          </h1>
         </div>
-        <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-700 font-bold">
-          <Coffee className="w-5 h-5" />
+
+        {/* Right: Profile Avatar & Name */}
+        <div className="flex items-center space-x-2.5">
+          <span className="text-sm font-medium hidden sm:inline-block">
+            Hello, {currentUser?.name || 'Rahul'}
+          </span>
+          <span className="text-sm font-medium sm:hidden">
+            {currentUser?.name?.split(' ')[0] || 'Rahul'}
+          </span>
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309]">
+            {initials}
+          </div>
         </div>
       </div>
 
