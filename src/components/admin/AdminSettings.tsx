@@ -13,7 +13,7 @@ export const AdminSettings: React.FC = () => {
   };
 
   const [profile, setProfile] = useState(settings);
-  
+
   // Sync profile when settings from DB changes (e.g. initial load)
   React.useEffect(() => {
     if (settings) setProfile(settings);

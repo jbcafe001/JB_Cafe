@@ -206,5 +206,4 @@ export interface CafeSettings {
   currencySymbol: string;
   outletTerminal: string;
   taxConfig: string;
-  logoUrl?: string;
 }
