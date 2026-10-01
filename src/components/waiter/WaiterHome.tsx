@@ -199,42 +199,32 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
             {initials}
           </div>
 
-          {/* Dropdown Menu */}
-          {isAvatarMenuOpen && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
-              <div className="p-3 border-b border-stone-100 text-stone-800">
-                <p className="text-xs font-bold truncate">{currentUser?.name || 'Waiter'}</p>
-                <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'waiter@brewandbite.com'}</p>
+            {/* Dropdown Menu */}
+            {isAvatarMenuOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+                <div className="p-3 border-b border-stone-100 text-stone-800">
+                  <p className="text-xs font-bold truncate">{currentUser?.name || 'Waiter'}</p>
+                  <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'waiter@brewandbite.com'}</p>
+                </div>
+                <div className="p-1.5">
+                  <button
+                    onClick={() => {
+                      setIsAvatarMenuOpen(false);
+                      showConfirm(
+                        'Logout',
+                        'Are you sure you want to log out?',
+                        () => logout(),
+                        { isDestructive: true, confirmText: 'Logout' }
+                      );
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                  >
+                    <LogOut className="w-4 h-4 text-red-500" />
+                    <span>Logout</span>
+                  </button>
+                </div>
               </div>
-              <div className="p-1.5">
-                <button
-                  onClick={() => {
-                    setIsAvatarMenuOpen(false);
-                    onNavigateToProfile();
-                  }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 hover:text-stone-900 rounded-lg transition-colors font-medium"
-                >
-                  <UserIcon className="w-4 h-4 text-stone-400" />
-                  <span>My Profile</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setIsAvatarMenuOpen(false);
-                    showConfirm(
-                      'Logout',
-                      'Are you sure you want to log out?',
-                      () => logout(),
-                      { isDestructive: true, confirmText: 'Logout' }
-                    );
-                  }}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-                >
-                  <LogOut className="w-4 h-4 text-red-500" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
 
