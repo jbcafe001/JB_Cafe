@@ -7,7 +7,7 @@ import {
   User as FirebaseUser
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { UserRole } from '../types';
+import { UserRole, ApiResponse } from '../types';
 
 export interface AppUser {
   uid: string;
@@ -16,20 +16,58 @@ export interface AppUser {
   role: UserRole;
 }
 
-export const loginUser = async (email: string, password: string): Promise<AppUser> => {
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  const user = userCredential.user;
-  
-  // Fetch role from Firestore
-  const userDoc = await getDoc(doc(db, 'users', user.uid));
-  if (userDoc.exists()) {
-    return {
-      uid: user.uid,
-      email: user.email!,
-      ...userDoc.data()
-    } as AppUser;
-  } else {
-    throw new Error("User record not found in database.");
+const getFriendlyErrorMessage = (code: string) => {
+  switch (code) {
+    case 'auth/invalid-credential':
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Invalid email or password. Please try again.';
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later.';
+    case 'auth/user-disabled':
+      return 'Your account has been disabled. Contact admin.';
+    default:
+      return 'An unexpected error occurred during login.';
+  }
+};
+
+export const loginUser = async (email: string, password: string): Promise<ApiResponse<AppUser>> => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Fetch role from Firestore
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      const appUser = {
+        uid: user.uid,
+        email: user.email!,
+        ...userDoc.data()
+      } as AppUser;
+
+      return {
+        message: 'Login successful',
+        status: 200,
+        toast: true,
+        data: appUser
+      };
+    } else {
+      throw {
+        message: 'User record not found in database.',
+        status: 404,
+        toast: true
+      };
+    }
+  } catch (error: any) {
+    // If it's already an ApiResponse structure, just rethrow
+    if (error.status) throw error;
+    
+    // Format Firebase errors
+    throw {
+      message: getFriendlyErrorMessage(error.code),
+      status: 401,
+      toast: true
+    };
   }
 };
 

@@ -193,3 +193,11 @@ export interface StaffMember {
   phone: string;
   status: 'Active' | 'Inactive';
 }
+
+export interface ApiResponse<T = any> {
+  message: string;
+  status: number | string;
+  toast: boolean;
+  data?: T;
+}
+

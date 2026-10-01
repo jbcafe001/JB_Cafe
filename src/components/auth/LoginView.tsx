@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Coffee, LogIn, Key, Mail, ShieldAlert, Eye, EyeOff } from 'lucide-react';
-import { loginUser, createDemoUsers } from '../../services/auth';
+import { loginUser } from '../../services/auth';
 import { UserRole } from '../../types';
 
 export const LoginView: React.FC = () => {
@@ -12,30 +12,22 @@ export const LoginView: React.FC = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleInitDemoUsers = async () => {
-    try {
-      setLoading(true);
-      await createDemoUsers();
-      alert("Demo users initialized successfully! You can now log in.");
-    } catch (e: any) {
-      alert("Error initializing demo users: " + e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const user = await loginUser(email, password);
+      const response = await loginUser(email, password);
       // login via CafeContext with the fetched user role
-      login(user.email, user.role as UserRole, user.name, user.uid);
+      if (response.data) {
+        login(response.data.email, response.data.role as UserRole, response.data.name, response.data.uid);
+      }
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to login. Please check credentials.');
+      if (err.toast !== false) {
+        setError(err.message || 'Failed to login. Please check credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -115,17 +107,6 @@ export const LoginView: React.FC = () => {
               <span>{loading ? 'Authenticating...' : 'Log In to Café System'}</span>
             </button>
           </form>
-
-          <div className="text-center pt-4 border-t border-stone-100">
-            <button 
-              type="button" 
-              onClick={handleInitDemoUsers}
-              disabled={loading}
-              className="text-[11px] text-stone-400 hover:text-stone-600 underline disabled:opacity-50"
-            >
-              Initialize Demo Users (Admin)
-            </button>
-          </div>
         </div>
       </div>
     </div>
