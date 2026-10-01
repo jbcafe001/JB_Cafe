@@ -16,6 +16,8 @@ import {
   Copy,
   Check,
   Trash2,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 
@@ -23,14 +25,16 @@ interface WaiterHomeProps {
   onSelectTable: (table: Table) => void;
   onNavigateToOrders: () => void;
   onNavigateToTables: () => void;
+  onNavigateToProfile: () => void;
 }
 
 export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onSelectTable,
   onNavigateToOrders,
   onNavigateToTables,
+  onNavigateToProfile,
 }) => {
-  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm, settings } = useCafe();
+  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm, settings, logout } = useCafe();
 
   // Selected table for quick order status / actions
   const [selectedTableForAction, setSelectedTableForAction] = useState<Table | null>(null);
@@ -39,9 +43,11 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
 
   useModalClose(() => setSelectedTableForAction(null), !!selectedTableForAction);
   useModalClose(() => setPaymentModalOrder(null), !!paymentModalOrder);
+  useModalClose(() => setIsAvatarMenuOpen(false), isAvatarMenuOpen);
 
   // Ready orders for immediate serving notification
   const readyOrders = orders.filter((o) => o.status === 'ready');
@@ -179,16 +185,51 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         </div>
 
         {/* Right: Profile Avatar & Name */}
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-2.5 relative">
           <span className="text-sm font-medium hidden sm:inline-block">
             Hello, {currentUser?.name || 'Rahul'}
           </span>
           <span className="text-sm font-medium sm:hidden">
             {currentUser?.name?.split(' ')[0] || 'Rahul'}
           </span>
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309]">
+          <div 
+            onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] cursor-pointer hover:bg-stone-50 transition-colors"
+          >
             {initials}
           </div>
+
+          {/* Dropdown Menu */}
+          {isAvatarMenuOpen && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="p-3 border-b border-stone-100 text-stone-800">
+                <p className="text-xs font-bold truncate">{currentUser?.name || 'Waiter'}</p>
+                <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'waiter@brewandbite.com'}</p>
+              </div>
+              <div className="p-1.5">
+                <button
+                  onClick={() => {
+                    setIsAvatarMenuOpen(false);
+                    onNavigateToProfile();
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-stone-700 hover:bg-stone-50 hover:text-stone-900 rounded-lg transition-colors font-medium"
+                >
+                  <UserIcon className="w-4 h-4 text-stone-400" />
+                  <span>My Profile</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAvatarMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                >
+                  <LogOut className="w-4 h-4 text-red-500" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

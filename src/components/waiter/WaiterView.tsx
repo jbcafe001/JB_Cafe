@@ -47,11 +47,12 @@ export const WaiterView: React.FC = () => {
               onSelectTable={handleSelectTable}
               onNavigateToOrders={() => setActiveTab('orders')}
               onNavigateToTables={() => setActiveTab('tables')}
+              onNavigateToProfile={() => setActiveTab('profile')}
             />
           )}
 
           {activeTab === 'orders' && (
-            <WaiterActiveOrders onSelectTableForOrder={(tblId) => {}} />
+            <WaiterActiveOrders onSelectTableForOrder={(tblId) => { }} />
           )}
 
           {activeTab === 'tables' && (
@@ -68,11 +69,10 @@ export const WaiterView: React.FC = () => {
             <button
               id="waiter-nav-home"
               onClick={() => setActiveTab('home')}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${
-                activeTab === 'home'
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'home'
                   ? 'text-[#B45309] font-extrabold'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
-              }`}
+                }`}
             >
               <Home className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Home</span>
@@ -81,11 +81,10 @@ export const WaiterView: React.FC = () => {
             <button
               id="waiter-nav-orders"
               onClick={() => setActiveTab('orders')}
-              className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${
-                activeTab === 'orders'
+              className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'orders'
                   ? 'text-[#B45309] font-extrabold'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
-              }`}
+                }`}
             >
               <ClipboardList className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Orders</span>
@@ -99,28 +98,16 @@ export const WaiterView: React.FC = () => {
             <button
               id="waiter-nav-tables"
               onClick={() => setActiveTab('tables')}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${
-                activeTab === 'tables'
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'tables'
                   ? 'text-[#B45309] font-extrabold'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
-              }`}
+                }`}
             >
               <Grid className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Tables</span>
             </button>
 
-            <button
-              id="waiter-nav-profile"
-              onClick={() => setActiveTab('profile')}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${
-                activeTab === 'profile'
-                  ? 'text-[#B45309] font-extrabold'
-                  : 'text-stone-400 hover:text-stone-600 font-medium'
-              }`}
-            >
-              <User className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px]">Profile</span>
-            </button>
+
           </nav>
         </>
       )}
