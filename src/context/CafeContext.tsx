@@ -310,6 +310,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentRole(role);
     setIsLoggedIn(true);
     addNotification(`Logged in as ${matchedUser.name} (${matchedUser.role})`, matchedUser.role);
+    addToast(`Welcome back, ${matchedUser.name}!`);
     return true;
   };
 
@@ -318,6 +319,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logoutUser().then(() => {
         setIsLoggedIn(false);
         setCurrentUser(null);
+        addToast('You have successfully logged out', 'info');
       }).catch(console.error);
     });
   };
@@ -328,6 +330,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentUser(userForRole);
     setIsLoggedIn(true);
     addNotification(`Switched role to ${role.toUpperCase()} (${userForRole.name})`, role);
+    addToast(`Switched role to ${role.toUpperCase()}`, 'info');
   };
 
   // Order Actions

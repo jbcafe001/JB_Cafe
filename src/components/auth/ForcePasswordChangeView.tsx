@@ -6,7 +6,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { useCafe } from '../../context/CafeContext';
 
 export const ForcePasswordChangeView: React.FC = () => {
-  const { currentUser, clearPasswordChangeFlag } = useCafe();
+  const { currentUser, clearPasswordChangeFlag, addToast } = useCafe();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -38,6 +38,7 @@ export const ForcePasswordChangeView: React.FC = () => {
       });
 
       clearPasswordChangeFlag();
+      addToast('Password updated successfully!', 'success');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Failed to update password. Please try again.');
