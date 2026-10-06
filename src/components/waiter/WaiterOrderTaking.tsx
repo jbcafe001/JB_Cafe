@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
-import { Table, MenuItemCategory, OrderItem } from '../../types';
+import { Table, MenuItemCategory, OrderItem, PaymentMethod } from '../../types';
 import {
   Search,
   Plus,
@@ -11,6 +11,9 @@ import {
   FileText,
   ShoppingBag,
   ArrowLeft,
+  QrCode,
+  Banknote,
+  CreditCard,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 
@@ -41,8 +44,14 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [cart, setCart] = useState<Record<string, OrderItem>>({});
   const [notes, setNotes] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
+  const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
-  useModalClose(() => setShowReviewModal(false), showReviewModal);
+  useModalClose(() => {
+    if (showPaymentModal) setShowPaymentModal(false);
+    else if (showReviewModal) setShowReviewModal(false);
+  }, showReviewModal || showPaymentModal);
 
   // Filter items
   const filteredItems = menuItems.filter((item) => {
@@ -90,28 +99,34 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const totalItemCount = cartItemsList.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cartItemsList.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  const handleReviewConfirm = () => {
+    setShowReviewModal(false);
+    setShowPaymentModal(true);
+    setCashTendered(subtotal);
+  };
+
   const handleSendToKitchen = () => {
     if (cartItemsList.length === 0) return;
 
-    if (table.currentOrderId) {
-      // Append to existing active order
-      addItemsToOrder(table.currentOrderId, cartItemsList, notes.trim() ? notes.trim() : undefined);
-    } else {
-      // Create new order
-      createOrder({
-        tableId: table.id,
-        items: cartItemsList,
-        notes: notes.trim() ? notes.trim() : undefined,
-        waiterId: currentUser?.id,
-        waiterName: currentUser?.name,
-      });
-    }
+    // Always create a new order instead of appending
+    createOrder({
+      tableId: table.id,
+      items: cartItemsList,
+      notes: notes.trim() ? notes.trim() : undefined,
+      waiterId: currentUser?.id,
+      waiterName: currentUser?.name,
+      paymentMethod,
+    });
 
+    setShowPaymentModal(false);
     setIsSuccess(true);
     setTimeout(() => {
       onOrderSent();
     }, 1200);
   };
+
+  const currentCash = typeof cashTendered === 'number' ? cashTendered : 0;
+  const changeToReturn = currentCash - subtotal;
 
   if (isSuccess) {
     return (
@@ -363,11 +378,132 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             <div className="p-4 bg-stone-50 border-t border-stone-200">
               <button
                 id="send-to-kitchen-primary-btn"
-                onClick={handleSendToKitchen}
+                onClick={handleReviewConfirm}
                 className="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl text-base shadow-lg shadow-amber-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95"
               >
-                <Send className="w-5 h-5" />
-                <span>SEND TO KITCHEN</span>
+                <CreditCard className="w-5 h-5" />
+                <span>PROCEED TO PAYMENT</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowPaymentModal(false)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+              <div>
+                <h3 className="font-black text-stone-900 text-lg">
+                  Collect Payment
+                </h3>
+                <p className="text-xs text-stone-500 font-mono">
+                  {table.name}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs sm:text-sm">
+              <div className="bg-stone-50 rounded-2xl p-4 border border-stone-200/80 flex justify-between items-center">
+                <div>
+                  <span className="text-xs text-stone-500 font-bold block uppercase">Total Due</span>
+                  <span className="text-2xl font-black text-stone-900">
+                    ₹{subtotal}
+                  </span>
+                </div>
+              </div>
+
+              {/* Mode */}
+              <div>
+                <label className="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-2">
+                  Payment Mode
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('upi')}
+                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
+                      paymentMethod === 'upi'
+                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-stone-200 text-stone-600 bg-white'
+                    }`}
+                  >
+                    <QrCode className="w-5 h-5 text-amber-600 mb-1" />
+                    <span className="font-extrabold text-xs">UPI</span>
+                    <span className="text-[10px] text-stone-400">QR Code</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('cash')}
+                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
+                      paymentMethod === 'cash'
+                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-stone-200 text-stone-600 bg-white'
+                    }`}
+                  >
+                    <Banknote className="w-5 h-5 text-amber-600 mb-1" />
+                    <span className="font-extrabold text-xs">Cash</span>
+                    <span className="text-[10px] text-stone-400">Cash Box</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('card')}
+                    className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
+                      paymentMethod === 'card'
+                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-stone-200 text-stone-600 bg-white'
+                    }`}
+                  >
+                    <CreditCard className="w-5 h-5 text-amber-600 mb-1" />
+                    <span className="font-extrabold text-xs">Card</span>
+                    <span className="text-[10px] text-stone-400">POS Swipe</span>
+                  </button>
+                </div>
+              </div>
+
+              {paymentMethod === 'cash' && (
+                <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-stone-600">Cash Received:</span>
+                    <input
+                      type="number"
+                      value={cashTendered}
+                      onChange={(e) =>
+                        setCashTendered(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                      className="w-28 px-2.5 py-1 text-right bg-white border border-stone-300 rounded-lg text-sm font-bold font-mono"
+                    />
+                  </div>
+                  <div className="pt-2 border-t border-stone-200 flex items-center justify-between text-xs">
+                    <span className="font-bold text-stone-600">Change:</span>
+                    <span
+                      className={`font-black font-mono text-sm ${
+                        changeToReturn >= 0 ? 'text-emerald-700' : 'text-red-600'
+                      }`}
+                    >
+                      {changeToReturn >= 0 ? `₹${changeToReturn}` : `Short ₹${Math.abs(changeToReturn)}`}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 bg-stone-50 border-t border-stone-200">
+              <button
+                onClick={handleSendToKitchen}
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                <span>CONFIRM PAYMENT & SEND TO KITCHEN</span>
               </button>
             </div>
           </div>

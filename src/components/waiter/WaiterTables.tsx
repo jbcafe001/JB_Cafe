@@ -78,8 +78,8 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
     }
   };
 
-  const getActiveOrderForTable = (tableId: string) => {
-    return orders.find(
+  const getActiveOrdersForTable = (tableId: string) => {
+    return orders.filter(
       (o) =>
         (o.status === 'new' ||
           o.status === 'preparing' ||
@@ -90,8 +90,8 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
   };
 
   const handleCardClick = (table: Table) => {
-    const activeOrder = getActiveOrderForTable(table.id);
-    if (activeOrder) {
+    const activeOrders = getActiveOrdersForTable(table.id);
+    if (activeOrders.length > 0) {
       setActiveTableModal(table);
     } else {
       onSelectTable(table);
@@ -104,6 +104,16 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
   const handleOpenPayment = (order: Order) => {
     setActiveTableModal(null);
+    if (order.paymentMethod) {
+      completeOrder(order.id, order.paymentMethod);
+      setPaymentModalOrder(order);
+      setPaymentSuccess(true);
+      setTimeout(() => {
+        setPaymentSuccess(false);
+        setPaymentModalOrder(null);
+      }, 1400);
+      return;
+    }
     setPaymentModalOrder(order);
     setPaymentMethod('upi');
     setCashTendered(order.total);
@@ -119,9 +129,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
     }, 1400);
   };
 
-  const activeOrderInModal = activeTableModal
-    ? getActiveOrderForTable(activeTableModal.id)
-    : null;
+  const activeOrdersInModal = activeTableModal
+    ? getActiveOrdersForTable(activeTableModal.id)
+    : [];
 
   const currentCash = typeof cashTendered === 'number' ? cashTendered : 0;
   const changeToReturn = paymentModalOrder ? currentCash - paymentModalOrder.total : 0;
@@ -188,14 +198,15 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredTables.map((table) => {
-            const activeOrder = getActiveOrderForTable(table.id);
-            // Derive the real status from the active order when table record is stale
+            const activeOrders = getActiveOrdersForTable(table.id);
+            // Derive the real status from the active orders when table record is stale
+            const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
             const effectiveStatus: typeof table.status = activeOrder
               ? (activeOrder.status === 'new' ? 'occupied' : activeOrder.status as typeof table.status)
               : table.status;
             const badge = getStatusBadge(effectiveStatus);
-            const isReady = effectiveStatus === 'ready';
-            const isServed = effectiveStatus === 'served';
+            const isReady = activeOrders.some(o => o.status === 'ready');
+            const isServed = activeOrders.some(o => o.status === 'served') && !isReady;
 
             return (
               <div
@@ -240,20 +251,21 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                   )}
 
                   {/* Direct Action Chips */}
-                  {isReady && activeOrder && (
+                  {isReady && activeOrders.filter(o => o.status === 'ready').map(readyOrder => (
                     <button
+                      key={readyOrder.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleServeTable(activeOrder.id);
+                        handleServeTable(readyOrder.id);
                       }}
                       className="text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
                     >
                       <Utensils className="w-4 h-4" />
                       <span>Serve</span>
                     </button>
-                  )}
+                  ))}
 
-                  {isServed && activeOrder && (
+                  {isServed && activeOrders.length > 0 && (
                     <div className="flex items-center space-x-1.5">
                       <button
                         onClick={(e) => {
@@ -263,19 +275,26 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                         className="text-xs sm:text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-xl font-bold flex items-center space-x-1 transition-colors"
                       >
                         <Plus className="w-4 h-4" />
-                        <span>Order More</span>
+                        <span>New Order</span>
                       </button>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenPayment(activeOrder);
-                        }}
-                        className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
-                      >
-                        <CreditCard className="w-4 h-4 text-amber-400" />
-                        <span>Pay</span>
-                      </button>
+                      {activeOrders.filter(o => o.status === 'served').map(servedOrder => (
+                        <button
+                          key={servedOrder.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (servedOrder.paymentMethod) {
+                              completeOrder(servedOrder.id, servedOrder.paymentMethod);
+                            } else {
+                              handleOpenPayment(servedOrder);
+                            }
+                          }}
+                          className="text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white px-3 py-1.5 rounded-xl font-bold shadow-xs flex items-center space-x-1.5"
+                        >
+                          <CreditCard className="w-4 h-4 text-amber-400" />
+                          <span>{servedOrder.paymentMethod ? 'Clear' : 'Pay'}</span>
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -286,17 +305,17 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       )}
 
       {/* Active Table Details Modal */}
-      {activeTableModal && activeOrderInModal && (
+      {activeTableModal && activeOrdersInModal.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setActiveTableModal(null)}>
           <div className="bg-white rounded-3xl w-full max-w-md p-4 shadow-2xl space-y-3 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between border-b border-stone-100 pb-2.5">
               <div>
                 <span className="text-xs font-mono font-bold text-[#B45309]">
-                  {activeOrderInModal.orderNumber}
+                  {activeOrdersInModal.map(o => o.orderNumber).join(', ')}
                 </span>
                 <h3 className="text-xl font-black text-stone-900">{activeTableModal.name}</h3>
                 <span className="text-xs text-stone-500">
-                  Waiter: {activeOrderInModal.waiterName}
+                  Waiter: {activeOrdersInModal[0]?.waiterName}
                 </span>
               </div>
               <button
@@ -312,56 +331,81 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
               <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-1.5 block">
                 Ordered Items
               </span>
-              <div className="space-y-0 divide-y divide-stone-200/60">
-                {activeOrderInModal.items.map((i, idx) => (
-                  <div key={idx} className="flex items-center justify-between py-1.5 text-stone-800">
-                    <div className="flex items-center space-x-2">
-                      <span className="w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs text-stone-700">
-                        {i.quantity}×
+              <div className="space-y-4">
+                {activeOrdersInModal.map((order) => (
+                  <div key={order.id}>
+                    <div className="flex justify-between items-center mb-1 border-b border-stone-200 pb-1">
+                      <span className="font-black text-stone-500 text-[10px] uppercase">
+                        Order {order.orderNumber}
                       </span>
-                      <span className="font-semibold text-sm text-stone-800">
-                        {i.name}
+                      <span className="text-[10px] font-bold text-stone-400 uppercase">
+                        {order.status}
                       </span>
                     </div>
-                    <span className="font-bold text-sm text-stone-900">₹{i.price * i.quantity}</span>
+                    <div className="space-y-0 divide-y divide-stone-200/60">
+                      {order.items.map((i, idx) => (
+                        <div key={idx} className="flex items-center justify-between py-1.5 text-stone-800">
+                          <div className="flex items-center space-x-2">
+                            <span className="w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs text-stone-700">
+                              {i.quantity}×
+                            </span>
+                            <span className="font-semibold text-sm text-stone-800">
+                              {i.name}
+                            </span>
+                          </div>
+                          <span className="font-bold text-sm text-stone-900">₹{i.price * i.quantity}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-2 pt-2 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
+              <div className="mt-3 pt-2 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
                 <span className="font-bold text-stone-500 text-sm uppercase tracking-wider">Total Amount</span>
-                <span className="text-lg font-black text-[#B45309]">₹{activeOrderInModal.total}</span>
+                <span className="text-lg font-black text-[#B45309]">
+                  ₹{activeOrdersInModal.reduce((sum, o) => sum + o.total, 0)}
+                </span>
               </div>
             </div>
 
             {/* Actions */}
             <div className="space-y-2">
-              {activeOrderInModal.status === 'ready' && (
+              {activeOrdersInModal.filter(o => o.status === 'ready').map(order => (
                 <button
+                  key={order.id}
                   onClick={() => {
-                    handleServeTable(activeOrderInModal.id);
-                    setActiveTableModal(null);
+                    handleServeTable(order.id);
+                    if (activeOrdersInModal.length === 1) setActiveTableModal(null);
                   }}
                   className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <Utensils className="w-4 h-4" />
-                  <span>Serve to {activeTableModal.name}</span>
+                  <span>Serve {order.orderNumber} to {activeTableModal.name}</span>
                 </button>
-              )}
+              ))}
 
-              {activeOrderInModal.status === 'served' && (
+              {activeOrdersInModal.filter(o => o.status === 'served').map(order => (
                 <button
-                  onClick={() => handleOpenPayment(activeOrderInModal)}
+                  key={order.id}
+                  onClick={() => {
+                    if (order.paymentMethod) {
+                      completeOrder(order.id, order.paymentMethod);
+                      if (activeOrdersInModal.length === 1) setActiveTableModal(null);
+                    } else {
+                      handleOpenPayment(order);
+                    }
+                  }}
                   className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <CreditCard className="w-4 h-4 text-amber-400" />
-                  <span>Settle Bill & Collect Payment</span>
+                  <span>{order.paymentMethod ? `Clear Table for ${order.orderNumber}` : `Settle Bill & Collect Payment for ${order.orderNumber}`}</span>
                 </button>
-              )}
+              ))}
 
-              {activeOrderInModal.status === 'preparing' && (
+              {activeOrdersInModal.some(o => o.status === 'preparing') && (
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-center text-xs text-blue-800 font-bold flex items-center justify-center space-x-2">
                   <Flame className="w-4 h-4 text-blue-600 animate-pulse" />
-                  <span>Order is preparing in the kitchen</span>
+                  <span>Preparing in the kitchen</span>
                 </div>
               )}
             </div>

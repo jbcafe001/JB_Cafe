@@ -100,7 +100,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
       return;
     }
 
-    const order = orders.find(
+    const activeOrders = orders.filter(
       (o) =>
         (o.status === 'ready' ||
           o.status === 'served' ||
@@ -109,15 +109,15 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         o.tableId === table.id
     );
 
-    if (order) {
+    if (activeOrders.length > 0) {
       setSelectedTableForAction(table);
     } else {
       onSelectTable(table);
     }
   };
 
-  const getActiveOrderForTable = (tableId: string) => {
-    return orders.find(
+  const getActiveOrdersForTable = (tableId: string) => {
+    return orders.filter(
       (o) =>
         (o.status === 'ready' ||
           o.status === 'served' ||
@@ -154,9 +154,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
     setTimeout(() => setCopiedUpi(false), 2000);
   };
 
-  const activeModalOrder = selectedTableForAction
-    ? getActiveOrderForTable(selectedTableForAction.id)
-    : null;
+  const activeModalOrders = selectedTableForAction
+    ? getActiveOrdersForTable(selectedTableForAction.id)
+    : [];
 
   const currentCash = typeof cashTendered === 'number' ? cashTendered : 0;
   const changeToReturn = paymentModalOrder ? currentCash - paymentModalOrder.total : 0;
@@ -192,39 +192,39 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
           <span className="text-sm font-medium sm:hidden">
             {currentUser?.name?.split(' ')[0] || 'Rahul'}
           </span>
-          <div 
+          <div
             onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
             className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] cursor-pointer hover:bg-stone-50 transition-colors"
           >
             {initials}
           </div>
 
-            {/* Dropdown Menu */}
-            {isAvatarMenuOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
-                <div className="p-3 border-b border-stone-100 text-stone-800">
-                  <p className="text-xs font-bold truncate">{currentUser?.name || 'Waiter'}</p>
-                  <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'waiter@brewandbite.com'}</p>
-                </div>
-                <div className="p-1.5">
-                  <button
-                    onClick={() => {
-                      setIsAvatarMenuOpen(false);
-                      showConfirm(
-                        'Logout',
-                        'Are you sure you want to log out?',
-                        () => logout(),
-                        { isDestructive: true, confirmText: 'Logout' }
-                      );
-                    }}
-                    className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-                  >
-                    <LogOut className="w-4 h-4 text-red-500" />
-                    <span>Logout</span>
-                  </button>
-                </div>
+          {/* Dropdown Menu */}
+          {isAvatarMenuOpen && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+              <div className="p-3 border-b border-stone-100 text-stone-800">
+                <p className="text-xs font-bold truncate">{currentUser?.name || 'Waiter'}</p>
+                <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'waiter@brewandbite.com'}</p>
               </div>
-            )}
+              <div className="p-1.5">
+                <button
+                  onClick={() => {
+                    setIsAvatarMenuOpen(false);
+                    showConfirm(
+                      'Logout',
+                      'Are you sure you want to log out?',
+                      () => logout(),
+                      { isDestructive: true, confirmText: 'Logout' }
+                    );
+                  }}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                >
+                  <LogOut className="w-4 h-4 text-red-500" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -286,8 +286,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         {/* Tables Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {tables.map((table) => {
-            const activeOrder = getActiveOrderForTable(table.id);
-            // Derive the real status from the active order when table record is stale
+            const activeOrders = getActiveOrdersForTable(table.id);
+            // Derive the real status from the active orders when table record is stale
+            const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
             const effectiveStatus: typeof table.status = activeOrder
               ? (activeOrder.status === 'new' ? 'occupied' : activeOrder.status as typeof table.status)
               : table.status;
@@ -300,15 +301,14 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 key={table.id}
                 id={`table-card-${table.number}`}
                 onClick={() => handleTableCardClick(table)}
-                className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${
-                  isReady
+                className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${isReady
                     ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20'
                     : isServed
-                    ? 'border-indigo-300 ring-1 ring-indigo-400/20 bg-indigo-50/10'
-                    : table.status === 'occupied'
-                    ? 'border-amber-200'
-                    : 'border-stone-200/90'
-                }`}
+                      ? 'border-indigo-300 ring-1 ring-indigo-400/20 bg-indigo-50/10'
+                      : table.status === 'occupied'
+                        ? 'border-amber-200'
+                        : 'border-stone-200/90'
+                  }`}
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -363,7 +363,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                         <Plus className="w-3.5 h-3.5" />
                         <span>Order More</span>
                       </button>
-                      
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -397,17 +397,17 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
       </div>
 
       {/* Table Detail & Action Modal (When clicking active table) */}
-      {selectedTableForAction && activeModalOrder && (
+      {selectedTableForAction && activeModalOrders.length > 0 && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedTableForAction(null)}>
           <div className="bg-white rounded-3xl w-full max-w-md p-4 shadow-2xl space-y-3 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between border-b border-stone-100 pb-2.5">
               <div>
                 <span className="text-xs font-mono font-bold text-[#B45309]">
-                  {activeModalOrder.orderNumber}
+                  {activeModalOrders.map(o => o.orderNumber).join(', ')}
                 </span>
                 <h3 className="text-xl font-black text-stone-900">{selectedTableForAction.name}</h3>
                 <span className="text-xs text-stone-500">
-                  Waiter: {activeModalOrder.waiterName}
+                  Waiter: {activeModalOrders[0]?.waiterName}
                 </span>
               </div>
               <button
@@ -423,71 +423,98 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
               <span className="font-black text-stone-400 uppercase tracking-widest text-[10px] mb-1.5 block">
                 Ordered Items
               </span>
-              <div className="space-y-0 divide-y divide-stone-200/60">
-                {activeModalOrder.items.map((item, idx) => (
-                  <div key={idx} className={`flex items-center justify-between py-1.5 transition-opacity ${item.served ? 'opacity-60' : ''}`}>
-                    <div className="flex items-center space-x-3">
-                      <button 
-                        onClick={() => toggleItemServed(activeModalOrder.id, idx)}
-                        className={`w-5 h-5 rounded-md border shadow-sm flex items-center justify-center transition-all ${item.served ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20' : 'bg-white border-stone-300 text-transparent hover:border-emerald-400'}`}
-                        title="Mark as Served"
-                      >
-                        <Check className="w-3 h-3" />
-                      </button>
-                      <div className="flex items-center space-x-2">
-                        <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${item.served ? 'text-stone-400' : 'text-stone-700'}`}>
-                          {item.quantity}×
-                        </span>
-                        <span className={`font-semibold text-sm ${item.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
-                          {item.name}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`font-bold text-sm ${item.served ? 'text-stone-500' : 'text-stone-900'}`}>
-                        ₹{item.price * item.quantity}
+              <div className="space-y-4">
+                {activeModalOrders.map((order) => (
+                  <div key={order.id}>
+                    <div className="flex justify-between items-center mb-1 border-b border-stone-200 pb-1">
+                      <span className="font-black text-stone-500 text-[10px] uppercase">
+                        Order {order.orderNumber}
                       </span>
-                      <button 
-                        onClick={() => removeItemFromOrder(activeModalOrder.id, idx)}
-                        className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                        title="Remove Item"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <span className="text-[10px] font-bold text-stone-400 uppercase">
+                        {order.status}
+                      </span>
+                    </div>
+                    <div className="space-y-0 divide-y divide-stone-200/60">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className={`flex items-center justify-between py-1.5 transition-opacity ${item.served ? 'opacity-60' : ''}`}>
+                          <div className="flex items-center space-x-3">
+                            <button
+                              onClick={() => toggleItemServed(order.id, idx)}
+                              className={`w-5 h-5 rounded-md border shadow-sm flex items-center justify-center transition-all ${item.served ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20' : 'bg-white border-stone-300 text-transparent hover:border-emerald-400'}`}
+                              title="Mark as Served"
+                            >
+                              <Check className="w-3 h-3" />
+                            </button>
+                            <div className="flex items-center space-x-2">
+                              <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${item.served ? 'text-stone-400' : 'text-stone-700'}`}>
+                                {item.quantity}×
+                              </span>
+                              <span className={`font-semibold text-sm ${item.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
+                                {item.name}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <span className={`font-bold text-sm ${item.served ? 'text-stone-500' : 'text-stone-900'}`}>
+                              ₹{item.price * item.quantity}
+                            </span>
+                            <button
+                              onClick={() => removeItemFromOrder(order.id, idx)}
+                              className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                              title="Remove Item"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-2 pt-2 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
+              <div className="mt-3 pt-2 border-t-2 border-stone-200 border-dashed flex justify-between items-center">
                 <span className="font-bold text-stone-500 text-sm uppercase tracking-wider">Total Amount</span>
-                <span className="text-lg font-black text-[#B45309]">₹{activeModalOrder.total}</span>
+                <span className="text-lg font-black text-[#B45309]">
+                  ₹{activeModalOrders.reduce((sum, o) => sum + o.total, 0)}
+                </span>
               </div>
             </div>
 
             {/* Action buttons depending on order status */}
             <div className="space-y-2">
-              {activeModalOrder.status === 'ready' && (
+              {activeModalOrders.filter(o => o.status === 'ready').map(order => (
                 <button
+                  key={order.id}
                   onClick={() => {
-                    handleServeFromModal(activeModalOrder.id);
-                    setSelectedTableForAction(null);
+                    handleServeFromModal(order.id);
+                    if (activeModalOrders.length === 1) {
+                      setSelectedTableForAction(null);
+                    }
                   }}
                   className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <Utensils className="w-4 h-4" />
-                  <span>Serve to {selectedTableForAction.name}</span>
+                  <span>Serve {order.orderNumber} to {selectedTableForAction.name}</span>
                 </button>
-              )}
+              ))}
 
-              {activeModalOrder.status === 'served' && (
+              {activeModalOrders.filter(o => o.status === 'served').map(order => (
                 <button
-                  onClick={() => handleOpenPayment(activeModalOrder)}
+                  key={order.id}
+                  onClick={() => {
+                    if (order.paymentMethod) {
+                      completeOrder(order.id, order.paymentMethod);
+                      if (activeModalOrders.length === 1) setSelectedTableForAction(null);
+                    } else {
+                      handleOpenPayment(order);
+                    }
+                  }}
                   className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <CreditCard className="w-4 h-4 text-amber-400" />
-                  <span>Settle Payment (₹{activeModalOrder.total})</span>
+                  <span>{order.paymentMethod ? `Clear Table for ${order.orderNumber}` : `Settle Payment for ${order.orderNumber} (₹${order.total})`}</span>
                 </button>
-              )}
+              ))}
 
               <button
                 onClick={() => {
@@ -498,25 +525,25 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                 className="w-full py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-sm rounded-xl flex items-center justify-center space-x-2 transition-all active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add More Items</span>
+                <span>New Order</span>
               </button>
 
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => {
                     showConfirm(
-                      'Cancel Order?',
-                      'Are you sure you want to cancel this order? This action cannot be undone.',
+                      'Cancel All Orders?',
+                      'Are you sure you want to cancel all active orders for this table?',
                       () => {
-                        cancelOrder(activeModalOrder.id);
+                        activeModalOrders.forEach(o => cancelOrder(o.id));
                         setSelectedTableForAction(null);
                       },
-                      { isDestructive: true, confirmText: 'Yes, Cancel Order' }
+                      { isDestructive: true, confirmText: 'Yes, Cancel All' }
                     );
                   }}
                   className="flex-1 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl transition-all border border-red-100 flex items-center justify-center"
                 >
-                  Cancel Order
+                  Cancel Orders
                 </button>
                 <button
                   onClick={() => {
@@ -594,11 +621,10 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('upi')}
-                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
-                          paymentMethod === 'upi'
+                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${paymentMethod === 'upi'
                             ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
                             : 'border-stone-200 text-stone-600 bg-white'
-                        }`}
+                          }`}
                       >
                         <QrCode className="w-5 h-5 text-amber-600 mb-1" />
                         <span className="font-extrabold text-xs">UPI</span>
@@ -608,11 +634,10 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('cash')}
-                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
-                          paymentMethod === 'cash'
+                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${paymentMethod === 'cash'
                             ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
                             : 'border-stone-200 text-stone-600 bg-white'
-                        }`}
+                          }`}
                       >
                         <Banknote className="w-5 h-5 text-amber-600 mb-1" />
                         <span className="font-extrabold text-xs">Cash</span>
@@ -622,11 +647,10 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('card')}
-                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
-                          paymentMethod === 'card'
+                        className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${paymentMethod === 'card'
                             ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
                             : 'border-stone-200 text-stone-600 bg-white'
-                        }`}
+                          }`}
                       >
                         <CreditCard className="w-5 h-5 text-amber-600 mb-1" />
                         <span className="font-extrabold text-xs">Card</span>
@@ -668,9 +692,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       <div className="pt-2 border-t border-stone-200 flex items-center justify-between text-xs">
                         <span className="font-bold text-stone-600">Change:</span>
                         <span
-                          className={`font-black font-mono text-sm ${
-                            changeToReturn >= 0 ? 'text-emerald-700' : 'text-red-600'
-                          }`}
+                          className={`font-black font-mono text-sm ${changeToReturn >= 0 ? 'text-emerald-700' : 'text-red-600'
+                            }`}
                         >
                           {changeToReturn >= 0 ? `₹${changeToReturn}` : `Short ₹${Math.abs(changeToReturn)}`}
                         </span>

@@ -31,6 +31,7 @@ interface CreateOrderParams {
   notes?: string;
   waiterId?: string;
   waiterName?: string;
+  paymentMethod?: PaymentMethod;
 }
 
 interface CafeContextType {
@@ -69,7 +70,7 @@ interface CafeContextType {
 
   // Order Flow
   createOrder: (params: CreateOrderParams) => Order;
-  addItemsToOrder: (orderId: string, newItems: OrderItem[], additionalNotes?: string) => void;
+  addItemsToOrder: (orderId: string, newItems: OrderItem[], additionalNotes?: string, paymentMethod?: PaymentMethod) => void;
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
@@ -314,7 +315,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Order Actions
-  const createOrder = ({ tableId, items, notes, waiterId, waiterName }: CreateOrderParams): Order => {
+  const createOrder = ({ tableId, items, notes, waiterId, waiterName, paymentMethod }: CreateOrderParams): Order => {
     const table = tables.find((t) => t.id === tableId);
     const tableNumStr = table ? table.name : 'Table';
     
@@ -342,6 +343,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       total,
       status: 'new',
       notes: notes || null,
+      paymentMethod,
       date: new Date().toISOString().split('T')[0],
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
@@ -366,7 +368,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newOrder;
   };
 
-  const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string) => {
+  const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string, paymentMethod?: PaymentMethod) => {
     const existingOrder = orders.find(o => o.id === orderId);
     if (!existingOrder) return;
 
@@ -390,13 +392,18 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       nextStatus = 'new';
     }
 
-    updateDoc(doc(db, 'orders', orderId), {
+    const updates: Partial<Order> = {
       items: updatedItems,
       subtotal,
       total: subtotal + existingOrder.tax,
       notes: combinedNotes,
       status: nextStatus
-    }).catch(console.error);
+    };
+    if (paymentMethod) {
+      updates.paymentMethod = paymentMethod;
+    }
+
+    updateDoc(doc(db, 'orders', orderId), updates).catch(console.error);
 
     if (updatedTableId) {
       const tableStatus = nextStatus === 'new' ? 'occupied' : nextStatus;
