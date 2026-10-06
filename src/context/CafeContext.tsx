@@ -39,6 +39,8 @@ interface CafeContextType {
   currentRole: UserRole;
   isLoggedIn: boolean;
   isAuthLoading: boolean;
+  requiresPasswordChange: boolean;
+  clearPasswordChangeFlag: () => void;
   isMobileFrame: boolean;
   setIsMobileFrame: (val: boolean) => void;
   users: User[];
@@ -189,6 +191,9 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isSyncing, setIsSyncing] = useState(true);
   // Stays true until Firebase Auth resolves — prevents login-page flash on refresh
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [requiresPasswordChange, setRequiresPasswordChange] = useState(false);
+
+  const clearPasswordChangeFlag = () => setRequiresPasswordChange(false);
 
   // Restore login session on refresh via Firebase Auth state
   useEffect(() => {
@@ -208,6 +213,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setCurrentUser(restoredUser);
             setCurrentRole(data.role);
             setIsLoggedIn(true);
+            // Check if user still needs to change their password
+            if (data.requiresPasswordChange === true) {
+              setRequiresPasswordChange(true);
+            }
           }
         } catch (err) {
           console.error('Failed to restore session:', err);
@@ -1185,6 +1194,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentRole,
         isLoggedIn,
         isAuthLoading,
+        requiresPasswordChange,
+        clearPasswordChangeFlag,
         isMobileFrame,
         setIsMobileFrame,
         users,

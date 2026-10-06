@@ -1,12 +1,13 @@
 import React from 'react';
 import { CafeProvider, useCafe } from './context/CafeContext';
 import { LoginView } from './components/auth/LoginView';
+import { ForcePasswordChangeView } from './components/auth/ForcePasswordChangeView';
 import { WaiterView } from './components/waiter/WaiterView';
 import { KitchenView } from './components/kitchen/KitchenView';
 import { AdminView } from './components/admin/AdminView';
 
 const MainAppContent: React.FC = () => {
-  const { isLoggedIn, isAuthLoading, currentRole } = useCafe();
+  const { isLoggedIn, isAuthLoading, currentRole, requiresPasswordChange } = useCafe();
 
   // Wait for Firebase Auth to resolve before rendering anything
   // This prevents the login-page flash when the user is already logged in
@@ -37,6 +38,8 @@ const MainAppContent: React.FC = () => {
       {/* Main View Router based on Authentication and Current Role */}
       {!isLoggedIn ? (
         <LoginView />
+      ) : requiresPasswordChange ? (
+        <ForcePasswordChangeView />
       ) : (
         <div className="flex-1 flex flex-col">
           {currentRole === 'waiter' && <WaiterView />}
