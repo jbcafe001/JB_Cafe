@@ -248,8 +248,8 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                   }`}
               >
                 <div>
-                  <div className="flex items-start justify-between">
-                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl">{table.name}</span>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl leading-none pt-1">{table.name}</span>
                     <span
                       className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
                     >

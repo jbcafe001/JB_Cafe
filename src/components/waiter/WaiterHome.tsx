@@ -335,12 +335,12 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       : 'border-stone-200/90'
                   }`}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl block">
+                    <span className="font-extrabold text-stone-900 text-lg sm:text-2xl block leading-none pt-1">
                       {table.name}
                     </span>
-                    <div className="flex items-center space-x-1.5 text-stone-400 text-sm mt-1">
+                    <div className="flex items-center space-x-1.5 text-stone-400 text-xs sm:text-sm mt-1">
                       <Users className="w-4 h-4" />
                       <span>{table.seats} Guests</span>
                     </div>
