@@ -1,38 +1,81 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { User, UserRole } from '../../types';
-import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight, User as UserIcon } from 'lucide-react';
+import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight, User as UserIcon, Trash2 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminUsers: React.FC = () => {
-  const { users, addUser, toggleUserStatus } = useCafe();
+  const { users, addUser, updateUser, deleteUser, toggleUserStatus, showConfirm } = useCafe();
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-
-  const handleCloseModal = () => setShowAddModal(false);
-  useModalClose(handleCloseModal, showAddModal);
   const [role, setRole] = useState<UserRole>('waiter');
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingUserId(null);
+  };
+  useModalClose(handleCloseModal, showAddModal);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
 
-    addUser({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim() || undefined,
-      role,
-      status: 'active',
-    });
+    setIsSubmitting(true);
+    try {
+      if (editingUserId) {
+        await updateUser(editingUserId, {
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          role,
+        });
+      } else {
+        await addUser({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || undefined,
+          role,
+          status: 'active',
+        }, password);
+      }
 
+      setName('');
+      setEmail('');
+      setPassword('');
+      setPhone('');
+      setEditingUserId(null);
+      setShowAddModal(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenEdit = (usr: User) => {
+    setEditingUserId(usr.id);
+    setName(usr.name);
+    setEmail(usr.email);
+    setPhone(usr.phone || '');
+    setRole(usr.role);
+    setShowAddModal(true);
+  };
+
+  const handleOpenAdd = () => {
+    setEditingUserId(null);
     setName('');
     setEmail('');
+    setPassword('');
     setPhone('');
-    setShowAddModal(false);
+    setRole('waiter');
+    setShowAddModal(true);
   };
 
   const getRoleBadge = (userRole: UserRole) => {
@@ -42,6 +85,12 @@ export const AdminUsers: React.FC = () => {
           label: 'Admin',
           icon: <Shield className="w-3.5 h-3.5" />,
           cls: 'bg-purple-50 text-purple-800 border-purple-200',
+        };
+      case 'admin_kunafa':
+        return {
+          label: 'Admin (KUNAFA)',
+          icon: <Shield className="w-3.5 h-3.5" />,
+          cls: 'bg-indigo-50 text-indigo-800 border-indigo-200',
         };
       case 'cook':
         return {
@@ -81,7 +130,7 @@ export const AdminUsers: React.FC = () => {
 
         <button
           id="add-user-btn"
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAdd}
           className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
         >
           <Plus className="w-4 h-4" />
@@ -136,22 +185,45 @@ export const AdminUsers: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-3 text-right">
-                      <button
-                        onClick={() => toggleUserStatus(usr.id)}
-                        className="text-xs font-semibold text-stone-600 hover:text-stone-900 px-2 py-1 rounded-lg hover:bg-stone-100 inline-flex items-center space-x-1"
-                      >
-                        {isActive ? (
-                          <>
-                            <ToggleRight className="w-4 h-4 text-emerald-600" />
-                            <span>Disable</span>
-                          </>
-                        ) : (
-                          <>
-                            <ToggleLeft className="w-4 h-4 text-stone-400" />
-                            <span>Enable</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => toggleUserStatus(usr.id)}
+                          className="text-xs font-semibold text-stone-600 hover:text-stone-900 px-2 py-1 rounded-lg hover:bg-stone-100 inline-flex items-center space-x-1"
+                        >
+                          {isActive ? (
+                            <>
+                              <ToggleRight className="w-4 h-4 text-emerald-600" />
+                              <span>Disable</span>
+                            </>
+                          ) : (
+                            <>
+                              <ToggleLeft className="w-4 h-4 text-stone-400" />
+                              <span>Enable</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleOpenEdit(usr)}
+                          className="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                          title="Edit User"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            showConfirm(
+                              'Delete User',
+                              `Are you sure you want to completely remove ${usr.name}? This action cannot be undone.`,
+                              () => deleteUser(usr.id),
+                              { isDestructive: true, confirmText: 'Delete' }
+                            );
+                          }}
+                          className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -166,7 +238,7 @@ export const AdminUsers: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
-              <h3 className="font-extrabold text-stone-900 text-base">Add Team Member</h3>
+              <h3 className="font-extrabold text-stone-900 text-base">{editingUserId ? 'Edit Team Member' : 'Add Team Member'}</h3>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
@@ -200,6 +272,20 @@ export const AdminUsers: React.FC = () => {
                 />
               </div>
 
+              {!editingUserId && (
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Temporary Password *</label>
+                  <input
+                    type="text"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="e.g. password123"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Assigned Role *</label>
                 <CustomSelect
@@ -209,6 +295,7 @@ export const AdminUsers: React.FC = () => {
                     { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
                     { value: 'cook', label: 'Cook (KDS Display)' },
                     { value: 'admin', label: 'Admin (Full Management)' },
+                    { value: 'admin_kunafa', label: 'Admin (KUNAFA)' },
                     { value: 'others', label: 'Others (Limited Access)' },
                   ]}
                 />
@@ -236,9 +323,11 @@ export const AdminUsers: React.FC = () => {
                 <button
                   type="submit"
                   id="save-user-btn"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs disabled:opacity-70 flex items-center space-x-2"
                 >
-                  Create User
+                  {isSubmitting && <span className="animate-spin h-3 w-3 border-2 border-white/40 border-t-white rounded-full" />}
+                  <span>{editingUserId ? 'Update User' : 'Create User'}</span>
                 </button>
               </div>
             </form>

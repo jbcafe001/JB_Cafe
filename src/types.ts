@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'waiter' | 'cook' | 'others';
+export type UserRole = 'admin' | 'admin_kunafa' | 'waiter' | 'cook' | 'others';
 
 export interface User {
   id: string;
@@ -8,6 +8,7 @@ export interface User {
   status: 'active' | 'inactive';
   avatar?: string;
   phone?: string;
+  requiresPasswordChange?: boolean;
 }
 
 export type TableStatus = 'available' | 'occupied' | 'preparing' | 'ready' | 'served';

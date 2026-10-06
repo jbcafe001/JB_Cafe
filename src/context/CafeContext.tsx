@@ -22,7 +22,7 @@ import {
   CafeSettings,
 } from '../types';
 import { INITIAL_USERS } from '../data/initialData';
-import { db } from '../firebase';
+import { db, registerNewUser } from '../firebase';
 import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
 interface CreateOrderParams {
@@ -99,7 +99,9 @@ interface CafeContextType {
   updateTable: (id: string, updates: Partial<Table>) => void;
 
   // User Management
-  addUser: (user: Omit<User, 'id'>) => void;
+  addUser: (user: Omit<User, 'id'>, password?: string) => void;
+  updateUser: (id: string, updates: Partial<User>) => void;
+  deleteUser: (id: string) => void;
   toggleUserStatus: (id: string) => void;
 
   // Notification
@@ -912,14 +914,24 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // User Management
-  const addUser = (usr: Omit<User, 'id'>) => {
-    const newUser: User = {
-      ...usr,
-      id: `u-${Date.now()}`,
-    };
-    setDoc(doc(db, 'users', newUser.id), newUser).catch(console.error);
-    addNotification(`New team member added: ${newUser.name} (${newUser.role})`, 'admin');
-    addToast(`User "${newUser.name}" added successfully!`, 'success');
+  const addUser = async (usr: Omit<User, 'id'>, password?: string) => {
+    try {
+      // First, create the user in Firebase Auth using the secondary app
+      // This assigns them the provided password (or default "password123") without logging the current admin out!
+      const uid = await registerNewUser(usr.email, password);
+      
+      const newUser: User = {
+        ...usr,
+        id: uid,
+        requiresPasswordChange: true, // Force password change on first login
+      };
+      await setDoc(doc(db, 'users', newUser.id), newUser);
+      addNotification(`New team member added: ${newUser.name} (${newUser.role})`, 'admin');
+      addToast(`User "${newUser.name}" added successfully!`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      addToast(err.message || 'Failed to add user', 'error');
+    }
   };
 
   const toggleUserStatus = (id: string) => {
@@ -928,6 +940,26 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newStatus = target.status === 'active' ? 'inactive' : 'active';
       updateDoc(doc(db, 'users', id), { status: newStatus }).catch(console.error);
       addToast(`${target.name} marked as ${newStatus}`, newStatus === 'active' ? 'success' : 'info');
+    }
+  };
+
+  const updateUser = async (id: string, updates: Partial<User>) => {
+    try {
+      await updateDoc(doc(db, 'users', id), updates);
+      addToast(`User updated successfully!`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      addToast(`Failed to update user: ${err.message}`, 'error');
+    }
+  };
+
+  const deleteUser = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'users', id));
+      addToast(`User deleted successfully!`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      addToast(`Failed to delete user: ${err.message}`, 'error');
     }
   };
 
@@ -1193,6 +1225,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addTable,
         updateTable,
         addUser,
+        updateUser,
+        deleteUser,
         toggleUserStatus,
         addStaffMember,
         updateStaffMember,
