@@ -51,10 +51,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
       o.status === 'served'
   );
 
-  const readyOrders = activeOrders.filter((o) => o.status === 'ready');
-  const servedOrders = activeOrders.filter((o) => o.status === 'served');
-  const preparingOrders = activeOrders.filter((o) => o.status === 'preparing');
-  const newOrders = activeOrders.filter((o) => o.status === 'new');
+  const readyOrders = activeOrders.filter((o) => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+  const servedOrders = activeOrders.filter((o) => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served)));
+  const preparingOrders = activeOrders.filter((o) => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
+  const newOrders = activeOrders.filter((o) => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
   const inKitchenOrders = [...newOrders, ...preparingOrders];
 
   const filteredOrders = activeOrders.filter((ord) => {
@@ -206,10 +206,11 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
         ) : (
           <div className="space-y-3.5">
             {filteredOrders.map((order) => {
-              const isReady = order.status === 'ready';
-              const isServed = order.status === 'served';
-              const isPreparing = order.status === 'preparing';
-              const isNew = order.status === 'new';
+              const allItemsServed = order.items.length > 0 && order.items.every(i => i.served);
+              const isServed = order.status === 'served' || allItemsServed;
+              const isReady = order.status === 'ready' && !allItemsServed;
+              const isPreparing = order.status === 'preparing' && !allItemsServed;
+              const isNew = order.status === 'new' && !allItemsServed;
 
               return (
                 <div
@@ -291,6 +292,11 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                             {item.quantity}×
                           </span>
                           <span className={`font-semibold ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
+                          {!item.served && (item.prepared || 0) > 0 && (
+                            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                              {item.prepared}/{item.quantity} Ready
+                            </span>
+                          )}
                           {item.notes && (
                             <span className="text-[10px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                               {item.notes}

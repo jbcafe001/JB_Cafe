@@ -74,6 +74,7 @@ interface CafeContextType {
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
+  incrementItemPrepared: (orderId: string, itemIndex: number) => void;
   toggleItemServed: (orderId: string, itemIndex: number | number[]) => void;
   removeItemFromOrder: (orderId: string, itemIndex: number | number[]) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
@@ -467,7 +468,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
 
+    const updatedItems = existingOrder.items.map(item => ({ ...item, served: true }));
+
     updateDoc(doc(db, 'orders', orderId), {
+      items: updatedItems,
       status: 'served',
       servedAt: timeStr,
     }).catch(console.error);
@@ -478,6 +482,44 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     addNotification(`${tableNum} — Order ${ordNum} served to table!`, 'waiter');
     addToast('Order served successfully!');
+  };
+
+  const incrementItemPrepared = (orderId: string, itemIndex: number) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+    
+    const updatedItems = [...existingOrder.items];
+    const item = updatedItems[itemIndex];
+    
+    const currentPrepared = item.prepared || 0;
+    if (currentPrepared >= item.quantity) return; // already fully prepared
+
+    item.prepared = currentPrepared + 1;
+    
+    const allPrepared = updatedItems.every(i => (i.prepared || 0) >= i.quantity);
+
+    if (allPrepared && existingOrder.status === 'preparing') {
+      // Auto-mark order as ready
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const tableNum = existingOrder.tableNumber;
+      const ordNum = existingOrder.orderNumber;
+      const updatedTableId = existingOrder.tableId;
+
+      updateDoc(doc(db, 'orders', orderId), {
+        items: updatedItems,
+        status: 'ready',
+        readyAt: timeStr,
+      }).catch(console.error);
+
+      if (updatedTableId) {
+        updateDoc(doc(db, 'tables', updatedTableId), { status: 'ready' }).catch(console.error);
+      }
+
+      addNotification(`${tableNum} — Order ${ordNum} is READY!`, 'waiter');
+      addToast('All items prepared! Order marked as ready.', 'success');
+    } else {
+      updateDoc(doc(db, 'orders', orderId), { items: updatedItems }).catch(console.error);
+    }
   };
 
   const toggleItemServed = (orderId: string, itemIndex: number | number[]) => {
@@ -493,7 +535,38 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     });
 
-    updateDoc(doc(db, 'orders', orderId), { items: updatedItems }).catch(console.error);
+    const allServed = updatedItems.every(i => i.served);
+    
+    if (allServed && existingOrder.status !== 'served') {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const updatedTableId = existingOrder.tableId;
+
+      updateDoc(doc(db, 'orders', orderId), { 
+        items: updatedItems,
+        status: 'served',
+        servedAt: timeStr
+      }).catch(console.error);
+      
+      if (updatedTableId) {
+        updateDoc(doc(db, 'tables', updatedTableId), { status: 'served' }).catch(console.error);
+      }
+      
+      addToast('All items served! Order marked as served.', 'success');
+    } else {
+      let nextStatus = existingOrder.status;
+      // If we are un-serving an item and the order was marked 'served', revert it to 'ready'
+      if (!allServed && existingOrder.status === 'served') {
+         nextStatus = 'ready';
+         if (existingOrder.tableId) {
+             updateDoc(doc(db, 'tables', existingOrder.tableId), { status: 'ready' }).catch(console.error);
+         }
+      }
+      
+      updateDoc(doc(db, 'orders', orderId), { 
+         items: updatedItems,
+         status: nextStatus 
+      }).catch(console.error);
+    }
   };
 
   const removeItemFromOrder = (orderId: string, itemIndex: number | number[]) => {
@@ -1059,6 +1132,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         startPreparingOrder,
         markOrderReady,
         serveOrder,
+        incrementItemPrepared,
         toggleItemServed,
         removeItemFromOrder,
         completeOrder,

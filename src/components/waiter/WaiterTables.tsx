@@ -199,14 +199,27 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredTables.map((table) => {
             const activeOrders = getActiveOrdersForTable(table.id);
-            // Derive the real status from the active orders when table record is stale
-            const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
-            const effectiveStatus: typeof table.status = activeOrder
-              ? (activeOrder.status === 'new' ? 'occupied' : activeOrder.status as typeof table.status)
-              : table.status;
+            // Check if ANY order is genuinely ready (status ready AND not all items served)
+            const hasGenuinelyReady = activeOrders.some(o => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            const hasGenuinelyPreparing = activeOrders.some(o => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            const hasGenuinelyNew = activeOrders.some(o => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            
+            const allItemsServed = activeOrders.length > 0 && activeOrders.every(o => o.items.length > 0 && o.items.every(i => i.served));
+            
+            let activeOrder = activeOrders.find(o => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.find(o => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.find(o => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
+            
+            let effectiveStatus: typeof table.status = table.status;
+            if (hasGenuinelyReady) effectiveStatus = 'ready';
+            else if (hasGenuinelyPreparing) effectiveStatus = 'preparing';
+            else if (hasGenuinelyNew) effectiveStatus = 'occupied';
+            else if (allItemsServed) effectiveStatus = 'served';
+            
             const badge = getStatusBadge(effectiveStatus);
-            const isReady = activeOrders.some(o => o.status === 'ready');
-            const isServed = activeOrders.some(o => o.status === 'served') && !isReady;
+            const isServed = (activeOrders.some(o => o.status === 'served') || allItemsServed) && !activeOrders.some(o => o.status === 'ready' && !o.items.every(i => i.served));
+            const isReady = activeOrders.some(o => o.status === 'ready') && !allItemsServed;
 
             return (
               <div
@@ -345,14 +358,19 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                     <div className="space-y-0 divide-y divide-stone-200/60">
                       {order.items.map((i, idx) => (
                         <div key={idx} className="flex items-center justify-between py-1.5 text-stone-800">
-                          <div className="flex items-center space-x-2">
-                            <span className="w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs text-stone-700">
-                              {i.quantity}×
-                            </span>
-                            <span className="font-semibold text-sm text-stone-800">
-                              {i.name}
-                            </span>
-                          </div>
+                            <div className="flex items-center space-x-2 flex-wrap">
+                              <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${i.served ? 'text-stone-400' : 'text-stone-700'}`}>
+                                {i.quantity}×
+                              </span>
+                              <span className={`font-semibold text-sm ${i.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
+                                {i.name}
+                              </span>
+                              {!i.served && (i.prepared || 0) > 0 && (
+                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                                  {i.prepared}/{i.quantity} Ready
+                                </span>
+                              )}
+                            </div>
                           <span className="font-bold text-sm text-stone-900">₹{i.price * i.quantity}</span>
                         </div>
                       ))}

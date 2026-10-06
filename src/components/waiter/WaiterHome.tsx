@@ -50,8 +50,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   useModalClose(() => setIsAvatarMenuOpen(false), isAvatarMenuOpen);
 
   // Ready orders for immediate serving notification
-  const readyOrders = orders.filter((o) => o.status === 'ready');
-  const servedOrders = orders.filter((o) => o.status === 'served');
+  const readyOrders = orders.filter((o) => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+  const servedOrders = orders.filter((o) => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served)));
 
   const getTableBadge = (status: TableStatus) => {
     switch (status) {
@@ -287,14 +287,27 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {tables.map((table) => {
             const activeOrders = getActiveOrdersForTable(table.id);
-            // Derive the real status from the active orders when table record is stale
-            const activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
-            const effectiveStatus: typeof table.status = activeOrder
-              ? (activeOrder.status === 'new' ? 'occupied' : activeOrder.status as typeof table.status)
-              : table.status;
+            // Check if ANY order is genuinely ready (status ready AND not all items served)
+            const hasGenuinelyReady = activeOrders.some(o => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            const hasGenuinelyPreparing = activeOrders.some(o => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            const hasGenuinelyNew = activeOrders.some(o => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            
+            const allItemsServed = activeOrders.length > 0 && activeOrders.every(o => o.items.length > 0 && o.items.every(i => i.served));
+            
+            let activeOrder = activeOrders.find(o => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.find(o => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.find(o => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
+            if (!activeOrder) activeOrder = activeOrders.length > 0 ? activeOrders[0] : null;
+            
+            let effectiveStatus: typeof table.status = table.status;
+            if (hasGenuinelyReady) effectiveStatus = 'ready';
+            else if (hasGenuinelyPreparing) effectiveStatus = 'preparing';
+            else if (hasGenuinelyNew) effectiveStatus = 'occupied';
+            else if (allItemsServed) effectiveStatus = 'served';
+            
             const badge = getTableBadge(effectiveStatus);
-            const isReady = effectiveStatus === 'ready';
-            const isServed = effectiveStatus === 'served';
+            const isServed = effectiveStatus === 'served' || allItemsServed;
+            const isReady = effectiveStatus === 'ready' && !allItemsServed;
 
             return (
               <div
@@ -445,13 +458,18 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                             >
                               <Check className="w-3 h-3" />
                             </button>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-2 flex-wrap">
                               <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${item.served ? 'text-stone-400' : 'text-stone-700'}`}>
                                 {item.quantity}×
                               </span>
                               <span className={`font-semibold text-sm ${item.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
                                 {item.name}
                               </span>
+                              {!item.served && (item.prepared || 0) > 0 && (
+                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                                  {item.prepared}/{item.quantity} Ready
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center space-x-3">

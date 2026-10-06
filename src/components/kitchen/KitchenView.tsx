@@ -21,7 +21,7 @@ import {
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
 export const KitchenView: React.FC = () => {
-  const { orders, startPreparingOrder, markOrderReady, logout, currentUser, settings, showConfirm } = useCafe();
+  const { orders, startPreparingOrder, markOrderReady, incrementItemPrepared, logout, currentUser, settings, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('jb_cafe_kds_sound') !== 'false';
@@ -45,11 +45,12 @@ export const KitchenView: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Filter orders
-  const newOrders = orders.filter((o) => o.status === 'new');
-  const preparingOrders = orders.filter((o) => o.status === 'preparing');
-  const readyOrders = orders.filter((o) => o.status === 'ready');
-  const servedOrders = orders.filter((o) => o.status === 'served').slice(0, 15);
+  const isAllItemsServed = (o: Order) => o.items.length > 0 && o.items.every(i => i.served);
+
+  const newOrders = orders.filter((o) => o.status === 'new' && !isAllItemsServed(o));
+  const preparingOrders = orders.filter((o) => o.status === 'preparing' && !isAllItemsServed(o) && o.items.some(i => (i.prepared || 0) < i.quantity));
+  const readyOrders = orders.filter((o) => (o.status === 'ready' || (o.status === 'preparing' && o.items.some(i => (i.prepared || 0) > 0))) && !isAllItemsServed(o));
+  const servedOrders = orders.filter((o) => o.status === 'served' || isAllItemsServed(o)).slice(0, 15);
 
   const displayedOrders =
     activeTab === 'new'
@@ -229,9 +230,11 @@ export const KitchenView: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {displayedOrders.map((order) => {
-              const isNew = order.status === 'new';
-              const isPrep = order.status === 'preparing';
-              const isRdy = order.status === 'ready';
+              const isAllItemsServed = order.items.length > 0 && order.items.every(i => i.served);
+              const isServed = order.status === 'served' || isAllItemsServed;
+              const isNew = order.status === 'new' && !isAllItemsServed;
+              const isPrep = order.status === 'preparing' && activeTab === 'preparing' && !isAllItemsServed;
+              const isRdy = (order.status === 'ready' || (order.status === 'preparing' && activeTab === 'ready')) && !isAllItemsServed;
 
               return (
                 <div
@@ -285,32 +288,53 @@ export const KitchenView: React.FC = () => {
                             </div>
                           )}
                           <div className="space-y-2.5">
-                            {order.items.filter(i => (i.batch || 1) === batchNum).map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-start justify-between text-sm sm:text-base gap-2"
-                              >
-                                <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                                  <span className={`shrink-0 w-7 h-7 rounded-lg border font-bold flex items-center justify-center text-xs ${item.served ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
-                                    {item.quantity}×
-                                  </span>
-                                  <div className="font-bold flex flex-wrap items-center gap-2 flex-1 pt-0.5">
-                                    <span className={item.served ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
-                                    {item.served && (
-                                      <span className="shrink-0 whitespace-nowrap text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200">
-                                        <Check className="w-3 h-3" />
-                                        <span>Already Served</span>
+                            {order.items.map((item, originalIdx) => ({ item, originalIdx }))
+                              .filter(x => (x.item.batch || 1) === batchNum)
+                              .map(({ item, originalIdx }) => {
+                                let renderCount = 0;
+                                if (activeTab === 'new' || activeTab === 'served') renderCount = item.quantity;
+                                else if (activeTab === 'preparing') renderCount = item.quantity - (item.prepared || 0);
+                                else if (activeTab === 'ready') renderCount = order.status === 'ready' ? item.quantity : (item.prepared || 0);
+                                
+                                if (renderCount <= 0) return null;
+                                
+                                return Array.from({ length: renderCount }).map((_, instIdx) => (
+                                  <div
+                                    key={`${originalIdx}-${instIdx}`}
+                                    className="flex items-start justify-between text-sm sm:text-base gap-2 mb-2"
+                                  >
+                                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                                      <span className={`shrink-0 w-7 h-7 rounded-lg border font-bold flex items-center justify-center text-xs ${item.served ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
+                                        1×
                                       </span>
-                                    )}
+                                      <div className="font-bold flex flex-wrap items-center gap-2 flex-1 pt-0.5">
+                                        <span className={item.served ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
+                                        {item.served && (
+                                          <span className="shrink-0 whitespace-nowrap text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200">
+                                            <Check className="w-3 h-3" />
+                                            <span>Already Served</span>
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                      {item.notes && (
+                                        <span className="shrink-0 text-xs text-[#B45309] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 mt-0.5">
+                                          {item.notes}
+                                        </span>
+                                      )}
+                                      {activeTab === 'preparing' && (
+                                        <button
+                                          onClick={() => incrementItemPrepared(order.id, originalIdx)}
+                                          className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-md font-extrabold tracking-wide hover:bg-emerald-200 transition-colors shadow-sm"
+                                        >
+                                          PREPARED
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                                {item.notes && (
-                                  <span className="shrink-0 text-xs text-[#B45309] bg-orange-50 px-2 py-0.5 rounded-md border border-orange-200 mt-0.5">
-                                    {item.notes}
-                                  </span>
-                                )}
-                              </div>
-                            ))}
+                                ));
+                            })}
                           </div>
                         </div>
                       ))}
@@ -338,17 +362,6 @@ export const KitchenView: React.FC = () => {
                       </button>
                     )}
 
-                    {isPrep && (
-                      <button
-                        id={`mark-ready-btn-${order.orderNumber.replace('#', '')}`}
-                        onClick={() => markOrderReady(order.id)}
-                        className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>MARK READY</span>
-                      </button>
-                    )}
-
                     {isRdy && (
                       <div className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
@@ -356,7 +369,7 @@ export const KitchenView: React.FC = () => {
                       </div>
                     )}
 
-                    {order.status === 'served' && (
+                    {isServed && (
                       <div className="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-xl text-center flex items-center justify-center space-x-1.5">
                         <Utensils className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Served to {order.tableNumber} {order.servedAt ? `(${order.servedAt})` : ''}</span>
