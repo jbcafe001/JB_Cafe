@@ -388,10 +388,13 @@ export const KitchenView: React.FC = () => {
                       </div>
                     )}
 
-                    {isServed && (
+                    {(isServed || activeTab === 'served') && (
                       <div className="w-full py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-xl text-center flex items-center justify-center space-x-1.5">
                         <Utensils className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>Served to {order.tableNumber} {order.servedAt ? `(${order.servedAt})` : ''}</span>
+                        <span>
+                          {isAllItemsServed || order.status === 'served' ? `Served to ${order.tableNumber}` : `Partially Served to ${order.tableNumber}`}
+                          {order.servedAt ? ` (${order.servedAt})` : ''}
+                        </span>
                       </div>
                     )}
 
