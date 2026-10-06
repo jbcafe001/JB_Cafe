@@ -44,7 +44,7 @@ const MainAppContent: React.FC = () => {
         <div className="flex-1 flex flex-col">
           {currentRole === 'waiter' && <WaiterView />}
           {currentRole === 'cook' && <KitchenView />}
-          {currentRole === 'admin' && <AdminView />}
+          {(currentRole === 'admin' || currentRole === 'admin_kunafa') && <AdminView />}
           {currentRole === 'others' && (
             <div className="flex-1 flex items-center justify-center p-8 text-center text-stone-500">
               <p>Your role ({currentRole}) does not have dashboard access.</p>

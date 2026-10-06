@@ -14,7 +14,7 @@ const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
 ];
 
 export const AdminMenu: React.FC = () => {
-  const { menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems } = useCafe();
+  const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter } = useCafe();
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -39,7 +39,7 @@ export const AdminMenu: React.FC = () => {
     setCategory('Coffee');
     setPrice('');
     setDescription('');
-    setBrand('JB Cafe');
+    setBrand(brandFilter === 'KUNAFA' ? 'KUNAFA' : 'JB Cafe');
     setEditingItem(null);
     setShowAddModal(true);
   };
@@ -223,14 +223,21 @@ export const AdminMenu: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Brand</label>
-                <CustomSelect
-                  value={brand}
-                  onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
-                  options={[
-                    { value: 'JB Cafe', label: 'JB Cafe' },
-                    { value: 'KUNAFA', label: 'KUNAFA' },
-                  ]}
-                />
+                {brandFilter === 'KUNAFA' ? (
+                  <div className="w-full px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 font-bold text-xs flex items-center space-x-2">
+                    <span>🟡 KUNAFA</span>
+                    <span className="text-stone-400 font-normal">(locked to your brand)</span>
+                  </div>
+                ) : (
+                  <CustomSelect
+                    value={brand}
+                    onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
+                    options={[
+                      { value: 'JB Cafe', label: 'JB Cafe' },
+                      { value: 'KUNAFA', label: 'KUNAFA' },
+                    ]}
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">

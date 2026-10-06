@@ -46,6 +46,9 @@ interface CafeContextType {
   users: User[];
   tables: Table[];
   menuItems: MenuItem[];
+  filteredMenuItems: MenuItem[];   // KUNAFA-filtered for admin_kunafa, all items for admin
+  filteredOrders: Order[];          // KUNAFA-filtered for admin_kunafa, all orders for admin
+  brandFilter: 'JB Cafe' | 'KUNAFA' | null; // null = no filter (regular admin)
   stockItems: StockItem[];
   orders: Order[];
   expenses: Expense[];
@@ -1201,6 +1204,17 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         users,
         tables,
         menuItems,
+        filteredMenuItems: currentRole === 'admin_kunafa'
+          ? menuItems.filter(m => m.brand === 'KUNAFA')
+          : menuItems,
+        filteredOrders: (() => {
+          if (currentRole !== 'admin_kunafa') return orders;
+          const kunafaItemNames = new Set(
+            menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name)
+          );
+          return orders.filter(o => o.items.some(i => kunafaItemNames.has(i.name)));
+        })(),
+        brandFilter: currentRole === 'admin_kunafa' ? 'KUNAFA' : null,
         stockItems,
         orders,
         expenses,

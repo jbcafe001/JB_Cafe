@@ -15,7 +15,7 @@ import {
 type DateFilter = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
 
 export const AdminSales: React.FC = () => {
-  const { orders } = useCafe();
+  const { filteredOrders: orders } = useCafe();
   const [selectedFilter, setSelectedFilter] = useState<DateFilter>('Today');
   const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
 

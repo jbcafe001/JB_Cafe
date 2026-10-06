@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const AdminReports: React.FC = () => {
-  const { orders, expenses, stockItems, todayStockUsage } = useCafe();
+  const { filteredOrders: orders, expenses, stockItems, todayStockUsage } = useCafe();
   const [timeframe, setTimeframe] = useState<'Daily' | 'Weekly' | 'Monthly'>('Daily');
 
   const completed = orders.filter((o) => o.status === 'completed');

@@ -45,7 +45,7 @@ type AdminTab =
   | 'settings';
 
 export const AdminView: React.FC = () => {
-  const { currentUser, logout, stockItems, orders, showConfirm } = useCafe();
+  const { currentUser, logout, stockItems, orders, filteredOrders, currentRole, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<AdminTab>(
     () => (localStorage.getItem('adminActiveTab') as AdminTab) || 'dashboard'
   );
@@ -53,7 +53,7 @@ export const AdminView: React.FC = () => {
 
   // Badge indicators
   const lowStockCount = stockItems.filter((s) => s.status === 'low' || s.status === 'out').length;
-  const activeOrdersCount = orders.filter(
+  const activeOrdersCount = filteredOrders.filter(
     (o) => o.status === 'new' || o.status === 'preparing' || o.status === 'ready'
   ).length;
 
@@ -118,7 +118,14 @@ export const AdminView: React.FC = () => {
         {/* Top category label */}
         <div className="px-5 py-4 border-b border-stone-100 hidden md:block">
           <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Menu</div>
-          <div className="text-xs font-semibold text-stone-800 mt-0.5">Admin Management</div>
+          <div className="text-xs font-semibold text-stone-800 mt-0.5">
+            {currentRole === 'admin_kunafa' ? (
+              <span className="flex items-center space-x-1">
+                <span>KUNAFA Admin</span>
+                <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">KUNAFA</span>
+              </span>
+            ) : 'Admin Management'}
+          </div>
         </div>
 
         {/* 10 Navigation Items */}

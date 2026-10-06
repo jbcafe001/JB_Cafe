@@ -241,7 +241,7 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export const AdminOrders: React.FC = () => {
-  const { orders } = useCafe();
+  const { filteredOrders: orders } = useCafe();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [fromDate, setFromDate] = useState<string>('');

@@ -17,7 +17,7 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { orders, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory } = useCafe();
+  const { filteredOrders: orders, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory } = useCafe();
 
   // Completed orders today
   const completedOrders = orders.filter((o) => o.status === 'completed');
