@@ -175,7 +175,7 @@ export const AdminUsers: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
+            <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm min-h-[400px] flex flex-col">
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Full Name *</label>
                 <input
@@ -225,7 +225,7 @@ export const AdminUsers: React.FC = () => {
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-2">
+              <div className="pt-2 flex items-center justify-end space-x-2 mt-auto">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}

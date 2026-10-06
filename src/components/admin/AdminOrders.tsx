@@ -66,12 +66,13 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
       {/* Panel */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#FAFAF9] rounded-3xl shadow-2xl border border-stone-200 flex flex-col"
+          className="pointer-events-auto w-full max-w-lg max-h-[90vh] bg-[#FAFAF9] rounded-3xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden"
           style={{ animation: 'slideUp 0.22s ease-out' }}
           onClick={e => e.stopPropagation()}
         >
-          {/* Header band */}
-          <div className="bg-gradient-to-br from-[#1C1917] to-[#292524] rounded-t-3xl p-6 text-white relative">
+          <div className="overflow-y-auto flex-1">
+            {/* Header band */}
+            <div className="bg-gradient-to-br from-[#1C1917] to-[#292524] p-6 text-white relative">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -222,6 +223,7 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
             >
               Close
             </button>
+          </div>
           </div>
         </div>
       </div>

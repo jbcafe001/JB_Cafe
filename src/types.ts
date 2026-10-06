@@ -45,6 +45,7 @@ export interface MenuItem {
   category: Exclude<MenuItemCategory, 'All'>;
   price: number;
   available: boolean;
+  brand?: 'JB Cafe' | 'KUNAFA';
   description?: string;
   ingredients: RecipeIngredient[];
 }

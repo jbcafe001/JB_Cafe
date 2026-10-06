@@ -25,6 +25,7 @@ export const AdminMenu: React.FC = () => {
   const [category, setCategory] = useState<Exclude<MenuItemCategory, 'All'>>('Coffee');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
+  const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
 
   const handleCloseModal = () => setShowAddModal(false);
   useModalClose(handleCloseModal, showAddModal);
@@ -38,6 +39,7 @@ export const AdminMenu: React.FC = () => {
     setCategory('Coffee');
     setPrice('');
     setDescription('');
+    setBrand('JB Cafe');
     setEditingItem(null);
     setShowAddModal(true);
   };
@@ -48,6 +50,7 @@ export const AdminMenu: React.FC = () => {
     setCategory(item.category);
     setPrice(item.price.toString());
     setDescription(item.description || '');
+    setBrand(item.brand || 'JB Cafe');
     setShowAddModal(true);
   };
 
@@ -61,6 +64,7 @@ export const AdminMenu: React.FC = () => {
         category,
         price: parseFloat(price) || 0,
         description: description.trim() || undefined,
+        brand,
       });
     } else {
       addMenuItem({
@@ -69,6 +73,7 @@ export const AdminMenu: React.FC = () => {
         price: parseFloat(price) || 0,
         available: true,
         description: description.trim() || undefined,
+        brand,
         ingredients: [
           { stockItemId: 'st-coffee', stockItemName: 'Coffee Beans', amount: 0.018, unit: 'KG' },
           { stockItemId: 'st-milk', stockItemName: 'Milk', amount: 0.15, unit: 'L' },
@@ -140,6 +145,11 @@ export const AdminMenu: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                     {item.category}
                   </span>
+                  {item.brand && (
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                      {item.brand}
+                    </span>
+                  )}
                   <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
                 </div>
                 <span className="text-base font-black text-stone-900">₹{item.price}</span>
@@ -208,6 +218,18 @@ export const AdminMenu: React.FC = () => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Flat White, Club Sandwich..."
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Brand</label>
+                <CustomSelect
+                  value={brand}
+                  onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
+                  options={[
+                    { value: 'JB Cafe', label: 'JB Cafe' },
+                    { value: 'KUNAFA', label: 'KUNAFA' },
+                  ]}
                 />
               </div>
 

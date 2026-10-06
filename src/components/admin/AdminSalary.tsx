@@ -825,7 +825,8 @@ export const AdminSalary: React.FC = () => {
       {/* 5. EMPLOYEE DETAIL MODAL (Section 5 & Section 13) */}
       {selectedStaff && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedStaff(null)}>
-          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-stone-200" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] shadow-2xl border border-stone-200 overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="overflow-y-auto flex-1">
             {/* Header */}
             <div className="p-5 border-b border-stone-100 flex items-start justify-between bg-stone-50/60">
               <div className="flex items-center space-x-3.5">
@@ -1060,6 +1061,7 @@ export const AdminSalary: React.FC = () => {
                   <Edit2 className="w-3 h-3" />
                   <span>Edit Employee Profile</span>
                 </button>
+              </div>
               </div>
             </div>
           </div>
