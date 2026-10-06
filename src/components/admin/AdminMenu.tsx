@@ -185,8 +185,8 @@ export const AdminMenu: React.FC = () => {
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
               <h3 className="font-extrabold text-stone-900 text-base">
                 {editingItem ? 'Edit Menu Item' : '+ Add New Menu Item'}
               </h3>

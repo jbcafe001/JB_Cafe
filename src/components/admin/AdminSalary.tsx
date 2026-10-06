@@ -1069,8 +1069,8 @@ export const AdminSalary: React.FC = () => {
       {/* 6. GIVE UPAAD / SALARY ADVANCE MODAL (Section 6 & Section 19) */}
       {showUpaadModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowUpaadModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50 rounded-t-2xl">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
                   <Receipt className="w-4 h-4" />
@@ -1249,8 +1249,8 @@ export const AdminSalary: React.FC = () => {
       {/* 9. SALARY PAYMENT CONFIRMATION MODAL (Section 9) */}
       {showPaySalaryModal && targetStaffForAction && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowPaySalaryModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50 rounded-t-2xl">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-[#B45309] text-white flex items-center justify-center font-bold">
                   <CreditCard className="w-4 h-4" />
@@ -1380,8 +1380,8 @@ export const AdminSalary: React.FC = () => {
       {/* 4. ADD / EDIT STAFF MODAL (Section 4) */}
       {showAddStaffModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowAddStaffModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200 overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-stone-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50 rounded-t-2xl">
               <h3 className="font-bold text-stone-900 text-sm">
                 {staffForm.id ? 'Edit Staff Member' : 'Add New Staff Member'}
               </h3>
