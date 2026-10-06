@@ -14,6 +14,7 @@ export interface AppUser {
   email: string;
   name: string;
   role: UserRole;
+  requiresPasswordChange?: boolean;
 }
 
 const getFriendlyErrorMessage = (code: string) => {
@@ -39,11 +40,13 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
     // Fetch role from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (userDoc.exists()) {
-      const appUser = {
+      const appUser: AppUser = {
         uid: user.uid,
         email: user.email!,
-        ...userDoc.data()
-      } as AppUser;
+        name: userDoc.data().name,
+        role: userDoc.data().role,
+        requiresPasswordChange: userDoc.data().requiresPasswordChange ?? false,
+      };
 
       return {
         message: 'Login successful',
