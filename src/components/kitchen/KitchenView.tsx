@@ -49,8 +49,8 @@ export const KitchenView: React.FC = () => {
 
   const newOrders = orders.filter((o) => o.status === 'new' && !isAllItemsServed(o));
   const preparingOrders = orders.filter((o) => o.status === 'preparing' && !isAllItemsServed(o) && o.items.some(i => (i.prepared || 0) < i.quantity));
-  const readyOrders = orders.filter((o) => (o.status === 'ready' || (o.status === 'preparing' && o.items.some(i => (i.prepared || 0) > 0))) && !isAllItemsServed(o));
-  const servedOrders = orders.filter((o) => o.status === 'served' || isAllItemsServed(o)).slice(0, 15);
+  const readyOrders = orders.filter((o) => (o.status === 'ready' || (o.status === 'preparing' && o.items.some(i => (i.prepared || 0) > (i.servedCount || 0)))) && !isAllItemsServed(o));
+  const servedOrders = orders.filter((o) => o.status === 'served' || isAllItemsServed(o) || o.items.some(i => (i.servedCount || 0) > 0)).slice(0, 15);
 
   const displayedOrders =
     activeTab === 'new'
@@ -291,25 +291,38 @@ export const KitchenView: React.FC = () => {
                             {order.items.map((item, originalIdx) => ({ item, originalIdx }))
                               .filter(x => (x.item.batch || 1) === batchNum)
                               .map(({ item, originalIdx }) => {
-                                let renderCount = 0;
-                                if (activeTab === 'new' || activeTab === 'served') renderCount = item.quantity;
-                                else if (activeTab === 'preparing') renderCount = item.quantity - (item.prepared || 0);
-                                else if (activeTab === 'ready') renderCount = order.status === 'ready' ? item.quantity : (item.prepared || 0);
+                                const preparedCount = item.prepared || 0;
+                                const totalCount = item.quantity;
+                                const unservedReady = preparedCount > (item.servedCount || 0) ? preparedCount - (item.servedCount || 0) : 0;
                                 
-                                if (renderCount <= 0) return null;
-                                
-                                return Array.from({ length: renderCount }).map((_, instIdx) => (
+                                // In the 'served' tab, if it's partially served, we only want to show the items that have SOME served count.
+                                if (activeTab === 'served' && (item.servedCount || 0) === 0 && order.status !== 'served' && !isAllItemsServed) return null;
+                                // In the 'ready' tab, we only want to show the items that have unserved prepared count.
+                                if (activeTab === 'ready' && unservedReady === 0 && order.status !== 'ready') return null;
+                                // In the 'preparing' tab, we might only want to show items that are not fully prepared.
+                                if (activeTab === 'preparing' && preparedCount >= totalCount) return null;
+
+                                const displayCount = 
+                                  (activeTab === 'ready' && order.status !== 'ready' && unservedReady > 0 && preparedCount < totalCount) 
+                                    ? unservedReady 
+                                    : (activeTab === 'served' && (item.servedCount || 0) > 0 && (item.servedCount || 0) < totalCount) 
+                                      ? item.servedCount 
+                                      : totalCount;
+
+                                const isItemFullyServedOrPartiallyServedInServedTab = item.served || (activeTab === 'served' && (item.servedCount || 0) > 0);
+
+                                return (
                                   <div
-                                    key={`${originalIdx}-${instIdx}`}
+                                    key={originalIdx}
                                     className="flex items-start justify-between text-sm sm:text-base gap-2 mb-2"
                                   >
                                     <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                                      <span className={`shrink-0 w-7 h-7 rounded-lg border font-bold flex items-center justify-center text-xs ${item.served ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
-                                        1×
+                                      <span className={`shrink-0 w-8 h-8 rounded-lg border font-bold flex items-center justify-center text-xs ${isItemFullyServedOrPartiallyServedInServedTab ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
+                                        {displayCount}×
                                       </span>
-                                      <div className="font-bold flex flex-wrap items-center gap-2 flex-1 pt-0.5">
-                                        <span className={item.served ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
-                                        {item.served && (
+                                      <div className="font-bold flex flex-wrap items-center gap-2 flex-1 pt-1">
+                                        <span className={isItemFullyServedOrPartiallyServedInServedTab ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
+                                        {isItemFullyServedOrPartiallyServedInServedTab && (
                                           <span className="shrink-0 whitespace-nowrap text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200">
                                             <Check className="w-3 h-3" />
                                             <span>Already Served</span>
@@ -326,14 +339,20 @@ export const KitchenView: React.FC = () => {
                                       {activeTab === 'preparing' && (
                                         <button
                                           onClick={() => incrementItemPrepared(order.id, originalIdx)}
-                                          className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-md font-extrabold tracking-wide hover:bg-emerald-200 transition-colors shadow-sm"
+                                          className="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-md font-extrabold tracking-wide hover:bg-emerald-200 transition-colors shadow-sm flex items-center space-x-1 whitespace-nowrap"
                                         >
-                                          PREPARED
+                                          <span>PREPARED</span>
+                                          <span className="bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded-sm">{preparedCount}/{totalCount}</span>
                                         </button>
+                                      )}
+                                      {activeTab === 'ready' && unservedReady > 0 && preparedCount < totalCount && (
+                                        <span className="text-[10px] bg-stone-100 text-stone-600 border border-stone-200 px-2 py-1 rounded-md font-bold">
+                                          {unservedReady}/{totalCount} READY
+                                        </span>
                                       )}
                                     </div>
                                   </div>
-                                ));
+                                );
                             })}
                           </div>
                         </div>

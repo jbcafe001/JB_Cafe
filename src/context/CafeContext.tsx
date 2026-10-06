@@ -75,6 +75,7 @@ interface CafeContextType {
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
   incrementItemPrepared: (orderId: string, itemIndex: number) => void;
+  servePreparedItems: (orderId: string) => void;
   toggleItemServed: (orderId: string, itemIndex: number | number[]) => void;
   removeItemFromOrder: (orderId: string, itemIndex: number | number[]) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
@@ -565,6 +566,50 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateDoc(doc(db, 'orders', orderId), { 
          items: updatedItems,
          status: nextStatus 
+      }).catch(console.error);
+    }
+  };
+
+  const servePreparedItems = (orderId: string) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
+    let updatedCount = 0;
+    const updatedItems = existingOrder.items.map(item => {
+      const prepared = item.prepared || 0;
+      const servedCnt = item.servedCount || 0;
+      if (prepared > servedCnt) {
+        updatedCount += (prepared - servedCnt);
+        const newServedCount = prepared;
+        return {
+          ...item,
+          servedCount: newServedCount,
+          served: newServedCount >= item.quantity
+        };
+      }
+      return item;
+    });
+
+    if (updatedCount > 0) {
+      const allServed = updatedItems.every(i => i.served);
+      let nextStatus = existingOrder.status;
+      let servedAt = existingOrder.servedAt;
+      
+      if (allServed) {
+        nextStatus = 'served';
+        servedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (existingOrder.tableId) {
+          updateDoc(doc(db, 'tables', existingOrder.tableId), { status: 'served' }).catch(console.error);
+        }
+        addToast('All items served! Order marked as served.', 'success');
+      } else {
+        addToast(`Served ${updatedCount} prepared items!`, 'success');
+      }
+
+      updateDoc(doc(db, 'orders', orderId), {
+        items: updatedItems,
+        status: nextStatus,
+        ...(servedAt ? { servedAt } : {})
       }).catch(console.error);
     }
   };
@@ -1133,6 +1178,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         markOrderReady,
         serveOrder,
         incrementItemPrepared,
+        servePreparedItems,
         toggleItemServed,
         removeItemFromOrder,
         completeOrder,

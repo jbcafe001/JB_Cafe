@@ -56,6 +56,7 @@ export interface OrderItem {
   quantity: number;
   notes?: string;
   served?: boolean;
+  servedCount?: number;
   prepared?: number;
   batch?: number;
 }
