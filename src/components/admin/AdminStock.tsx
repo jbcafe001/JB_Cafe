@@ -248,7 +248,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Milk</span>
               <span className="text-base font-black text-stone-900">
-                {todayStockUsage['st-milk']?.amount || 6.4} L
+                {todayStockUsage['st-milk']?.amount || 0} L
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Used today</span>
             </div>
@@ -256,7 +256,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Coffee Beans</span>
               <span className="text-base font-black text-stone-900">
-                {Math.round((todayStockUsage['st-coffee']?.amount || 0.82) * 1000)} g
+                {Math.round((todayStockUsage['st-coffee']?.amount || 0) * 1000)} g
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Espresso bar</span>
             </div>
@@ -264,7 +264,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Sugar</span>
               <span className="text-base font-black text-stone-900">
-                {todayStockUsage['st-sugar']?.amount || 1.2} KG
+                {todayStockUsage['st-sugar']?.amount || 0} KG
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Sweetener</span>
             </div>
@@ -272,7 +272,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Bread</span>
               <span className="text-base font-black text-stone-900">
-                {Math.round(todayStockUsage['st-bread']?.amount || 14)} packs
+                {Math.round(todayStockUsage['st-bread']?.amount || 0)} packs
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Sandwiches</span>
             </div>
@@ -280,7 +280,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Cheese</span>
               <span className="text-base font-black text-stone-900">
-                {todayStockUsage['st-cheese']?.amount || 0.9} KG
+                {todayStockUsage['st-cheese']?.amount || 0} KG
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Toasties</span>
             </div>
@@ -288,7 +288,7 @@ export const AdminStock: React.FC = () => {
             <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
               <span className="text-[11px] font-bold text-stone-600 block truncate">Potatoes</span>
               <span className="text-base font-black text-stone-900">
-                {todayStockUsage['st-potatoes']?.amount || 3.5} KG
+                {todayStockUsage['st-potatoes']?.amount || 0} KG
               </span>
               <span className="text-[9px] text-stone-400 block mt-0.5">Fries prep</span>
             </div>

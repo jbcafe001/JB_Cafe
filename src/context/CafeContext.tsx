@@ -828,14 +828,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Stock Usage calculations from all today's orders and manual usage logs
   const todayStockUsage = useMemo(() => {
-    const usage: Record<string, { name: string; amount: number; unit: string }> = {
-      'st-milk': { name: 'Milk', amount: 6.4, unit: 'L' },
-      'st-coffee': { name: 'Coffee Beans', amount: 0.82, unit: 'KG' },
-      'st-sugar': { name: 'Sugar', amount: 1.2, unit: 'KG' },
-      'st-bread': { name: 'Bread', amount: 14, unit: 'Packs' },
-      'st-cheese': { name: 'Cheese', amount: 0.9, unit: 'KG' },
-      'st-potatoes': { name: 'Potatoes', amount: 3.5, unit: 'KG' },
-    };
+    const usage: Record<string, { name: string; amount: number; unit: string }> = {};
 
     // Add usage from manual logs
     materialUsageLogs.forEach((log) => {
@@ -1184,8 +1177,22 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Reset demo data to pristine state
-  const resetDemoData = () => {
-    addToast('Demo reset is disabled. You are now using live Firebase data!', 'info');
+  const resetDemoData = async () => {
+    try {
+      const { getDocs } = await import('firebase/firestore');
+      
+      const collectionsToClear = ['stockItems', 'materialUsageLogs', 'stockAdditions', 'orders', 'expenses'];
+      for (const coll of collectionsToClear) {
+        const snap = await getDocs(collection(db, coll));
+        const deletePromises = snap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletePromises);
+      }
+
+      addToast('All dummy stock data has been cleared!', 'success');
+    } catch (err) {
+      console.error('Error clearing stock data:', err);
+      addToast('Failed to clear stock data.', 'error');
+    }
   };
 
   const updateSettings = (updates: Partial<CafeSettings>) => {

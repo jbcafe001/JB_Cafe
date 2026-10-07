@@ -21,13 +21,7 @@ export const AdminReports: React.FC = () => {
   const netProfit = totalSales - totalExpenses;
 
   // Best selling items ranking
-  const bestSellers = [
-    { rank: 1, name: 'Cappuccino', count: 142, revenue: 19880, percent: 100 },
-    { rank: 2, name: 'Cold Coffee', count: 118, revenue: 18880, percent: 83 },
-    { rank: 3, name: 'Veg Grilled Sandwich', count: 96, revenue: 13440, percent: 67 },
-    { rank: 4, name: 'Cutting Masala Chai', count: 88, revenue: 3520, percent: 62 },
-    { rank: 5, name: 'Chocolate Brownie', count: 64, revenue: 7680, percent: 45 },
-  ];
+  const bestSellers: { rank: number; name: string; count: number; revenue: number; percent: number }[] = [];
 
   return (
     <div className="space-y-6">
@@ -159,37 +153,18 @@ export const AdminReports: React.FC = () => {
             </p>
 
             <div className="space-y-3 text-xs sm:text-sm">
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-stone-900">Fresh Whole Milk</h4>
-                  <span className="text-xs text-stone-500">6.4 L used today across 44 coffees</span>
-                </div>
-                <span className="font-extrabold text-amber-700 font-mono text-sm">6.4 L</span>
-              </div>
-
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-stone-900">Arabica Coffee Beans</h4>
-                  <span className="text-xs text-stone-500">Espresso extraction volume</span>
-                </div>
-                <span className="font-extrabold text-amber-700 font-mono text-sm">820 g</span>
-              </div>
-
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-stone-900">Sandwich Bread</h4>
-                  <span className="text-xs text-stone-500">Grilled & fresh sandwiches</span>
-                </div>
-                <span className="font-extrabold text-amber-700 font-mono text-sm">14 packs</span>
-              </div>
-
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-stone-900">Refined Sugar</h4>
-                  <span className="text-xs text-stone-500">Beverages & desserts</span>
-                </div>
-                <span className="font-extrabold text-amber-700 font-mono text-sm">1.2 KG</span>
-              </div>
+              {Object.keys(todayStockUsage).length > 0 ? (
+                Object.entries(todayStockUsage).map(([id, usage]: [string, any]) => (
+                  <div key={id} className="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-stone-900">{usage.name}</h4>
+                    </div>
+                    <span className="font-extrabold text-amber-700 font-mono text-sm">{usage.amount} {usage.unit}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-stone-400 italic p-3">No usage recorded yet.</p>
+              )}
             </div>
           </div>
 

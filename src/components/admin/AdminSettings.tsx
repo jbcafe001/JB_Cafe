@@ -95,17 +95,16 @@ export const AdminSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Demo Reset Card */}
+      {/* Clear Dummy Data Card */}
       <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs space-y-4">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-extrabold text-stone-900 text-sm flex items-center space-x-2">
               <RotateCcw className="w-4 h-4 text-amber-600" />
-              <span>Reset Demo State</span>
+              <span>Clear Dummy Data</span>
             </h3>
             <p className="text-xs text-stone-500 mt-1 max-w-md">
-              Restores initial seed dataset: Table 04 ready with order #104, stock thresholds, menu
-              items, and sample revenue data.
+              Permanently removes all existing stock items, stock usage logs, stock additions, dummy orders, and dummy expenses from the database.
             </p>
           </div>
         </div>
@@ -117,12 +116,12 @@ export const AdminSettings: React.FC = () => {
           {resetDone ? (
             <>
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>Demo State Restored!</span>
+              <span>Dummy Data Cleared!</span>
             </>
           ) : (
             <>
               <RotateCcw className="w-4 h-4 text-amber-400" />
-              <span>Reset to Clean Demo State</span>
+              <span>Clear All Dummy Data</span>
             </>
           )}
         </button>
