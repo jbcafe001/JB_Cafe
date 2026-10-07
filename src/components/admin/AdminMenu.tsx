@@ -195,9 +195,10 @@ export const AdminMenu: React.FC = () => {
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto" onClick={handleCloseModal}>
+          <div className="min-h-full flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
+              <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
               <h3 className="font-extrabold text-stone-900 text-base">
                 {editingItem ? 'Edit Menu Item' : '+ Add New Menu Item'}
               </h3>
@@ -294,24 +295,22 @@ export const AdminMenu: React.FC = () => {
                   <div className="space-y-2 mb-2">
                     {ingredients.map((ing, idx) => (
                       <div key={idx} className="flex items-center space-x-2">
-                        <select
-                          className="flex-1 px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                          value={ing.stockItemId}
-                          onChange={(e) => {
-                            const selectedItem = stockItems.find(s => s.id === e.target.value);
-                            const newIngs = [...ingredients];
-                            newIngs[idx].stockItemId = e.target.value;
-                            newIngs[idx].stockItemName = selectedItem ? selectedItem.name : '';
-                            newIngs[idx].unit = selectedItem ? selectedItem.unit : '';
-                            setIngredients(newIngs);
-                          }}
-                          required
-                        >
-                          <option value="" disabled>Select Material</option>
-                          {stockItems.map(s => (
-                            <option key={s.id} value={s.id}>{s.name} ({s.unit})</option>
-                          ))}
-                        </select>
+                        <div className="flex-1 min-w-[150px]">
+                          <CustomSelect
+                            value={ing.stockItemId}
+                            onChange={(val) => {
+                              const selectedItem = stockItems.find((s) => s.id === val);
+                              const newIngs = [...ingredients];
+                              newIngs[idx].stockItemId = val;
+                              newIngs[idx].stockItemName = selectedItem ? selectedItem.name : '';
+                              newIngs[idx].unit = selectedItem ? selectedItem.unit : '';
+                              setIngredients(newIngs);
+                            }}
+                            options={stockItems.map((s) => ({ value: s.id, label: `${s.name} (${s.unit})` }))}
+                            placeholder="Select Material"
+                            placement="top"
+                          />
+                        </div>
                         <input
                           type="number"
                           step="any"
@@ -360,6 +359,7 @@ export const AdminMenu: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ interface CustomSelectProps {
   className?: string;
   placeholder?: string;
   id?: string;
+  placement?: 'top' | 'bottom';
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -22,6 +23,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   className = '',
   placeholder = 'Select\u2026',
   id,
+  placement = 'bottom',
 }) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,7 +74,13 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute z-[200] mt-1.5 w-full bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-100">
+        <div 
+          className={`absolute z-[200] w-full bg-white border border-stone-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in duration-100 ${
+            placement === 'top' 
+              ? 'bottom-full mb-1.5 slide-in-from-bottom-1 origin-bottom' 
+              : 'mt-1.5 slide-in-from-top-1 origin-top'
+          }`}
+        >
           <ul className="max-h-52 overflow-y-auto py-1 divide-y divide-stone-50">
             {options.map((opt) => {
               const isSelected = opt.value === value;

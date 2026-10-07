@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CafeProvider, useCafe } from './context/CafeContext';
 import { LoginView } from './components/auth/LoginView';
 import { ForcePasswordChangeView } from './components/auth/ForcePasswordChangeView';
@@ -8,6 +8,22 @@ import { AdminView } from './components/admin/AdminView';
 
 const MainAppContent: React.FC = () => {
   const { isLoggedIn, isAuthLoading, currentRole, requiresPasswordChange } = useCafe();
+
+  // Globally prevent mouse wheel from changing number input values
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number') {
+        (target as HTMLInputElement).blur();
+      }
+    };
+    
+    // Add event listener to the window
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Wait for Firebase Auth to resolve before rendering anything
   // This prevents the login-page flash when the user is already logged in
