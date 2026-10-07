@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Table, MenuItemCategory, OrderItem, PaymentMethod } from '../../types';
 import {
@@ -39,19 +39,6 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 }) => {
   const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems } = useCafe();
 
-  const getMaxAvailable = (menuItem: typeof menuItems[0]) => {
-    if (!menuItem.ingredients || menuItem.ingredients.length === 0) return null;
-    
-    let maxQty = Infinity;
-    for (const ing of menuItem.ingredients) {
-      const stock = stockItems.find((s) => s.id === ing.stockItemId);
-      if (!stock || ing.amount <= 0) return 0;
-      const possible = Math.floor(stock.available / ing.amount);
-      if (possible < maxQty) maxQty = possible;
-    }
-    return maxQty === Infinity ? null : maxQty;
-  };
-
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Record<string, OrderItem>>({});
@@ -61,6 +48,37 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Calculate how much of each stock item is currently reserved in the cart
+  const usedStockMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    (Object.values(cart) as OrderItem[]).forEach((cartItem) => {
+      const menuItem = menuItems.find(m => m.id === cartItem.menuItemId || m.name === cartItem.name);
+      if (menuItem && menuItem.ingredients) {
+        menuItem.ingredients.forEach(ing => {
+          map[ing.stockItemId] = (map[ing.stockItemId] || 0) + (ing.amount * cartItem.quantity);
+        });
+      }
+    });
+    return map;
+  }, [cart, menuItems]);
+
+  const getAdditionalAvailable = (menuItem: typeof menuItems[0]) => {
+    if (!menuItem.ingredients || menuItem.ingredients.length === 0) return null;
+    
+    let maxQty = Infinity;
+    for (const ing of menuItem.ingredients) {
+      const stock = stockItems.find((s) => s.id === ing.stockItemId);
+      if (!stock || ing.amount <= 0) return 0;
+      
+      const usedAmount = usedStockMap[ing.stockItemId] || 0;
+      const remainingStock = Math.max(0, stock.available - usedAmount);
+      
+      const possible = Math.floor(remainingStock / ing.amount);
+      if (possible < maxQty) maxQty = possible;
+    }
+    return maxQty === Infinity ? null : maxQty;
+  };
   useModalClose(() => {
     if (showPaymentModal) setShowPaymentModal(false);
     else if (showReviewModal) setShowReviewModal(false);
@@ -231,9 +249,9 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         ) : (
           filteredItems.map((item) => {
             const currentQty = cart[item.id]?.quantity || 0;
-            const maxAvailable = getMaxAvailable(item);
-            const isOutOfStock = maxAvailable !== null && maxAvailable <= 0;
-            const canAddMore = maxAvailable === null || currentQty < maxAvailable;
+            const additionalAvailable = getAdditionalAvailable(item);
+            const isOutOfStock = additionalAvailable !== null && additionalAvailable <= 0 && currentQty === 0;
+            const canAddMore = additionalAvailable === null || additionalAvailable > 0;
             
             return (
               <div
@@ -249,9 +267,9 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                     <span className="font-bold text-amber-700 text-sm inline-block">
                       ₹{item.price}
                     </span>
-                    {maxAvailable !== null && (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-bold ${maxAvailable > 0 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>
-                        {maxAvailable > 0 ? `${maxAvailable} available` : 'Out of stock'}
+                    {additionalAvailable !== null && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-bold ${additionalAvailable > 0 ? 'bg-amber-100 text-amber-800' : currentQty > 0 ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800'}`}>
+                        {additionalAvailable > 0 ? `${additionalAvailable} more available` : currentQty > 0 ? 'Limit Reached' : 'Out of stock'}
                       </span>
                     )}
                   </div>
