@@ -131,6 +131,10 @@ export const AdminView: React.FC = () => {
         {/* 10 Navigation Items */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
           {NAV_ITEMS.map((item) => {
+            if (currentRole === 'admin_kunafa' && (item.id === 'tables' || item.id === 'salary')) {
+              return null;
+            }
+
             const isActive = activeTab === item.id;
 
             return (
@@ -206,8 +210,8 @@ export const AdminView: React.FC = () => {
         {activeTab === 'expenses' && <AdminExpenses />}
         {activeTab === 'stock' && <AdminStock />}
         {activeTab === 'menu' && <AdminMenu />}
-        {activeTab === 'tables' && <AdminTables />}
-        {activeTab === 'salary' && <AdminSalary />}
+        {activeTab === 'tables' && currentRole !== 'admin_kunafa' && <AdminTables />}
+        {activeTab === 'salary' && currentRole !== 'admin_kunafa' && <AdminSalary />}
         {activeTab === 'users' && <AdminUsers />}
         {activeTab === 'reports' && <AdminReports />}
         {activeTab === 'settings' && <AdminSettings />}

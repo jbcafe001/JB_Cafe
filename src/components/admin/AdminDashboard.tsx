@@ -278,6 +278,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         {/* Right Column: Table Availability + Dark Stock Alert Card (Col 4) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* Table Availability Card */}
+          {currentRole !== 'admin_kunafa' && (
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-bold text-stone-800">Table Availability</h2>
@@ -343,6 +344,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               })}
             </div>
           </div>
+          )}
 
           {/* Dark Stock Inventory Alert Card */}
           <div className="bg-stone-900 text-white p-5 rounded-2xl shadow-xl">
@@ -382,6 +384,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           </div>
 
           {/* 16. Staff Salary Summary Card (Section 16) */}
+          {currentRole !== 'admin_kunafa' && (
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <div>
@@ -421,8 +424,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </div>
             </div>
           </div>
+          )}
 
           {/* 17. Upcoming Salaries Section (Section 17) */}
+          {currentRole !== 'admin_kunafa' && (
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-stone-900 text-sm">Upcoming Salaries</h3>
@@ -458,6 +463,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               View Staff Salary
             </button>
           </div>
+          )}
         </div>
       </div>
 
