@@ -15,9 +15,10 @@ import {
 type DateFilter = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
 
 export const AdminSales: React.FC = () => {
-  const { filteredOrders: orders } = useCafe();
+  const { filteredOrders: orders, menuItems } = useCafe();
   const [selectedFilter, setSelectedFilter] = useState<DateFilter>('Today');
   const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
 
   const todayStr = new Date().toISOString().split('T')[0];
   const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -26,18 +27,27 @@ export const AdminSales: React.FC = () => {
   const filteredOrders = useMemo(() => {
     const completed = orders.filter((o) => o.status === 'completed');
 
-    if (selectedFilter === 'Today') {
-      return completed.filter((o) => !o.createdAt.includes('-') || o.createdAt.startsWith(todayStr));
-    }
-    if (selectedFilter === 'Yesterday') {
-      return completed.filter((o) => o.createdAt.includes(yesterdayStr));
-    }
-    if (selectedFilter === 'Custom Date') {
-      return completed.filter((o) => o.createdAt.includes(customDate));
-    }
     // 'This Week' or 'This Month'
-    return completed;
-  }, [orders, selectedFilter, customDate, todayStr, yesterdayStr])
+    let finalOrders = selectedFilter === 'This Week' || selectedFilter === 'This Month' ? completed : completed;
+
+    if (selectedFilter === 'Today') {
+      finalOrders = completed.filter((o) => !o.createdAt.includes('-') || o.createdAt.startsWith(todayStr));
+    } else if (selectedFilter === 'Yesterday') {
+      finalOrders = completed.filter((o) => o.createdAt.includes(yesterdayStr));
+    } else if (selectedFilter === 'Custom Date') {
+      finalOrders = completed.filter((o) => o.createdAt.includes(customDate));
+    }
+
+    if (brandFilter !== 'All') {
+      const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+      finalOrders = finalOrders.filter(o => {
+        const hasKunafa = o.items.some(i => kunafaItemNames.has(i.name));
+        return brandFilter === 'KUNAFA' ? hasKunafa : !hasKunafa;
+      });
+    }
+
+    return finalOrders;
+  }, [orders, selectedFilter, customDate, todayStr, yesterdayStr, brandFilter, menuItems])
   .sort((a, b) => {
     const numA = parseInt(a.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
     const numB = parseInt(b.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
@@ -70,21 +80,40 @@ export const AdminSales: React.FC = () => {
           <p className="text-xs text-stone-500">Revenue, payment channels, and audit records</p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-stone-100 p-1 rounded-xl border border-stone-200">
-          {(['Today', 'Yesterday', 'This Week', 'This Month', 'Custom Date'] as const).map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setSelectedFilter(filter)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedFilter === filter
-                  ? 'bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-1.5 bg-stone-100 p-1 rounded-xl border border-stone-200">
+            {(['Today', 'Yesterday', 'This Week', 'This Month', 'Custom Date'] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setSelectedFilter(filter)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  selectedFilter === filter
+                    ? 'bg-white text-stone-900 shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {/* Brand Filter */}
+          <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+            {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+              <button
+                key={b}
+                onClick={() => setBrandFilter(b)}
+                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                  brandFilter === b
+                    ? 'bg-white text-stone-900 shadow-xs'
+                    : 'text-stone-500 hover:text-stone-700'
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

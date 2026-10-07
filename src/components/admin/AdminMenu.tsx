@@ -17,6 +17,7 @@ export const AdminMenu: React.FC = () => {
   const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter } = useCafe();
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
@@ -32,7 +33,12 @@ export const AdminMenu: React.FC = () => {
   useModalClose(handleCloseModal, showAddModal);
 
   const filteredItems = menuItems.filter(
-    (item) => activeCategory === 'All' || item.category === activeCategory
+    (item) => {
+      const matchesCat = activeCategory === 'All' || item.category === activeCategory;
+      const itemBrand = item.brand || 'JB Cafe'; // Fallback to JB Cafe if undefined
+      const matchesBrand = listBrandFilter === 'All' || itemBrand === listBrandFilter;
+      return matchesCat && matchesBrand;
+    }
   );
 
   const handleOpenAdd = () => {
@@ -104,31 +110,50 @@ export const AdminMenu: React.FC = () => {
         </button>
       </div>
 
-      {/* Category Pills */}
-      <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar">
-        <button
-          onClick={() => setActiveCategory('All')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-            activeCategory === 'All'
-              ? 'bg-amber-600 text-white shadow-xs'
-              : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
-          }`}
-        >
-          All Items ({menuItems.length})
-        </button>
-        {CATEGORIES.map((cat) => (
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Category Pills */}
+        <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar flex-1">
           <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-              activeCategory === cat
+            onClick={() => setActiveCategory('All')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              activeCategory === 'All'
                 ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
             }`}
           >
-            {cat}
+            All Items
           </button>
-        ))}
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                activeCategory === cat
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Brand Filter */}
+        <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
+          {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+            <button
+              key={b}
+              onClick={() => setListBrandFilter(b)}
+              className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                listBrandFilter === b
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-500 hover:text-stone-700'
+              }`}
+            >
+              {b}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Menu Cards Grid */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import {
   TrendingUp,
@@ -17,7 +17,19 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { filteredOrders: orders, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory } = useCafe();
+  const { filteredOrders: allOrders, menuItems, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory } = useCafe();
+
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+
+  // Filter orders by brand
+  const orders = React.useMemo(() => {
+    if (brandFilter === 'All') return allOrders;
+    const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+    return allOrders.filter(o => {
+      const hasKunafa = o.items.some(i => kunafaItemNames.has(i.name));
+      return brandFilter === 'KUNAFA' ? hasKunafa : !hasKunafa;
+    });
+  }, [allOrders, brandFilter, menuItems]);
 
   // Completed orders today
   const completedOrders = orders.filter((o) => o.status === 'completed');
@@ -100,6 +112,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   return (
     <div className="space-y-6">
+      {/* Dashboard Header & Filters */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">DASHBOARD</h2>
+          <p className="text-xs text-stone-500">Overview of today's cafe operations and metrics</p>
+        </div>
+        
+        {/* Brand Filter */}
+        <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+          {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+            <button
+              key={b}
+              onClick={() => setBrandFilter(b)}
+              className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                brandFilter === b
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-500 hover:text-stone-700'
+              }`}
+            >
+              {b}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Top Section: Clean Minimalism Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Today's Sales */}

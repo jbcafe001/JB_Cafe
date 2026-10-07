@@ -241,9 +241,10 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export const AdminOrders: React.FC = () => {
-  const { filteredOrders: orders } = useCafe();
+  const { filteredOrders: orders, menuItems } = useCafe();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -272,7 +273,14 @@ export const AdminOrders: React.FC = () => {
       if (toDate && orderDate > toDate) matchesDate = false;
     }
 
-    return matchesSearch && matchesStatus && matchesDate;
+    let matchesBrand = true;
+    if (brandFilter !== 'All') {
+      const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+      const hasKunafa = o.items.some(i => kunafaItemNames.has(i.name));
+      matchesBrand = brandFilter === 'KUNAFA' ? hasKunafa : !hasKunafa;
+    }
+
+    return matchesSearch && matchesStatus && matchesDate && matchesBrand;
   }).sort((a, b) => {
     // Extract numerical part from orderNumber (e.g. #1044 -> 1044) to sort descending
     const numA = parseInt(a.orderNumber.replace(/[^0-9]/g, ''), 10) || 0;
@@ -315,10 +323,27 @@ export const AdminOrders: React.FC = () => {
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-100 transition-colors whitespace-nowrap"
                 >
                   <X className="w-3.5 h-3.5" />
-                  Clear Filter
                 </button>
               )}
             </div>
+
+            {/* Brand Filter */}
+            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setBrandFilter(b)}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                    brandFilter === b
+                      ? 'bg-white text-stone-900 shadow-xs'
+                      : 'text-stone-500 hover:text-stone-700'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+
 
             {/* Search */}
             <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-stone-200 w-full sm:w-64">
