@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { StockItem } from '../../types';
 import {
@@ -62,6 +62,20 @@ export const AdminStock: React.FC = () => {
   const totalStockValue = stockItems.reduce((sum, s) => sum + s.available * s.costPerUnit, 0);
 
   const selectedItem = stockItems.find((s) => s.id === selectedStockItemId);
+
+  // Auto-calculate purchase cost based on quantity entered and unit cost
+  useEffect(() => {
+    if (quantity && selectedItem) {
+      const q = parseFloat(quantity);
+      if (!isNaN(q) && q > 0) {
+        setPurchaseCost((q * selectedItem.costPerUnit).toString());
+      } else {
+        setPurchaseCost('');
+      }
+    } else {
+      setPurchaseCost('');
+    }
+  }, [quantity, selectedItem?.id]); // Re-run when quantity or item selection changes
 
   const handleStockSelectChange = (id: string) => {
     setSelectedStockItemId(id);

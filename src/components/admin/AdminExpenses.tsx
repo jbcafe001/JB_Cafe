@@ -43,7 +43,7 @@ export const AdminExpenses: React.FC = () => {
 
   // For demo, weekly is all current expenses
   const weekTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const monthTotal = weekTotal + 18500; // Realistic month total
+  const monthTotal = weekTotal; // True month total based on DB
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();

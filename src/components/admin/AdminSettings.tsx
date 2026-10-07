@@ -95,37 +95,53 @@ export const AdminSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Clear Dummy Data Card */}
+      {/* Seed Materials Card */}
       <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs space-y-4">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-extrabold text-stone-900 text-sm flex items-center space-x-2">
-              <RotateCcw className="w-4 h-4 text-amber-600" />
-              <span>Clear Dummy Data</span>
+              <Check className="w-4 h-4 text-emerald-600" />
+              <span>Seed Required Materials</span>
             </h3>
             <p className="text-xs text-stone-500 mt-1 max-w-md">
-              Permanently removes all existing stock items, stock usage logs, stock additions, dummy orders, and dummy expenses from the database.
+              Automatically creates all the required materials (Coffee, Milk, Sugar, etc.) needed by your current Menu Items, so you don't have to add them one by one.
             </p>
           </div>
         </div>
 
         <button
-          onClick={handleReset}
-          className="px-4 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-2 transition-colors active:scale-95"
+          onClick={async () => {
+            try {
+              const { doc, setDoc } = await import('firebase/firestore');
+              const { db } = await import('../../firebase');
+              const requiredItems = [
+                { id: 'st-coffee', name: 'Coffee Beans', unit: 'KG', minThreshold: 2, costPerUnit: 800, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-milk', name: 'Milk', unit: 'L', minThreshold: 10, costPerUnit: 60, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-sugar', name: 'Sugar', unit: 'KG', minThreshold: 5, costPerUnit: 45, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-lemons', name: 'Fresh Lemons & Mint', unit: 'KG', minThreshold: 1, costPerUnit: 120, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-tea', name: 'Tea Leaves', unit: 'KG', minThreshold: 1, costPerUnit: 600, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-bread', name: 'Bread', unit: 'Packs', minThreshold: 5, costPerUnit: 40, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-cheese', name: 'Cheese', unit: 'KG', minThreshold: 2, costPerUnit: 450, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-potatoes', name: 'Potatoes', unit: 'KG', minThreshold: 10, costPerUnit: 30, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-chocolate', name: 'Cocoa & Brownie Mix', unit: 'KG', minThreshold: 2, costPerUnit: 500, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-icecream', name: 'Vanilla Ice Cream', unit: 'L', minThreshold: 2, costPerUnit: 200, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+              ];
+              for (const item of requiredItems) {
+                await setDoc(doc(db, 'stockItems', item.id), item);
+              }
+              alert('Successfully seeded all required materials!');
+            } catch (err) {
+              console.error(err);
+              alert('Failed to seed materials');
+            }
+          }}
+          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-2 transition-colors active:scale-95"
         >
-          {resetDone ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-400" />
-              <span>Dummy Data Cleared!</span>
-            </>
-          ) : (
-            <>
-              <RotateCcw className="w-4 h-4 text-amber-400" />
-              <span>Clear All Dummy Data</span>
-            </>
-          )}
+          <Check className="w-4 h-4 text-emerald-100" />
+          <span>Seed Materials Now</span>
         </button>
       </div>
+
     </div>
   );
 };
