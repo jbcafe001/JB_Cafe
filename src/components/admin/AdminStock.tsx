@@ -103,7 +103,7 @@ export const AdminStock: React.FC = () => {
     const q = parseFloat(useQuantity);
     if (!selectedStockItemId || isNaN(q) || q <= 0) return;
 
-    useStock(selectedStockItemId, q, usePurpose, useNotes);
+    useStock(selectedStockItemId, q, usePurpose, useNotes, true);
 
     setUseQuantity('');
     setUseNotes('');

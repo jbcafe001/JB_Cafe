@@ -84,8 +84,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
     '8 PM',
   ];
 
-  const hourlySales = [1250, 1820, 2480, 2950, 1680, 1420, 1950, 2800, 2600, 2200, 1300];
-  const maxSaleHour = Math.max(...hourlySales);
+  const hourlySales = new Array(11).fill(0);
+  completedOrders.forEach((o) => {
+    if (!o.completedAt && !o.createdAt) return;
+    const d = new Date(o.completedAt || o.createdAt);
+    const hour = d.getHours();
+    if (hour >= 10 && hour <= 20) {
+      hourlySales[hour - 10] += o.total;
+    }
+  });
+  const maxSaleHour = Math.max(...hourlySales, 1);
 
   // Recent 6 orders
   const recentOrders = orders.slice(0, 6);
@@ -98,30 +106,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Today's Sales</p>
           <p className="text-3xl font-bold mt-2 text-stone-900">₹{todaySales.toLocaleString()}</p>
-          <p className="text-xs text-green-600 font-medium mt-1">+14% from yesterday</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">Based on completed orders</p>
         </div>
 
         {/* Active Orders */}
         <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Active Orders</p>
-          <p className="text-3xl font-bold mt-2 text-stone-900">{activeOrdersCount || 12}</p>
-          <p className="text-xs text-stone-500 font-medium mt-1">Avg. Wait: 14 mins</p>
+          <p className="text-3xl font-bold mt-2 text-stone-900">{activeOrdersCount}</p>
+          <p className="text-xs text-stone-500 font-medium mt-1">Orders in progress</p>
         </div>
 
         {/* Estimated Net Profit */}
         <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Est. Net Profit</p>
-          <p className="text-3xl font-bold mt-2 text-stone-900">₹{estimatedNet > 0 ? estimatedNet.toLocaleString() : '13,250'}</p>
+          <p className={`text-3xl font-bold mt-2 ${estimatedNet < 0 ? 'text-red-600' : 'text-stone-900'}`}>
+            {estimatedNet < 0 ? '-' : ''}₹{Math.abs(estimatedNet).toLocaleString()}
+          </p>
           <p className="text-xs text-stone-500 font-medium mt-1">Expenses: ₹{todayExpenses.toLocaleString()}</p>
         </div>
 
         {/* Stock Alert (With Left Accent Border) */}
-        <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm border-l-4 border-l-orange-400">
+        <div className={`col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm border-l-4 ${lowStockItems.length > 0 ? 'border-l-orange-400' : 'border-l-green-400'}`}>
           <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Stock Alert</p>
           <p className="text-3xl font-bold mt-2 text-stone-900">
-            {lowStockItems.length < 10 ? `0${lowStockItems.length}` : lowStockItems.length} Items
+            {lowStockItems.length} {lowStockItems.length === 1 ? 'Item' : 'Items'}
           </p>
-          <p className="text-xs text-orange-600 font-medium mt-1">Action Required</p>
+          {lowStockItems.length > 0 ? (
+            <p className="text-xs text-orange-600 font-medium mt-1">Action Required</p>
+          ) : (
+            <p className="text-xs text-green-600 font-medium mt-1">All Good</p>
+          )}
         </div>
       </div>
 

@@ -23,6 +23,14 @@ type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 export const KitchenView: React.FC = () => {
   const { orders, startPreparingOrder, markOrderReady, incrementItemPrepared, logout, currentUser, settings, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
+  const [bulkPrepareModal, setBulkPrepareModal] = useState<{
+    isOpen: boolean;
+    orderId: string;
+    itemIndex: number;
+    itemName: string;
+    maxRemaining: number;
+    inputValue: string;
+  } | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('jb_cafe_kds_sound') !== 'false';
   });
@@ -338,7 +346,21 @@ export const KitchenView: React.FC = () => {
                                       )}
                                       {activeTab === 'preparing' && (
                                         <button
-                                          onClick={() => incrementItemPrepared(order.id, originalIdx)}
+                                          onClick={() => {
+                                            const remaining = totalCount - preparedCount;
+                                            if (totalCount > 5) {
+                                              setBulkPrepareModal({
+                                                isOpen: true,
+                                                orderId: order.id,
+                                                itemIndex: originalIdx,
+                                                itemName: item.name,
+                                                maxRemaining: remaining,
+                                                inputValue: ''
+                                              });
+                                            } else {
+                                              incrementItemPrepared(order.id, originalIdx, 1);
+                                            }
+                                          }}
                                           className="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-md font-extrabold tracking-wide hover:bg-emerald-200 transition-colors shadow-sm flex items-center space-x-1 whitespace-nowrap"
                                         >
                                           <span>PREPARED</span>
@@ -410,6 +432,70 @@ export const KitchenView: React.FC = () => {
           </div>
         )}
       </main>
+      {/* Bulk Prepare Modal */}
+      {bulkPrepareModal?.isOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50">
+              <h2 className="font-bold text-stone-800">Prepare {bulkPrepareModal.itemName}</h2>
+              <button
+                onClick={() => setBulkPrepareModal(null)}
+                className="p-1.5 hover:bg-stone-200 rounded-full text-stone-500 transition-colors"
+              >
+                <VolumeX className="w-4 h-4 opacity-0 hidden" />
+                <span className="text-xl leading-none">&times;</span>
+              </button>
+            </div>
+            
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-stone-600">
+                Enter quantity prepared. Maximum available: <span className="font-bold text-stone-900">{bulkPrepareModal.maxRemaining}</span>
+              </p>
+              <input
+                type="number"
+                min="1"
+                max={bulkPrepareModal.maxRemaining}
+                value={bulkPrepareModal.inputValue}
+                onChange={(e) => setBulkPrepareModal({ ...bulkPrepareModal, inputValue: e.target.value })}
+                className="w-full border border-stone-300 rounded-xl px-4 py-3 text-lg font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#B45309] focus:border-[#B45309]"
+                placeholder="Enter amount..."
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const val = parseInt(bulkPrepareModal.inputValue, 10);
+                    if (!isNaN(val) && val > 0 && val <= bulkPrepareModal.maxRemaining) {
+                      incrementItemPrepared(bulkPrepareModal.orderId, bulkPrepareModal.itemIndex, val);
+                      setBulkPrepareModal(null);
+                    }
+                  }
+                }}
+              />
+            </div>
+
+            <div className="p-4 bg-stone-50 flex gap-3">
+              <button
+                onClick={() => setBulkPrepareModal(null)}
+                className="flex-1 py-3 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold rounded-xl transition-colors text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={!bulkPrepareModal.inputValue || isNaN(parseInt(bulkPrepareModal.inputValue, 10)) || parseInt(bulkPrepareModal.inputValue, 10) <= 0 || parseInt(bulkPrepareModal.inputValue, 10) > bulkPrepareModal.maxRemaining}
+                onClick={() => {
+                  const val = parseInt(bulkPrepareModal.inputValue, 10);
+                  if (!isNaN(val) && val > 0 && val <= bulkPrepareModal.maxRemaining) {
+                    incrementItemPrepared(bulkPrepareModal.orderId, bulkPrepareModal.itemIndex, val);
+                    setBulkPrepareModal(null);
+                  }
+                }}
+                className="flex-1 py-3 bg-[#B45309] hover:bg-amber-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors text-sm"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

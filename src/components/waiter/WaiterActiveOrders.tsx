@@ -448,24 +448,11 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
 
             <div className="w-full space-y-2 pt-2">
               <button
-                id="settle-now-btn"
-                onClick={() => {
-                  const ord = justServedOrder;
-                  setJustServedOrder(null);
-                  handleOpenCompleteModal(ord);
-                }}
-                className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-              >
-                <CreditCard className="w-4 h-4 text-amber-400" />
-                <span>Collect Payment Now (₹{justServedOrder.total})</span>
-              </button>
-
-              <button
                 id="let-dine-btn"
                 onClick={() => setJustServedOrder(null)}
-                className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl transition-all"
+                className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-95"
               >
-                Done (Guests Dining — Settle Later)
+                Done (Back to Orders)
               </button>
             </div>
           </div>

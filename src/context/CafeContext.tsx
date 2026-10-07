@@ -81,7 +81,7 @@ interface CafeContextType {
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
   serveOrder: (orderId: string) => void;
-  incrementItemPrepared: (orderId: string, itemIndex: number) => void;
+  incrementItemPrepared: (orderId: string, itemIndex: number, amount?: number) => void;
   servePreparedItems: (orderId: string) => void;
   toggleItemServed: (orderId: string, itemIndex: number | number[]) => void;
   removeItemFromOrder: (orderId: string, itemIndex: number | number[]) => void;
@@ -91,7 +91,7 @@ interface CafeContextType {
   // Stock
   createStockItem: (item: Omit<StockItem, 'id'>) => void;
   addStock: (stockItemId: string, quantity: number, purchaseCost: number) => void;
-  useStock: (stockItemId: string, quantity: number, purpose?: string, notes?: string) => void;
+  useStock: (stockItemId: string, quantity: number, purpose?: string, notes?: string, showToast?: boolean) => void;
   todayStockUsage: Record<string, { name: string; amount: number; unit: string }>;
 
   // Expenses
@@ -361,12 +361,24 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const table = tables.find((t) => t.id === tableId);
     const tableNumStr = table ? table.name : 'Table';
     
-    // Generate next sequential order number (e.g. #1044)
-    const existingNums = orders
-      .map((o) => parseInt(o.orderNumber.replace('#', ''), 10))
+    // Generate order number in YYMMDDn format
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const prefix = `${yy}${mm}${dd}`;
+
+    const todayOrders = orders.filter((o) => o.orderNumber.replace('#', '').startsWith(prefix));
+    
+    const existingNs = todayOrders
+      .map((o) => {
+        const numStr = o.orderNumber.replace('#', '').slice(prefix.length);
+        return parseInt(numStr, 10);
+      })
       .filter((n) => !isNaN(n));
-    const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1044;
-    const orderNumber = `#${nextNum}`;
+      
+    const nextN = existingNs.length > 0 ? Math.max(...existingNs) + 1 : 1;
+    const orderNumber = `${prefix}${nextN}`;
 
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const tax = 0; // standard clean subtotal
@@ -486,9 +498,30 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
 
+    const updatedItems = existingOrder.items.map((item) => {
+      const currentPrepared = item.prepared || 0;
+      const remainingToPrepare = item.quantity - currentPrepared;
+
+      if (remainingToPrepare > 0) {
+        const menuItem = menuItems.find((m) => m.id === item.menuItemId || m.name === item.name);
+        if (menuItem && menuItem.ingredients) {
+          menuItem.ingredients.forEach((ing) => {
+            useStock(
+              ing.stockItemId,
+              ing.amount * remainingToPrepare,
+              `Order ${ordNum}`,
+              `Prepared: ${menuItem.name}`
+            );
+          });
+        }
+      }
+      return { ...item, prepared: item.quantity };
+    });
+
     updateDoc(doc(db, 'orders', orderId), {
       status: 'ready',
       readyAt: timeStr,
+      items: updatedItems,
     }).catch(console.error);
 
     if (updatedTableId) {
@@ -525,7 +558,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addToast('Order served successfully!');
   };
 
-  const incrementItemPrepared = (orderId: string, itemIndex: number) => {
+  const incrementItemPrepared = (orderId: string, itemIndex: number, amount: number = 1) => {
     const existingOrder = orders.find(o => o.id === orderId);
     if (!existingOrder) return;
     
@@ -533,9 +566,25 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const item = updatedItems[itemIndex];
     
     const currentPrepared = item.prepared || 0;
-    if (currentPrepared >= item.quantity) return; // already fully prepared
+    const remaining = item.quantity - currentPrepared;
+    if (remaining <= 0) return; // already fully prepared
 
-    item.prepared = currentPrepared + 1;
+    const validAmount = Math.min(amount, remaining);
+
+    item.prepared = currentPrepared + validAmount;
+    
+    // Deduct stock for the prepared quantity of this item
+    const menuItem = menuItems.find((m) => m.id === item.menuItemId || m.name === item.name);
+    if (menuItem && menuItem.ingredients) {
+      menuItem.ingredients.forEach((ing) => {
+        useStock(
+          ing.stockItemId,
+          ing.amount * validAmount,
+          `Order ${existingOrder.orderNumber}`,
+          `Prepared: ${menuItem.name}`
+        );
+      });
+    }
     
     const allPrepared = updatedItems.every(i => (i.prepared || 0) >= i.quantity);
 
@@ -827,7 +876,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     stockItemId: string,
     quantity: number,
     purpose: string = 'Kitchen Prep',
-    notes?: string
+    notes?: string,
+    showToast: boolean = false
   ) => {
     const stockItem = stockItems.find((s) => s.id === stockItemId);
     if (!stockItem || quantity <= 0) return;
@@ -869,7 +919,9 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       `Recorded usage: ${quantity} ${stockItem.unit} of ${stockItem.name} (${purpose})`,
       'admin'
     );
-    addToast(`Used ${quantity} ${stockItem.unit} of ${stockItem.name}`, 'info');
+    if (showToast) {
+      addToast(`Used ${quantity} ${stockItem.unit} of ${stockItem.name}`, 'info');
+    }
   };
 
   // Stock Usage calculations from all today's orders and manual usage logs
