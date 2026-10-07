@@ -37,7 +37,20 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   onBack,
   onOrderSent,
 }) => {
-  const { menuItems, createOrder, currentUser, addItemsToOrder } = useCafe();
+  const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems } = useCafe();
+
+  const getMaxAvailable = (menuItem: typeof menuItems[0]) => {
+    if (!menuItem.ingredients || menuItem.ingredients.length === 0) return null;
+    
+    let maxQty = Infinity;
+    for (const ing of menuItem.ingredients) {
+      const stock = stockItems.find((s) => s.id === ing.stockItemId);
+      if (!stock || ing.amount <= 0) return 0;
+      const possible = Math.floor(stock.available / ing.amount);
+      if (possible < maxQty) maxQty = possible;
+    }
+    return maxQty === Infinity ? null : maxQty;
+  };
 
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -218,17 +231,30 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         ) : (
           filteredItems.map((item) => {
             const currentQty = cart[item.id]?.quantity || 0;
+            const maxAvailable = getMaxAvailable(item);
+            const isOutOfStock = maxAvailable !== null && maxAvailable <= 0;
+            const canAddMore = maxAvailable === null || currentQty < maxAvailable;
+            
             return (
               <div
                 key={item.id}
-                className="bg-white border border-stone-200/80 rounded-xl p-3 flex items-center justify-between shadow-xs transition-shadow hover:shadow-sm"
+                className={`bg-white border rounded-xl p-3 flex items-center justify-between transition-shadow ${isOutOfStock ? 'border-red-200 bg-red-50/30 opacity-75' : 'border-stone-200/80 shadow-xs hover:shadow-sm'}`}
               >
                 <div className="pr-2 flex-1">
-                  <h4 className="font-bold text-stone-900 text-sm">{item.name}</h4>
+                  <h4 className="font-bold text-stone-900 text-sm flex items-center gap-2">
+                    {item.name}
+                  </h4>
                   <p className="text-xs text-stone-500 line-clamp-1">{item.description}</p>
-                  <span className="font-bold text-amber-700 text-sm mt-0.5 inline-block">
-                    ₹{item.price}
-                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="font-bold text-amber-700 text-sm inline-block">
+                      ₹{item.price}
+                    </span>
+                    {maxAvailable !== null && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-bold ${maxAvailable > 0 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>
+                        {maxAvailable > 0 ? `${maxAvailable} available` : 'Out of stock'}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Instant Quantity Tap Controls */}
@@ -236,8 +262,9 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                   {currentQty === 0 ? (
                     <button
                       id={`add-btn-${item.id}`}
+                      disabled={!canAddMore}
                       onClick={() => handleAddItem(item.id, item.name, item.price)}
-                      className="w-10 h-10 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 font-bold flex items-center justify-center transition-colors shadow-xs active:scale-95"
+                      className={`w-10 h-10 rounded-xl border font-bold flex items-center justify-center transition-colors shadow-xs ${!canAddMore ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed' : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-300 active:scale-95'}`}
                     >
                       <Plus className="w-5 h-5" />
                     </button>
@@ -253,8 +280,9 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                         {currentQty}
                       </span>
                       <button
+                        disabled={!canAddMore}
                         onClick={() => handleAddItem(item.id, item.name, item.price)}
-                        className="w-8 h-8 rounded-lg bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center shadow-xs font-bold active:scale-95"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-xs font-bold ${!canAddMore ? 'bg-stone-200 text-stone-400 cursor-not-allowed' : 'bg-amber-600 hover:bg-amber-700 text-white active:scale-95'}`}
                       >
                         <Plus className="w-4 h-4" />
                       </button>
