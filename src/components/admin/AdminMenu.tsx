@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
-import { MenuItem, MenuItemCategory } from '../../types';
-import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee } from 'lucide-react';
+import { MenuItem, MenuItemCategory, RecipeIngredient } from '../../types';
+import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee, Trash2 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
@@ -26,6 +26,7 @@ export const AdminMenu: React.FC = () => {
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
+  const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
 
   const handleCloseModal = () => setShowAddModal(false);
   useModalClose(handleCloseModal, showAddModal);
@@ -40,6 +41,7 @@ export const AdminMenu: React.FC = () => {
     setPrice('');
     setDescription('');
     setBrand(brandFilter === 'KUNAFA' ? 'KUNAFA' : 'JB Cafe');
+    setIngredients([]);
     setEditingItem(null);
     setShowAddModal(true);
   };
@@ -51,6 +53,7 @@ export const AdminMenu: React.FC = () => {
     setPrice(item.price.toString());
     setDescription(item.description || '');
     setBrand(item.brand || 'JB Cafe');
+    setIngredients(item.ingredients || []);
     setShowAddModal(true);
   };
 
@@ -65,6 +68,7 @@ export const AdminMenu: React.FC = () => {
         price: parseFloat(price) || 0,
         description: description.trim() || undefined,
         brand,
+        ingredients,
       });
     } else {
       addMenuItem({
@@ -74,10 +78,7 @@ export const AdminMenu: React.FC = () => {
         available: true,
         description: description.trim() || undefined,
         brand,
-        ingredients: [
-          { stockItemId: 'st-coffee', stockItemName: 'Coffee Beans', amount: 0.018, unit: 'KG' },
-          { stockItemId: 'st-milk', stockItemName: 'Milk', amount: 0.15, unit: 'L' },
-        ],
+        ingredients,
       });
     }
 
@@ -273,6 +274,73 @@ export const AdminMenu: React.FC = () => {
                   placeholder="Short appetizing description..."
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                 />
+              </div>
+
+              {/* Recipe / Ingredients Section */}
+              <div className="pt-2 border-t border-stone-200">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block font-semibold text-stone-700">Recipe / Ingredients</label>
+                  <button
+                    type="button"
+                    onClick={() => setIngredients([...ingredients, { stockItemId: '', stockItemName: '', amount: 0, unit: '' }])}
+                    className="text-amber-600 hover:text-amber-700 text-xs font-bold flex items-center"
+                  >
+                    <Plus className="w-3 h-3 mr-1" /> Add
+                  </button>
+                </div>
+                {ingredients.length === 0 ? (
+                  <div className="text-xs text-stone-400 italic mb-2">No ingredients added. Stock will not be auto-managed for this item.</div>
+                ) : (
+                  <div className="space-y-2 mb-2">
+                    {ingredients.map((ing, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <select
+                          className="flex-1 px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                          value={ing.stockItemId}
+                          onChange={(e) => {
+                            const selectedItem = stockItems.find(s => s.id === e.target.value);
+                            const newIngs = [...ingredients];
+                            newIngs[idx].stockItemId = e.target.value;
+                            newIngs[idx].stockItemName = selectedItem ? selectedItem.name : '';
+                            newIngs[idx].unit = selectedItem ? selectedItem.unit : '';
+                            setIngredients(newIngs);
+                          }}
+                          required
+                        >
+                          <option value="" disabled>Select Material</option>
+                          {stockItems.map(s => (
+                            <option key={s.id} value={s.id}>{s.name} ({s.unit})</option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          step="any"
+                          required
+                          min="0"
+                          placeholder={`Amt${ing.unit ? ` (${ing.unit})` : ''}`}
+                          value={ing.amount || ''}
+                          onChange={(e) => {
+                            const newIngs = [...ingredients];
+                            newIngs[idx].amount = parseFloat(e.target.value) || 0;
+                            setIngredients(newIngs);
+                          }}
+                          className="w-20 px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newIngs = [...ingredients];
+                            newIngs.splice(idx, 1);
+                            setIngredients(newIngs);
+                          }}
+                          className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="pt-2 flex items-center justify-end space-x-2">
