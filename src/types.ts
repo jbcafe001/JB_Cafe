@@ -88,6 +88,22 @@ export interface Order {
   paymentMethod?: PaymentMethod;
 }
 
+export interface Material {
+  id: string;
+  name: string;
+  unit: string;
+  minThreshold: number;
+  costPerUnit: number;
+}
+
+export interface StockBalance {
+  id: string; // same as material id
+  materialId: string;
+  available: number;
+  status: 'good' | 'low' | 'out';
+  lastRestocked?: string;
+}
+
 export interface StockItem {
   id: string;
   name: string;
@@ -96,6 +112,7 @@ export interface StockItem {
   minThreshold: number;
   costPerUnit: number;
   status: 'good' | 'low' | 'out';
+  lastRestocked?: string;
 }
 
 export interface StockUsageEntry {

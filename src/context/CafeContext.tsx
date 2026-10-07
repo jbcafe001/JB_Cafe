@@ -9,6 +9,8 @@ import {
   Table,
   MenuItem,
   StockItem,
+  Material,
+  StockBalance,
   Order,
   OrderItem,
   Expense,
@@ -163,7 +165,26 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [tables, setTables] = useState<Table[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [stockBalances, setStockBalances] = useState<StockBalance[]>([]);
+  
+  const stockItems: StockItem[] = useMemo(() => {
+    return materials.map(m => {
+      const balance = stockBalances.find(b => b.materialId === m.id) || { available: 0, status: 'out' as const, lastRestocked: undefined };
+      return {
+        id: m.id,
+        name: m.name,
+        available: balance.available,
+        unit: m.unit,
+        minThreshold: m.minThreshold,
+        costPerUnit: m.costPerUnit,
+        status: balance.status,
+        lastRestocked: balance.lastRestocked
+      };
+    });
+  }, [materials, stockBalances]);
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [stockAdditions, setStockAdditions] = useState<StockAddition[]>([]);
@@ -251,7 +272,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     attachListener('users', setUsers);
     attachListener('tables', setTables);
     attachListener('menuItems', setMenuItems);
-    attachListener('stockItems', setStockItems);
+    attachListener('materials', setMaterials);
+    attachListener('stockBalances', setStockBalances);
     attachListener('orders', setOrders);
     attachListener('expenses', setExpenses);
     attachListener('stockAdditions', setStockAdditions);
@@ -741,12 +763,24 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Stock Management
   const createStockItem = (item: Omit<StockItem, 'id'>) => {
-    const newItem: StockItem = {
-      ...item,
-      id: `st-${Date.now()}`,
+    const id = `st-${Date.now()}`;
+    const newMaterial: Material = {
+      id,
+      name: item.name,
+      unit: item.unit,
+      minThreshold: item.minThreshold,
+      costPerUnit: item.costPerUnit,
     };
-    setDoc(doc(db, 'stockItems', newItem.id), newItem).catch(console.error);
-    addNotification(`New material added: ${newItem.name}`, 'admin');
+    const newBalance: StockBalance = {
+      id,
+      materialId: id,
+      available: item.available,
+      status: item.status,
+      lastRestocked: item.lastRestocked,
+    };
+    setDoc(doc(db, 'materials', id), newMaterial).catch(console.error);
+    setDoc(doc(db, 'stockBalances', id), newBalance).catch(console.error);
+    addNotification(`New material added: ${newMaterial.name}`, 'admin');
     addToast('Material added successfully!');
   };
 
@@ -766,11 +800,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setDoc(doc(db, 'stockAdditions', newAddition.id), newAddition).catch(console.error);
 
-    // Update stock item
+    // Update stock balance
     const updatedQty = stockItem.available + quantity;
-    updateDoc(doc(db, 'stockItems', stockItemId), {
+    updateDoc(doc(db, 'stockBalances', stockItemId), {
       available: updatedQty,
-      status: updatedQty <= stockItem.minThreshold ? 'low' : 'good'
+      status: updatedQty <= stockItem.minThreshold ? 'low' : 'good',
+      lastRestocked: new Date().toISOString().split('T')[0]
     }).catch(console.error);
 
     // Also optionally record as an expense under 'Ingredients'
@@ -825,7 +860,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addNotification(`Alert: ${stockItem.name} is OUT OF STOCK!`, 'admin');
     }
 
-    updateDoc(doc(db, 'stockItems', stockItemId), {
+    updateDoc(doc(db, 'stockBalances', stockItemId), {
       available: updatedQty,
       status: newStatus,
     }).catch(console.error);
@@ -1192,7 +1227,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { getDocs } = await import('firebase/firestore');
       
-      const collectionsToClear = ['stockItems', 'materialUsageLogs', 'stockAdditions', 'orders', 'expenses'];
+      const collectionsToClear = ['materials', 'stockBalances', 'stockItems', 'materialUsageLogs', 'stockAdditions', 'orders', 'expenses'];
       for (const coll of collectionsToClear) {
         const snap = await getDocs(collection(db, coll));
         const deletePromises = snap.docs.map(d => deleteDoc(d.ref));

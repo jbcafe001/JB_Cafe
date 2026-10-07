@@ -112,24 +112,44 @@ export const AdminSettings: React.FC = () => {
         <button
           onClick={async () => {
             try {
-              const { doc, setDoc } = await import('firebase/firestore');
+              const { doc, setDoc, getDocs, collection, deleteDoc } = await import('firebase/firestore');
               const { db } = await import('../../firebase');
+              
+              // Clear old stockItems collection
+              const oldSnap = await getDocs(collection(db, 'stockItems'));
+              await Promise.all(oldSnap.docs.map(d => deleteDoc(d.ref)));
+              
+              // Clear materials and stockBalances just in case
+              const oldMaterials = await getDocs(collection(db, 'materials'));
+              await Promise.all(oldMaterials.docs.map(d => deleteDoc(d.ref)));
+              const oldBalances = await getDocs(collection(db, 'stockBalances'));
+              await Promise.all(oldBalances.docs.map(d => deleteDoc(d.ref)));
+
               const requiredItems = [
-                { id: 'st-coffee', name: 'Coffee Beans', unit: 'KG', minThreshold: 2, costPerUnit: 800, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-milk', name: 'Milk', unit: 'L', minThreshold: 10, costPerUnit: 60, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-sugar', name: 'Sugar', unit: 'KG', minThreshold: 5, costPerUnit: 45, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-lemons', name: 'Fresh Lemons & Mint', unit: 'KG', minThreshold: 1, costPerUnit: 120, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-tea', name: 'Tea Leaves', unit: 'KG', minThreshold: 1, costPerUnit: 600, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-bread', name: 'Bread', unit: 'Packs', minThreshold: 5, costPerUnit: 40, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-cheese', name: 'Cheese', unit: 'KG', minThreshold: 2, costPerUnit: 450, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-potatoes', name: 'Potatoes', unit: 'KG', minThreshold: 10, costPerUnit: 30, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-chocolate', name: 'Cocoa & Brownie Mix', unit: 'KG', minThreshold: 2, costPerUnit: 500, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
-                { id: 'st-icecream', name: 'Vanilla Ice Cream', unit: 'L', minThreshold: 2, costPerUnit: 200, available: 0, status: 'out', lastRestocked: new Date().toISOString().split('T')[0] },
+                { id: 'st-coffee', name: 'Coffee Beans', unit: 'KG', minThreshold: 2, costPerUnit: 800 },
+                { id: 'st-milk', name: 'Milk', unit: 'L', minThreshold: 10, costPerUnit: 60 },
+                { id: 'st-sugar', name: 'Sugar', unit: 'KG', minThreshold: 5, costPerUnit: 45 },
+                { id: 'st-lemons', name: 'Fresh Lemons & Mint', unit: 'KG', minThreshold: 1, costPerUnit: 120 },
+                { id: 'st-tea', name: 'Tea Leaves', unit: 'KG', minThreshold: 1, costPerUnit: 600 },
+                { id: 'st-bread', name: 'Bread', unit: 'Packs', minThreshold: 5, costPerUnit: 40 },
+                { id: 'st-cheese', name: 'Cheese', unit: 'KG', minThreshold: 2, costPerUnit: 450 },
+                { id: 'st-potatoes', name: 'Potatoes', unit: 'KG', minThreshold: 10, costPerUnit: 30 },
+                { id: 'st-chocolate', name: 'Cocoa & Brownie Mix', unit: 'KG', minThreshold: 2, costPerUnit: 500 },
+                { id: 'st-icecream', name: 'Vanilla Ice Cream', unit: 'L', minThreshold: 2, costPerUnit: 200 },
               ];
               for (const item of requiredItems) {
-                await setDoc(doc(db, 'stockItems', item.id), item);
+                // Insert into materials
+                await setDoc(doc(db, 'materials', item.id), item);
+                // Insert into stockBalances
+                await setDoc(doc(db, 'stockBalances', item.id), {
+                  id: item.id,
+                  materialId: item.id,
+                  available: 0,
+                  status: 'out',
+                  lastRestocked: new Date().toISOString().split('T')[0]
+                });
               }
-              alert('Successfully seeded all required materials!');
+              alert('Successfully seeded all required materials and stock balances!');
             } catch (err) {
               console.error(err);
               alert('Failed to seed materials');
