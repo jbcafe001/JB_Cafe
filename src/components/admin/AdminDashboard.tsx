@@ -17,7 +17,7 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const { filteredOrders: allOrders, menuItems, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory } = useCafe();
+  const { filteredOrders: allOrders, menuItems, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory, currentRole } = useCafe();
 
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
 
@@ -195,6 +195,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               <thead className="bg-stone-50 text-[10px] uppercase tracking-wider text-stone-400 font-bold">
                 <tr>
                   <th className="px-5 py-3">Order #</th>
+                  {currentRole !== 'admin_kunafa' && <th className="px-5 py-3">Brand</th>}
                   <th className="px-5 py-3">Table</th>
                   <th className="px-5 py-3">Waiter</th>
                   <th className="px-5 py-3">Items</th>
@@ -215,6 +216,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                       <td className="px-5 py-4 font-bold text-stone-900 font-mono">
                         {ord.orderNumber}
                       </td>
+                      {currentRole !== 'admin_kunafa' && (
+                        <td className="px-5 py-4 font-semibold text-stone-700">
+                          {(() => {
+                            const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+                            const isKunafa = ord.items.some(i => kunafaItemNames.has(i.name));
+                            return (
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                                isKunafa
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-stone-100 text-stone-800'
+                              }`}>
+                                {isKunafa ? 'KUNAFA' : 'JB Cafe'}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                      )}
                       <td className="px-5 py-4 text-stone-700">{ord.tableNumber}</td>
                       <td className="px-5 py-4 text-stone-600">{ord.waiterName}</td>
                       <td className="px-5 py-4 text-stone-600 max-w-[180px] truncate" title={summary}>

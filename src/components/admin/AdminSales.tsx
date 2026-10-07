@@ -15,7 +15,7 @@ import {
 type DateFilter = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
 
 export const AdminSales: React.FC = () => {
-  const { filteredOrders: orders, menuItems } = useCafe();
+  const { filteredOrders: orders, menuItems, currentRole } = useCafe();
   const [selectedFilter, setSelectedFilter] = useState<DateFilter>('Today');
   const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
@@ -99,21 +99,23 @@ export const AdminSales: React.FC = () => {
           </div>
 
           {/* Brand Filter */}
-          <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
-            {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-              <button
-                key={b}
-                onClick={() => setBrandFilter(b)}
-                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                  brandFilter === b
-                    ? 'bg-white text-stone-900 shadow-xs'
-                    : 'text-stone-500 hover:text-stone-700'
-                }`}
-              >
-                {b}
-              </button>
-            ))}
-          </div>
+          {currentRole !== 'admin_kunafa' && (
+            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setBrandFilter(b)}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                    brandFilter === b
+                      ? 'bg-white text-stone-900 shadow-xs'
+                      : 'text-stone-500 hover:text-stone-700'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -200,6 +202,7 @@ export const AdminSales: React.FC = () => {
             <thead>
               <tr className="border-b border-stone-200 text-stone-400 font-semibold uppercase text-[11px] tracking-wider">
                 <th className="pb-2.5">Order</th>
+                {currentRole !== 'admin_kunafa' && <th className="pb-2.5">Brand</th>}
                 <th className="pb-2.5">Date</th>
                 <th className="pb-2.5">Time</th>
                 <th className="pb-2.5">Table</th>
@@ -218,6 +221,23 @@ export const AdminSales: React.FC = () => {
                 return (
                   <tr key={ord.id} className="hover:bg-stone-50/80 transition-colors">
                     <td className="py-3 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
+                    {currentRole !== 'admin_kunafa' && (
+                      <td className="py-3 font-semibold text-stone-700">
+                        {(() => {
+                          const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+                          const isKunafa = ord.items.some(i => kunafaItemNames.has(i.name));
+                          return (
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                              isKunafa
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-stone-100 text-stone-800'
+                            }`}>
+                              {isKunafa ? 'KUNAFA' : 'JB Cafe'}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                    )}
                     <td className="py-3 text-stone-500">{dateDisplay}</td>
                     <td className="py-3 text-stone-500">{timeDisplay}</td>
                     <td className="py-3 font-semibold">{ord.tableNumber}</td>

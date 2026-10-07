@@ -76,7 +76,7 @@ interface CafeContextType {
   switchRole: (role: UserRole) => void;
 
   // Order Flow
-  createOrder: (params: CreateOrderParams) => Order;
+  createOrder: (params: CreateOrderParams) => Order | Order[];
   addItemsToOrder: (orderId: string, newItems: OrderItem[], additionalNotes?: string, paymentMethod?: PaymentMethod) => void;
   startPreparingOrder: (orderId: string) => void;
   markOrderReady: (orderId: string) => void;
@@ -357,69 +357,99 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Order Actions
-  const createOrder = ({ tableId, items, notes, waiterId, waiterName, paymentMethod }: CreateOrderParams): Order => {
+  const createOrder = ({ tableId, items, notes, waiterId, waiterName, paymentMethod }: CreateOrderParams): Order | Order[] => {
+    // 1. Group items by brand
+    const brandGroups: Record<string, OrderItem[]> = {
+      'JB Cafe': [],
+      'KUNAFA': []
+    };
+
+    items.forEach(item => {
+      const menuItem = menuItems.find(m => m.id === item.menuItemId || m.name === item.name);
+      if (menuItem?.brand === 'KUNAFA') {
+        brandGroups['KUNAFA'].push(item);
+      } else {
+        brandGroups['JB Cafe'].push(item);
+      }
+    });
+
+    const createdOrders: Order[] = [];
     const table = tables.find((t) => t.id === tableId);
     const tableNumStr = table ? table.name : 'Table';
     
-    // Generate order number in YYMMDDn format
+    // Base for order number in YYMMDD format
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
     const prefix = `${yy}${mm}${dd}`;
 
-    const todayOrders = orders.filter((o) => o.orderNumber.replace('#', '').startsWith(prefix));
-    
-    const existingNs = todayOrders
-      .map((o) => {
-        const numStr = o.orderNumber.replace('#', '').slice(prefix.length);
-        return parseInt(numStr, 10);
-      })
-      .filter((n) => !isNaN(n));
+    let nextN = -1;
+
+    const processGroup = (groupItems: OrderItem[], groupNotes: string | null) => {
+      if (groupItems.length === 0) return;
+
+      if (nextN === -1) {
+        const todayOrders = orders.filter((o) => o.orderNumber.replace('#', '').startsWith(prefix));
+        const existingNs = todayOrders
+          .map((o) => {
+            const numStr = o.orderNumber.replace('#', '').slice(prefix.length);
+            return parseInt(numStr, 10);
+          })
+          .filter((n) => !isNaN(n));
+          
+        nextN = existingNs.length > 0 ? Math.max(...existingNs) + 1 : 1;
+      } else {
+        nextN++;
+      }
+
+      const orderNumber = `${prefix}${nextN}`;
+      const subtotal = groupItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+      const tax = 0; // standard clean subtotal
+      const total = subtotal + tax;
+
+      const newOrder: Order = {
+        id: `ord-${Date.now()}-${nextN}`,
+        orderNumber,
+        tableId,
+        tableNumber: tableNumStr,
+        waiterId: waiterId || currentUser?.id || 'u-waiter-1',
+        waiterName: waiterName || currentUser?.name || 'Rahul Sharma',
+        items: groupItems.map(i => ({ ...i, batch: 1 })),
+        subtotal,
+        tax,
+        total,
+        status: 'new',
+        notes: groupNotes,
+        paymentMethod,
+        date: new Date().toISOString().split('T')[0],
+        createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      // Strip undefined values — Firebase rejects them
+      const cleanOrder = JSON.parse(JSON.stringify(newOrder));
+      setDoc(doc(db, 'orders', newOrder.id), cleanOrder).catch(console.error);
+
+      // Update Table status to occupied
+      updateDoc(doc(db, 'tables', tableId), {
+        status: 'occupied',
+        currentOrderId: newOrder.id,
+        activeWaiterId: newOrder.waiterId,
+        activeWaiterName: newOrder.waiterName,
+      }).catch(console.error);
+
+      // Notify Kitchen
+      addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
       
-    const nextN = existingNs.length > 0 ? Math.max(...existingNs) + 1 : 1;
-    const orderNumber = `${prefix}${nextN}`;
-
-    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const tax = 0; // standard clean subtotal
-    const total = subtotal + tax;
-
-    const newOrder: Order = {
-      id: `ord-${Date.now()}`,
-      orderNumber,
-      tableId,
-      tableNumber: tableNumStr,
-      waiterId: waiterId || currentUser?.id || 'u-waiter-1',
-      waiterName: waiterName || currentUser?.name || 'Rahul Sharma',
-      items: items.map(i => ({ ...i, batch: 1 })),
-      subtotal,
-      tax,
-      total,
-      status: 'new',
-      notes: notes || null,
-      paymentMethod,
-      date: new Date().toISOString().split('T')[0],
-      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      createdOrders.push(newOrder);
     };
 
-    // Strip undefined values — Firebase rejects them
-    const cleanOrder = JSON.parse(JSON.stringify(newOrder));
-    setDoc(doc(db, 'orders', newOrder.id), cleanOrder).catch(console.error);
+    processGroup(brandGroups['JB Cafe'], notes ? `JB Cafe: ${notes}` : null);
+    processGroup(brandGroups['KUNAFA'], notes ? `Kunafa: ${notes}` : null);
 
+    addToast(createdOrders.length > 1 ? 'Multiple orders created successfully (split by brand)!' : 'New order created successfully!');
 
-    // Update Table status to occupied
-    updateDoc(doc(db, 'tables', tableId), {
-      status: 'occupied',
-      currentOrderId: newOrder.id,
-      activeWaiterId: newOrder.waiterId,
-      activeWaiterName: newOrder.waiterName,
-    }).catch(console.error);
-
-    // Notify Kitchen
-    addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
-    addToast('New order created successfully!');
-
-    return newOrder;
+    return createdOrders.length === 1 ? createdOrders[0] : createdOrders;
   };
 
   const addItemsToOrder = (orderId: string, newItems: OrderItem[], additionalNotes?: string, paymentMethod?: PaymentMethod) => {
@@ -744,13 +774,29 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       completedAt: timeStr,
     }).catch(console.error);
 
-    // 1. Free Table
-    updateDoc(doc(db, 'tables', completedOrder.tableId), {
-      status: 'available',
-      currentOrderId: null,
-      activeWaiterId: null,
-      activeWaiterName: null,
-    }).catch(console.error);
+    // 1. Free Table (only if no other active orders remain)
+    const otherActiveOrders = orders.filter(
+      o => o.tableId === completedOrder.tableId &&
+           o.id !== orderId &&
+           ['new', 'preparing', 'ready', 'served'].includes(o.status)
+    );
+
+    if (otherActiveOrders.length === 0) {
+      updateDoc(doc(db, 'tables', completedOrder.tableId), {
+        status: 'available',
+        currentOrderId: null,
+        activeWaiterId: null,
+        activeWaiterName: null,
+      }).catch(console.error);
+    } else {
+      // Just update currentOrderId to the remaining active order
+      const nextActive = otherActiveOrders[0];
+      updateDoc(doc(db, 'tables', completedOrder.tableId), {
+        currentOrderId: nextActive.id,
+        activeWaiterId: nextActive.waiterId,
+        activeWaiterName: nextActive.waiterName,
+      }).catch(console.error);
+    }
 
     // 2. Automatically Deduct Ingredients from Stock
     // Calculate total ingredients used by completed order items
@@ -799,12 +845,27 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateDoc(doc(db, 'orders', orderId), { status: 'cancelled' }).catch(console.error);
 
     if (ord.tableId) {
-      updateDoc(doc(db, 'tables', ord.tableId), {
-        status: 'available',
-        currentOrderId: null,
-        activeWaiterId: null,
-        activeWaiterName: null
-      }).catch(console.error);
+      const otherActiveOrders = orders.filter(
+        o => o.tableId === ord.tableId &&
+             o.id !== orderId &&
+             ['new', 'preparing', 'ready', 'served'].includes(o.status)
+      );
+
+      if (otherActiveOrders.length === 0) {
+        updateDoc(doc(db, 'tables', ord.tableId), {
+          status: 'available',
+          currentOrderId: null,
+          activeWaiterId: null,
+          activeWaiterName: null
+        }).catch(console.error);
+      } else {
+        const nextActive = otherActiveOrders[0];
+        updateDoc(doc(db, 'tables', ord.tableId), {
+          currentOrderId: nextActive.id,
+          activeWaiterId: nextActive.waiterId,
+          activeWaiterName: nextActive.waiterName,
+        }).catch(console.error);
+      }
     }
     addNotification(`Order ${ord.orderNumber} was cancelled`, 'all');
     addToast('Order cancelled successfully', 'error');

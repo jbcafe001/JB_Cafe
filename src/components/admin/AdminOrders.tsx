@@ -260,7 +260,7 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
 // ─── Main Component ─────────────────────────────────────────────────────────
 
 export const AdminOrders: React.FC = () => {
-  const { filteredOrders: orders, menuItems } = useCafe();
+  const { filteredOrders: orders, menuItems, currentRole } = useCafe();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
@@ -347,21 +347,23 @@ export const AdminOrders: React.FC = () => {
             </div>
 
             {/* Brand Filter */}
-            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
-              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-                <button
-                  key={b}
-                  onClick={() => setBrandFilter(b)}
-                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                    brandFilter === b
-                      ? 'bg-white text-stone-900 shadow-xs'
-                      : 'text-stone-500 hover:text-stone-700'
-                  }`}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
+            {currentRole !== 'admin_kunafa' && (
+              <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+                {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => setBrandFilter(b)}
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                      brandFilter === b
+                        ? 'bg-white text-stone-900 shadow-xs'
+                        : 'text-stone-500 hover:text-stone-700'
+                    }`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )}
 
 
             {/* Search */}
@@ -432,6 +434,7 @@ export const AdminOrders: React.FC = () => {
                   <tr>
                     <th className="px-5 py-3">Date</th>
                     <th className="px-5 py-3">Order #</th>
+                    {currentRole !== 'admin_kunafa' && <th className="px-5 py-3">Brand</th>}
                     <th className="px-5 py-3">Table</th>
                     <th className="px-5 py-3">Waiter</th>
                     <th className="px-5 py-3">Items Summary</th>
@@ -454,6 +457,23 @@ export const AdminOrders: React.FC = () => {
                           : new Date().toLocaleDateString('en-GB')}
                       </td>
                       <td className="px-5 py-4 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
+                      {currentRole !== 'admin_kunafa' && (
+                        <td className="px-5 py-4 font-semibold text-stone-700">
+                          {(() => {
+                            const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+                            const isKunafa = ord.items.some(i => kunafaItemNames.has(i.name));
+                            return (
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                                isKunafa
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-stone-100 text-stone-800'
+                              }`}>
+                                {isKunafa ? 'KUNAFA' : 'JB Cafe'}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                      )}
                       <td className="px-5 py-4 font-semibold text-stone-700">{ord.tableNumber}</td>
                       <td className="px-5 py-4 text-stone-600">{ord.waiterName}</td>
                       <td className="px-5 py-4 text-stone-400 max-w-xs truncate text-xs">
