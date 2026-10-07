@@ -111,7 +111,7 @@ export const AdminView: React.FC = () => {
 
       {/* Clean Minimalism Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 h-screen w-60 bg-white text-stone-700 border-r border-stone-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
+        className={`fixed md:sticky top-0 left-0 z-40 h-[100dvh] md:h-screen w-60 bg-white text-stone-700 border-r border-stone-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >

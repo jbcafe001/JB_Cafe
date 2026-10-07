@@ -25,7 +25,7 @@ import {
 } from '../types';
 import { INITIAL_USERS } from '../data/initialData';
 import { db, registerNewUser } from '../firebase';
-import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
 interface CreateOrderParams {
   tableId: string;
@@ -297,6 +297,33 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unsubs.forEach(unsub => unsub());
     };
   }, []);
+
+  // Self-heal stuck tables on load (runs once after 5 seconds to ensure DB is initialized)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      tables.forEach((table) => {
+        if (table.status !== 'available') {
+          getDocs(query(
+            collection(db, 'orders'),
+            where('tableId', '==', table.id),
+            where('status', 'in', ['new', 'preparing', 'ready', 'served'])
+          )).then(snap => {
+            if (snap.empty) {
+              console.log(`Auto-healing stuck table: ${table.id}`);
+              updateDoc(doc(db, 'tables', table.id), {
+                status: 'available',
+                currentOrderId: null,
+                activeWaiterId: null,
+                activeWaiterName: null
+              }).catch(console.error);
+            }
+          }).catch(console.error);
+        }
+      });
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [tables.length]); // depends on tables.length so it runs after tables are initially loaded
+
 
 
 
@@ -775,28 +802,28 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }).catch(console.error);
 
     // 1. Free Table (only if no other active orders remain)
-    const otherActiveOrders = orders.filter(
-      o => o.tableId === completedOrder.tableId &&
-           o.id !== orderId &&
-           ['new', 'preparing', 'ready', 'served'].includes(o.status)
-    );
-
-    if (otherActiveOrders.length === 0) {
-      updateDoc(doc(db, 'tables', completedOrder.tableId), {
-        status: 'available',
-        currentOrderId: null,
-        activeWaiterId: null,
-        activeWaiterName: null,
-      }).catch(console.error);
-    } else {
-      // Just update currentOrderId to the remaining active order
-      const nextActive = otherActiveOrders[0];
-      updateDoc(doc(db, 'tables', completedOrder.tableId), {
-        currentOrderId: nextActive.id,
-        activeWaiterId: nextActive.waiterId,
-        activeWaiterName: nextActive.waiterName,
-      }).catch(console.error);
-    }
+    getDocs(query(
+      collection(db, 'orders'),
+      where('tableId', '==', completedOrder.tableId),
+      where('status', 'in', ['new', 'preparing', 'ready', 'served'])
+    )).then(snap => {
+      const activeDocs = snap.docs.filter(d => d.id !== orderId);
+      if (activeDocs.length === 0) {
+        updateDoc(doc(db, 'tables', completedOrder.tableId), {
+          status: 'available',
+          currentOrderId: null,
+          activeWaiterId: null,
+          activeWaiterName: null,
+        }).catch(console.error);
+      } else {
+        const nextActive = activeDocs[0].data();
+        updateDoc(doc(db, 'tables', completedOrder.tableId), {
+          currentOrderId: activeDocs[0].id,
+          activeWaiterId: nextActive.waiterId,
+          activeWaiterName: nextActive.waiterName,
+        }).catch(console.error);
+      }
+    }).catch(console.error);
 
     // 2. Automatically Deduct Ingredients from Stock
     // Calculate total ingredients used by completed order items
@@ -845,27 +872,28 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateDoc(doc(db, 'orders', orderId), { status: 'cancelled' }).catch(console.error);
 
     if (ord.tableId) {
-      const otherActiveOrders = orders.filter(
-        o => o.tableId === ord.tableId &&
-             o.id !== orderId &&
-             ['new', 'preparing', 'ready', 'served'].includes(o.status)
-      );
-
-      if (otherActiveOrders.length === 0) {
-        updateDoc(doc(db, 'tables', ord.tableId), {
-          status: 'available',
-          currentOrderId: null,
-          activeWaiterId: null,
-          activeWaiterName: null
-        }).catch(console.error);
-      } else {
-        const nextActive = otherActiveOrders[0];
-        updateDoc(doc(db, 'tables', ord.tableId), {
-          currentOrderId: nextActive.id,
-          activeWaiterId: nextActive.waiterId,
-          activeWaiterName: nextActive.waiterName,
-        }).catch(console.error);
-      }
+      getDocs(query(
+        collection(db, 'orders'),
+        where('tableId', '==', ord.tableId),
+        where('status', 'in', ['new', 'preparing', 'ready', 'served'])
+      )).then(snap => {
+        const activeDocs = snap.docs.filter(d => d.id !== orderId);
+        if (activeDocs.length === 0) {
+          updateDoc(doc(db, 'tables', ord.tableId), {
+            status: 'available',
+            currentOrderId: null,
+            activeWaiterId: null,
+            activeWaiterName: null
+          }).catch(console.error);
+        } else {
+          const nextActive = activeDocs[0].data();
+          updateDoc(doc(db, 'tables', ord.tableId), {
+            currentOrderId: activeDocs[0].id,
+            activeWaiterId: nextActive.waiterId,
+            activeWaiterName: nextActive.waiterName,
+          }).catch(console.error);
+        }
+      }).catch(console.error);
     }
     addNotification(`Order ${ord.orderNumber} was cancelled`, 'all');
     addToast('Order cancelled successfully', 'error');
