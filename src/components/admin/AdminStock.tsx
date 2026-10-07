@@ -24,10 +24,12 @@ import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminStock: React.FC = () => {
-  const { stockItems, addStock, useStock, todayStockUsage, materialUsageLogs } = useCafe();
+  const { stockItems, createStockItem, addStock, useStock, todayStockUsage, materialUsageLogs } = useCafe();
 
   const [showAddStockModal, setShowAddStockModal] = useState(false);
   const [showUseStockModal, setShowUseStockModal] = useState(false);
+  const [showCreateMaterialModal, setShowCreateMaterialModal] = useState(false);
+  
   const [selectedStockItemId, setSelectedStockItemId] = useState<string>(stockItems[0]?.id || '');
   const [selectedItemUnit, setSelectedItemUnit] = useState(stockItems[0]?.unit || 'L');
 
@@ -39,12 +41,19 @@ export const AdminStock: React.FC = () => {
   const [useQuantity, setUseQuantity] = useState('');
   const [usePurpose, setUsePurpose] = useState('Kitchen Cooking & Prep');
   const [useNotes, setUseNotes] = useState('');
+  
+  // Create Material modal state
+  const [newMaterialName, setNewMaterialName] = useState('');
+  const [newMaterialUnit, setNewMaterialUnit] = useState('KG');
+  const [newMaterialMinThreshold, setNewMaterialMinThreshold] = useState('5');
+  const [newMaterialCost, setNewMaterialCost] = useState('100');
 
   // Material Usage Log filter
   const [selectedMaterialFilter, setSelectedMaterialFilter] = useState('all');
 
   useModalClose(() => setShowUseStockModal(false), showUseStockModal);
   useModalClose(() => setShowAddStockModal(false), showAddStockModal);
+  useModalClose(() => setShowCreateMaterialModal(false), showCreateMaterialModal);
 
   // Overview metrics
   const totalItems = stockItems.length;
@@ -87,6 +96,26 @@ export const AdminStock: React.FC = () => {
     setShowUseStockModal(false);
   };
 
+  const handleCreateMaterialSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMaterialName) return;
+
+    createStockItem({
+      name: newMaterialName,
+      unit: newMaterialUnit,
+      available: 0,
+      minThreshold: parseFloat(newMaterialMinThreshold) || 0,
+      costPerUnit: parseFloat(newMaterialCost) || 0,
+      status: 'out',
+      lastRestocked: new Date().toISOString().split('T')[0]
+    });
+
+    setNewMaterialName('');
+    setNewMaterialMinThreshold('5');
+    setNewMaterialCost('100');
+    setShowCreateMaterialModal(false);
+  };
+
   // Quick quantity chip presets based on unit
   const getQuickChips = (unit: string) => {
     switch (unit) {
@@ -125,6 +154,16 @@ export const AdminStock: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
+          {/* Create Material Button */}
+          <button
+            id="create-material-btn"
+            onClick={() => setShowCreateMaterialModal(true)}
+            className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
+          >
+            <Plus className="w-3.5 h-3.5 text-indigo-600" />
+            <span>New Material</span>
+          </button>
+
           {/* Use Stock Button */}
           <button
             id="use-stock-header-btn"
@@ -747,6 +786,103 @@ export const AdminStock: React.FC = () => {
                   className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs"
                 >
                   Confirm Restock
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Material Modal */}
+      {showCreateMaterialModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
+              <div className="flex items-center space-x-2">
+                <Plus className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-extrabold text-stone-900">Create New Material</h3>
+              </div>
+              <button
+                onClick={() => setShowCreateMaterialModal(false)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMaterialSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Material Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newMaterialName}
+                  onChange={(e) => setNewMaterialName(e.target.value)}
+                  placeholder="e.g. Arabica Coffee Beans"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Measurement Unit *</label>
+                  <CustomSelect
+                    value={newMaterialUnit}
+                    onChange={(val) => setNewMaterialUnit(val)}
+                    options={[
+                      { value: 'L', label: 'Liters (L)' },
+                      { value: 'KG', label: 'Kilograms (KG)' },
+                      { value: 'Packs', label: 'Packs' },
+                      { value: 'Units', label: 'Units' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Low Stock Warning At *</label>
+                  <input
+                    type="number"
+                    step="any"
+                    required
+                    min="0"
+                    value={newMaterialMinThreshold}
+                    onChange={(e) => setNewMaterialMinThreshold(e.target.value)}
+                    placeholder="e.g. 5"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Cost Per Unit (₹) *</label>
+                <input
+                  type="number"
+                  step="any"
+                  required
+                  min="0"
+                  value={newMaterialCost}
+                  onChange={(e) => setNewMaterialCost(e.target.value)}
+                  placeholder="e.g. 100"
+                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="p-3 bg-indigo-50/50 rounded-xl text-xs text-stone-500 border border-indigo-100/50">
+                Newly created materials start with 0 stock. Once created, you can use the "Add Stock" button to restock it.
+              </div>
+
+              <div className="pt-2 flex items-center justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateMaterialModal(false)}
+                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-xs"
+                >
+                  Create Material
                 </button>
               </div>
             </form>

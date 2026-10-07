@@ -87,6 +87,7 @@ interface CafeContextType {
   cancelOrder: (orderId: string) => void;
 
   // Stock
+  createStockItem: (item: Omit<StockItem, 'id'>) => void;
   addStock: (stockItemId: string, quantity: number, purchaseCost: number) => void;
   useStock: (stockItemId: string, quantity: number, purpose?: string, notes?: string) => void;
   todayStockUsage: Record<string, { name: string; amount: number; unit: string }>;
@@ -739,6 +740,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Stock Management
+  const createStockItem = (item: Omit<StockItem, 'id'>) => {
+    const newItem: StockItem = {
+      ...item,
+      id: `st-${Date.now()}`,
+    };
+    setDoc(doc(db, 'stockItems', newItem.id), newItem).catch(console.error);
+    addNotification(`New material added: ${newItem.name}`, 'admin');
+    addToast('Material added successfully!');
+  };
+
   const addStock = (stockItemId: string, quantity: number, purchaseCost: number) => {
     const stockItem = stockItems.find((s) => s.id === stockItemId);
     if (!stockItem) return;
@@ -1250,6 +1261,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeItemFromOrder,
         completeOrder,
         cancelOrder,
+        createStockItem,
         addStock,
         useStock,
         todayStockUsage,
