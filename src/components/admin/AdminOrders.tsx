@@ -38,6 +38,8 @@ const StatusBadge: React.FC<{ status: string; size?: 'sm' | 'md' }> = ({ status,
 // ─── Order Detail Modal ─────────────────────────────────────────────────────
 
 const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ order, onClose }) => {
+  const { menuItems } = useCafe();
+
   const dateStr = order.date
     ? new Date(order.date).toLocaleDateString('en-GB')
     : '—';
@@ -126,28 +128,45 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
                       </div>
                     )}
                     <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-                      {batches[batchNum].map((item, idx) => (
-                        <div
-                          key={idx}
-                          className={`flex items-center justify-between px-4 py-3 ${idx < batches[batchNum].length - 1 ? 'border-b border-stone-50' : ''}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-black flex items-center justify-center flex-shrink-0">
-                              {item.quantity}
-                            </span>
-                            <div>
-                              <p className="text-sm font-semibold text-stone-800">{item.name}</p>
-                              {item.category && <p className="text-[10px] text-stone-400">{item.category}</p>}
+                      {batches[batchNum].map((item, idx) => {
+                        const menuData = menuItems.find(m => m.id === item.menuItemId || m.name === item.name);
+                        const itemBrand = menuData?.brand || 'JB Cafe';
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`flex items-center justify-between px-4 py-3 ${idx < batches[batchNum].length - 1 ? 'border-b border-stone-50' : ''}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-black flex items-center justify-center flex-shrink-0">
+                                {item.quantity}
+                              </span>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-semibold text-stone-800">{item.name}</p>
+                                  {itemBrand === 'KUNAFA' && (
+                                    <span className="text-[8px] font-bold uppercase tracking-widest text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded-sm border border-indigo-200">
+                                      KUNAFA
+                                    </span>
+                                  )}
+                                  {itemBrand === 'JB Cafe' && (
+                                    <span className="text-[8px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-sm border border-amber-200">
+                                      JB CAFE
+                                    </span>
+                                  )}
+                                </div>
+                                {item.category && <p className="text-[10px] text-stone-400 mt-0.5">{item.category}</p>}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-stone-900 font-mono">₹{item.price * item.quantity}</p>
+                              {item.quantity > 1 && (
+                                <p className="text-[10px] text-stone-400 font-mono">₹{item.price} each</p>
+                              )}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-bold text-stone-900 font-mono">₹{item.price * item.quantity}</p>
-                            {item.quantity > 1 && (
-                              <p className="text-[10px] text-stone-400 font-mono">₹{item.price} each</p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

@@ -171,9 +171,14 @@ export const AdminMenu: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                     {item.category}
                   </span>
-                  {item.brand && (
+                  {item.brand === 'KUNAFA' && (
                     <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
-                      {item.brand}
+                      KUNAFA
+                    </span>
+                  )}
+                  {(item.brand === 'JB Cafe' || !item.brand) && (
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      JB CAFE
                     </span>
                   )}
                   <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
