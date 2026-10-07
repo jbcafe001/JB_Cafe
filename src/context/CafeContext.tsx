@@ -912,11 +912,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Update stock balance
     const updatedQty = stockItem.available + quantity;
-    updateDoc(doc(db, 'stockBalances', stockItemId), {
+    setDoc(doc(db, 'stockBalances', stockItemId), {
+      materialId: stockItemId,
       available: updatedQty,
       status: updatedQty <= stockItem.minThreshold ? 'low' : 'good',
       lastRestocked: new Date().toISOString().split('T')[0]
-    }).catch(console.error);
+    }, { merge: true }).catch(console.error);
 
     // Also optionally record as an expense under 'Ingredients'
     if (purchaseCost > 0) {
@@ -971,10 +972,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addNotification(`Alert: ${stockItem.name} is OUT OF STOCK!`, 'admin');
     }
 
-    updateDoc(doc(db, 'stockBalances', stockItemId), {
+    setDoc(doc(db, 'stockBalances', stockItemId), {
+      materialId: stockItemId,
       available: updatedQty,
       status: newStatus,
-    }).catch(console.error);
+    }, { merge: true }).catch(console.error);
 
     addNotification(
       `Recorded usage: ${quantity} ${stockItem.unit} of ${stockItem.name} (${purpose})`,
