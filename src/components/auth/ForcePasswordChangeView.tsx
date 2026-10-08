@@ -2,11 +2,48 @@ import React, { useState } from 'react';
 import { Coffee, Key, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 import { auth, db } from '../../firebase';
 import { updatePassword } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useCafe } from '../../context/CafeContext';
 
+const hashPassword = async (password: string) => {
+  const msgUint8 = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+};
+
+const validatePassword = (pwd: string) => {
+  const errors: string[] = [];
+  if (pwd.length < 8) errors.push('at least 8 characters');
+  if (!/[A-Z]/.test(pwd)) errors.push('one uppercase letter');
+  if (!/[a-z]/.test(pwd)) errors.push('one lowercase letter');
+  if (!/[0-9]/.test(pwd)) errors.push('one number');
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) errors.push('one special character');
+  
+  if (errors.length > 0) {
+    return 'Password must contain ' + errors.join(', ') + '.';
+  }
+  return '';
+};
+
+const getPasswordStrength = (pwd: string) => {
+  let score = 0;
+  if (!pwd) return { label: '', color: 'bg-transparent', width: 'w-0' };
+  
+  if (pwd.length > 5) score += 1;
+  if (pwd.length > 7) score += 1;
+  if (/[A-Z]/.test(pwd)) score += 1;
+  if (/[a-z]/.test(pwd)) score += 1;
+  if (/[0-9]/.test(pwd)) score += 1;
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score += 1;
+  
+  if (score < 3) return { label: 'Weak (Easy to crack)', color: 'bg-rose-500', width: 'w-1/3' };
+  if (score < 5) return { label: 'Medium', color: 'bg-amber-500', width: 'w-2/3' };
+  return { label: 'Strong', color: 'bg-emerald-500', width: 'w-full' };
+};
+
 export const ForcePasswordChangeView: React.FC = () => {
-  const { currentUser, clearPasswordChangeFlag, addToast } = useCafe();
+  const { currentUser, clearPasswordChangeFlag, addToast, logout } = useCafe();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,12 +53,14 @@ export const ForcePasswordChangeView: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.');
+    const validationError = validatePassword(newPassword);
+    if (validationError) {
+      setError(validationError);
       return;
     }
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters.');
+
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
 
@@ -31,17 +70,35 @@ export const ForcePasswordChangeView: React.FC = () => {
     try {
       if (!auth.currentUser || !currentUser) throw new Error('Session expired.');
 
+      const hashedPwd = await hashPassword(newPassword);
+
+      // Check if any user has the same password
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('passwordHash', '==', hashedPwd));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        setError('This password is already in use by another user. Please choose a different password.');
+        setLoading(false);
+        return;
+      }
+
       await updatePassword(auth.currentUser, newPassword);
 
       await updateDoc(doc(db, 'users', currentUser.id), {
         requiresPasswordChange: false,
+        passwordHash: hashedPwd
       });
 
       clearPasswordChangeFlag();
       addToast('Password updated successfully!', 'success');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to update password. Please try again.');
+      if (err.code === 'auth/requires-recent-login' || err.message?.includes('auth/requires-recent-login')) {
+        setError('For security reasons, your login session has expired. Please log out and log in again to change your password.');
+      } else {
+        setError(err.message || 'Failed to update password. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -85,7 +142,7 @@ export const ForcePasswordChangeView: React.FC = () => {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password (min. 6 chars)"
+                  placeholder="Enter new password"
                   className="w-full pl-9 pr-10 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-stone-800"
                 />
                 <button
@@ -96,6 +153,20 @@ export const ForcePasswordChangeView: React.FC = () => {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+              {newPassword && (
+                <div className="mt-2">
+                  <div className="h-1.5 w-full bg-stone-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 ${getPasswordStrength(newPassword).color} ${getPasswordStrength(newPassword).width}`}
+                    ></div>
+                  </div>
+                  <p className={`text-xs mt-1 font-medium ${
+                    getPasswordStrength(newPassword).color.replace('bg-', 'text-')
+                  }`}>
+                    {getPasswordStrength(newPassword).label}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div>
@@ -123,6 +194,14 @@ export const ForcePasswordChangeView: React.FC = () => {
               <span>{loading ? 'Updating...' : 'Set New Password & Continue'}</span>
             </button>
           </form>
+
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full py-3 px-4 mt-3 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-xl text-sm transition-all"
+          >
+            Log out and try again
+          </button>
         </div>
       </div>
     </div>

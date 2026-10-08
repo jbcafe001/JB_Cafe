@@ -180,7 +180,7 @@ export const AdminView: React.FC = () => {
                 <p className="text-xs font-bold text-stone-900 leading-tight">
                   {currentUser?.name || 'Administrator'}
                 </p>
-                <span className="text-[10px] text-stone-400">admin@cafe.demo</span>
+                <span className="text-[10px] text-stone-400">{currentUser?.email || 'admin@cafe.demo'}</span>
               </div>
             </div>
 
