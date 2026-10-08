@@ -109,7 +109,7 @@ export const ForcePasswordChangeView: React.FC = () => {
       <div className="w-full max-w-md bg-white border border-stone-200/80 rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-stone-900 text-white p-6 text-center">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-3 shadow-inner overflow-hidden">
+          <div className="w-20 h-20 mx-auto rounded-full bg-white flex items-center justify-center mb-4 shadow-md overflow-hidden border-4 border-white/10 shrink-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-1" />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white">JB PAVILION & CAFE</h1>

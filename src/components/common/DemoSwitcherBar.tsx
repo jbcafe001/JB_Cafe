@@ -41,7 +41,7 @@ export const DemoSwitcherBar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Brand & Demo Pill */}
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white border border-stone-200 overflow-hidden flex items-center justify-center shadow-xs shrink-0">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-0.5" />
             </div>
             <div>

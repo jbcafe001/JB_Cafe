@@ -88,11 +88,11 @@ export const KitchenView: React.FC = () => {
           
           {/* Left: Cafe Name & Logo */}
           <div className="flex items-center space-x-2.5 min-w-0 flex-1">
-            <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner shrink-0">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-md overflow-hidden shrink-0 border-2 border-white/20">
               {settings?.logoUrl ? (
-                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain p-0.5" />
               ) : (
-                <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
               )}
             </div>
             <div className="flex flex-col min-w-0">

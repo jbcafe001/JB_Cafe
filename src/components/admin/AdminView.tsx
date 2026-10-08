@@ -92,8 +92,8 @@ export const AdminView: React.FC = () => {
       {/* Mobile Top bar */}
       <div className="md:hidden bg-white border-b border-stone-200 text-stone-900 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+          <div className="w-10 h-10 rounded-full bg-white border border-stone-200 overflow-hidden flex items-center justify-center shadow-xs shrink-0">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-0.5" />
           </div>
           <div>
             <span className="font-extrabold text-sm tracking-tight text-stone-900">JB PAVILION & CAFE</span>
