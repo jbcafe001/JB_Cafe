@@ -383,7 +383,7 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                           <button
                             id={`free-table-btn-${order.orderNumber.replace('#', '')}`}
                             onClick={() => {
-                              tableActiveOrders.forEach(o => completeOrder(o.id, 'cash'));
+                              tableActiveOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                             }}
                             className="w-full sm:w-auto px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                           >

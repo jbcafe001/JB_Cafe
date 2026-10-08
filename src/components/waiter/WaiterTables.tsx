@@ -325,7 +325,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              activeOrders.forEach(o => completeOrder(o.id, 'cash'));
+                              activeOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                             }}
                             className="flex-1 text-[10px] sm:text-xs bg-stone-900 hover:bg-stone-800 text-white py-2 rounded-xl font-bold shadow-xs flex items-center justify-center space-x-1.5 whitespace-nowrap"
                           >
@@ -518,7 +518,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
               {activeOrdersInModal.length > 0 && activeOrdersInModal.every(o => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served))) && (
                 <button
                   onClick={() => {
-                    activeOrdersInModal.forEach(o => completeOrder(o.id, 'cash'));
+                    activeOrdersInModal.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                     setActiveTableModal(null);
                   }}
                   className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 mb-3"
