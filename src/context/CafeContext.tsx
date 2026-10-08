@@ -266,29 +266,46 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Listen for Firestore changes — one listener per collection
   useEffect(() => {
+    // Only subscribe if we are logged in, so we know the correct role
+    if (!isLoggedIn || !currentUser) return;
+
     const unsubs: (() => void)[] = [];
 
-    const attachListener = (collName: string, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
-      const unsub = onSnapshot(collection(db, collName), (snap) => {
-        setter(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    const attachListener = (source: any, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
+      // source can be a collection reference or a query
+      const unsub = onSnapshot(typeof source === 'string' ? collection(db, source) : source, (snap: any) => {
+        setter(snap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
         setIsSyncing(false);
       });
       unsubs.push(unsub);
     };
 
+    // Shared collections for all roles
     attachListener('users', setUsers);
     attachListener('tables', setTables);
     attachListener('menuItems', setMenuItems);
     attachListener('materials', setMaterials);
     attachListener('stockBalances', setStockBalances);
-    attachListener('orders', setOrders);
-    attachListener('expenses', setExpenses);
-    attachListener('stockAdditions', setStockAdditions);
-    attachListener('materialUsageLogs', setMaterialUsageLogs);
-    attachListener('staffMembers', setStaffMembers);
-    attachListener('upaadRecords', setUpaadRecords);
-    attachListener('salaryHistory', setSalaryHistory);
-    attachListener('notifications', setNotifications);
+
+    // Admins need everything for reports and full history
+    if (currentRole === 'admin' || currentRole === 'admin_kunafa') {
+      attachListener('orders', setOrders);
+      attachListener('expenses', setExpenses);
+      attachListener('stockAdditions', setStockAdditions);
+      attachListener('materialUsageLogs', setMaterialUsageLogs);
+      attachListener('staffMembers', setStaffMembers);
+      attachListener('upaadRecords', setUpaadRecords);
+      attachListener('salaryHistory', setSalaryHistory);
+      attachListener('notifications', setNotifications);
+    } else {
+      // Waiters and Kitchen only need ACTIVE orders and notifications
+      const activeOrdersQuery = query(
+        collection(db, 'orders'),
+        where('status', 'in', ['new', 'preparing', 'ready', 'served'])
+      );
+      attachListener(activeOrdersQuery, setOrders);
+      attachListener('notifications', setNotifications);
+    }
 
     const unsubSettings = onSnapshot(doc(db, 'settings', 'cafeProfile'), (snap) => {
       if (snap.exists()) {
@@ -303,7 +320,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       unsubs.forEach(unsub => unsub());
     };
-  }, []);
+  }, [isLoggedIn, currentRole]);
 
   // Real-time session monitoring (logout if disabled, sync if edited)
   useEffect(() => {
