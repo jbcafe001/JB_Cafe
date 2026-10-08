@@ -304,6 +304,32 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  // Real-time session monitoring (logout if disabled, sync if edited)
+  useEffect(() => {
+    if (currentUser && currentUser.id) {
+      const liveUser = users.find(u => u.id === currentUser.id);
+      if (liveUser) {
+        if (liveUser.status === 'inactive') {
+          import('../services/auth').then(({ logoutUser }) => {
+            logoutUser();
+            setIsLoggedIn(false);
+            setCurrentUser(null);
+            addToast('Your account was disabled by an admin.', 'error');
+          });
+        } else if (liveUser.role !== currentUser.role || liveUser.name !== currentUser.name) {
+          // Keep currentUser details in sync with the live db (e.g. role changes, name changes)
+          setCurrentUser(prev => prev ? {
+            ...prev,
+            name: liveUser.name,
+            role: liveUser.role,
+          } : null);
+          setCurrentRole(liveUser.role);
+          addToast('Your account permissions were updated by an admin.', 'info');
+        }
+      }
+    }
+  }, [users, currentUser]);
+
   // Self-heal stuck tables on load (runs once after 5 seconds to ensure DB is initialized)
   useEffect(() => {
     const timer = setTimeout(() => {
