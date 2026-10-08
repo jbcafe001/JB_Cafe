@@ -19,9 +19,11 @@
     cursor: pointer !important;
   }
 
-  /* Prevent text wrapping in all tables across the admin panel for cleaner mobile view */
+  /* Prevent text wrapping and overlapping in all tables across the admin panel for cleaner mobile view */
   th, td {
     white-space: nowrap;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
