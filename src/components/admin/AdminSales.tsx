@@ -12,13 +12,14 @@ import {
   Download,
 } from 'lucide-react';
 
-type DateFilter = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
+type DateFilter = 'All Time' | 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
 
 export const AdminSales: React.FC = () => {
   const { filteredOrders: orders, menuItems, currentRole } = useCafe();
-  const [selectedFilter, setSelectedFilter] = useState<DateFilter>('Today');
+  const [selectedFilter, setSelectedFilter] = useState<DateFilter>('All Time');
   const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const todayStr = new Date().toISOString().split('T')[0];
   const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -27,15 +28,22 @@ export const AdminSales: React.FC = () => {
   const filteredOrders = useMemo(() => {
     const completed = orders.filter((o) => o.status === 'completed');
 
-    // 'This Week' or 'This Month'
-    let finalOrders = selectedFilter === 'This Week' || selectedFilter === 'This Month' ? completed : completed;
+    let finalOrders = completed;
 
-    if (selectedFilter === 'Today') {
-      finalOrders = completed.filter((o) => !o.createdAt.includes('-') || o.createdAt.startsWith(todayStr));
+    if (selectedFilter === 'All Time') {
+      // no-op, keep all
+    } else if (selectedFilter === 'Today') {
+      finalOrders = completed.filter((o) => o.date === todayStr);
     } else if (selectedFilter === 'Yesterday') {
-      finalOrders = completed.filter((o) => o.createdAt.includes(yesterdayStr));
+      finalOrders = completed.filter((o) => o.date === yesterdayStr);
+    } else if (selectedFilter === 'This Week') {
+      const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+      finalOrders = completed.filter((o) => o.date >= oneWeekAgo && o.date <= todayStr);
+    } else if (selectedFilter === 'This Month') {
+      const currentMonth = todayStr.substring(0, 7);
+      finalOrders = completed.filter((o) => o.date.startsWith(currentMonth));
     } else if (selectedFilter === 'Custom Date') {
-      finalOrders = completed.filter((o) => o.createdAt.includes(customDate));
+      finalOrders = completed.filter((o) => o.date === customDate);
     }
 
     if (brandFilter !== 'All') {
@@ -80,41 +88,71 @@ export const AdminSales: React.FC = () => {
           <p className="text-xs text-stone-500">Revenue, payment channels, and audit records</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center">
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-1.5 bg-stone-100 p-1 rounded-xl border border-stone-200">
-            {(['Today', 'Yesterday', 'This Week', 'This Month', 'Custom Date'] as const).map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setSelectedFilter(filter)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  selectedFilter === filter
-                    ? 'bg-white text-stone-900 shadow-xs'
-                    : 'text-stone-600 hover:text-stone-900'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
+        <div className="relative">
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className="flex items-center space-x-2 px-4 py-2 bg-white border border-stone-200 rounded-xl text-sm font-bold text-stone-700 shadow-xs hover:bg-stone-50 transition-colors"
+          >
+            <Filter className="w-4 h-4 text-stone-400" />
+            <span>Filters</span>
+          </button>
 
-          {/* Brand Filter */}
-          {currentRole !== 'admin_kunafa' && (
-            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
-              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-                <button
-                  key={b}
-                  onClick={() => setBrandFilter(b)}
-                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                    brandFilter === b
-                      ? 'bg-white text-stone-900 shadow-xs'
-                      : 'text-stone-500 hover:text-stone-700'
-                  }`}
-                >
-                  {b}
-                </button>
-              ))}
-            </div>
+          {isFiltersOpen && (
+            <>
+              {/* Invisible overlay for click-outside to close */}
+              <div 
+                className="fixed inset-0 z-40"
+                onClick={() => setIsFiltersOpen(false)}
+              />
+              
+              <div className="absolute right-0 mt-2 w-64 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+                <div className="p-3 border-b border-stone-100">
+                  <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2 px-2">Date Range</p>
+                  <div className="flex flex-col space-y-1">
+                    {(['All Time', 'Today', 'Yesterday', 'This Week', 'This Month', 'Custom Date'] as const).map((filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => {
+                          setSelectedFilter(filter);
+                          if (filter !== 'Custom Date') setIsFiltersOpen(false);
+                        }}
+                        className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                          selectedFilter === filter
+                            ? 'bg-amber-50 text-amber-700'
+                            : 'text-stone-600 hover:bg-stone-50'
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {currentRole !== 'admin_kunafa' && (
+                  <div className="p-3 bg-stone-50/50">
+                    <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-2 px-2">Brand</p>
+                    <div className="flex flex-col space-y-1">
+                      {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                        <button
+                          key={b}
+                          onClick={() => {
+                            setBrandFilter(b);
+                            setIsFiltersOpen(false);
+                          }}
+                          className={`text-left px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            brandFilter === b
+                              ? 'bg-stone-200 text-stone-900'
+                              : 'text-stone-500 hover:bg-stone-100'
+                          }`}
+                        >
+                          {b}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
