@@ -68,6 +68,33 @@ export const AdminSettings: React.FC = () => {
           </div>
 
           <div>
+            <label className="block text-stone-500 font-semibold mb-1">Upload Logo</label>
+            <div className="flex items-center space-x-3">
+              {profile.logoUrl && (
+                <div className="w-10 h-10 rounded-lg bg-white border border-stone-200 p-1 shrink-0 overflow-hidden shadow-xs">
+                  <img src={profile.logoUrl} alt="Preview" className="w-full h-full object-contain" />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setProfile({ ...profile, logoUrl: reader.result as string });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                disabled={isKunafaAdmin}
+                className={`w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-stone-900 file:text-white hover:file:bg-stone-800 file:cursor-pointer transition-all ${isKunafaAdmin ? 'opacity-70 cursor-not-allowed' : ''}`}
+              />
+            </div>
+          </div>
+
+          <div>
             <label className="block text-stone-500 font-semibold mb-1">Currency Symbol</label>
             <input
               type="text"
