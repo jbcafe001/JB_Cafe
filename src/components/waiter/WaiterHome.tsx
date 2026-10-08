@@ -294,9 +294,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                   </div>
 
                   <span
-                    className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}
+                    className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold border whitespace-nowrap ${badge.bg}`}
                   >
-                    <span className={`w-2 h-2 rounded-full ${badge.dot}`} />
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${badge.dot}`} />
                     <span>{badge.label}</span>
                   </span>
                 </div>
@@ -351,15 +351,15 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       )}
 
                       {isServed && activeOrder && (
-                        <div className="flex items-center space-x-2 w-full">
+                        <div className="flex flex-col sm:flex-row gap-2 w-full">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onSelectTable(table);
                             }}
-                            className="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1 transition-colors"
+                            className="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
                           >
-                            <Plus className="w-3.5 h-3.5" />
+                            <Plus className="w-3.5 h-3.5 shrink-0" />
                             <span>Order More</span>
                           </button>
 
@@ -368,9 +368,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                               e.stopPropagation();
                               activeOrders.forEach(o => completeOrder(o.id, 'cash'));
                             }}
-                            className="flex-1 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1 transition-colors"
+                            className="flex-1 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                             <span>Free Table</span>
                           </button>
                         </div>

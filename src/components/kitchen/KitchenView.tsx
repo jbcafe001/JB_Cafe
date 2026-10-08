@@ -87,7 +87,7 @@ export const KitchenView: React.FC = () => {
         <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-md">
           
           {/* Left: Cafe Name & Logo */}
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-2.5 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner shrink-0">
               {settings?.logoUrl ? (
                 <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-lg" />
@@ -95,15 +95,15 @@ export const KitchenView: React.FC = () => {
                 <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight whitespace-nowrap">
+            <div className="flex flex-col min-w-0">
+              <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight truncate">
                 {cafeName}
               </h1>
-              <div className="flex items-center space-x-1.5 sm:space-x-2">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
                 <span className="text-[9px] sm:text-xs text-white/80 font-medium tracking-wide uppercase whitespace-nowrap">
-                  KDS
+                  KITCHEN
                 </span>
-                <span className="bg-white/20 text-white border border-white/30 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
+                <span className="bg-white/20 text-white border border-white/30 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold whitespace-nowrap">
                   Live
                 </span>
               </div>
@@ -111,7 +111,7 @@ export const KitchenView: React.FC = () => {
           </div>
 
           {/* Right: Actions, Clock, Profile */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 shrink-0 pl-2">
             {/* KDS Controls */}
             <div className="flex items-center space-x-1.5 sm:space-x-2">
               <button
