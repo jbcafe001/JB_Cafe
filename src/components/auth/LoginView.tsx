@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Coffee, LogIn, Key, Mail, ShieldAlert, Eye, EyeOff } from 'lucide-react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
+import { useCafe } from '../../context/CafeContext';
 
 export const LoginView: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ export const LoginView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { addToast } = useCafe();
 
   const getFriendlyError = (code: string) => {
     switch (code) {
@@ -47,6 +49,7 @@ export const LoginView: React.FC = () => {
       }
 
       // If active, CafeContext's onAuthStateChanged will handle the rest
+      addToast('Successfully logged in!', 'success');
     } catch (err: any) {
       console.error(err);
       setError(getFriendlyError(err.code));
