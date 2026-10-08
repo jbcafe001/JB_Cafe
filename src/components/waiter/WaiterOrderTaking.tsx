@@ -43,6 +43,17 @@ const CATEGORIES: MenuItemCategory[] = [
   'Rice',
   'Shake',
   'Cold Coffee',
+  'Sizzling Brownie',
+  'Cheesecake',
+  'Cookie Tin',
+  'Coffee Tiramisu',
+  'Kunafa',
+  'Dessert Can',
+  'Chocolate Bowl',
+  'Baklava',
+  'Kunafa Cheese Bomb',
+  'Bombolinis',
+  'Chocolate Bar',
 ];
 
 export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({

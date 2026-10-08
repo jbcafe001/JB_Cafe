@@ -43,7 +43,18 @@ export type MenuItemCategory =
   | 'Soup'
   | 'Rice'
   | 'Shake'
-  | 'Cold Coffee';
+  | 'Cold Coffee'
+  | 'Sizzling Brownie'
+  | 'Cheesecake'
+  | 'Cookie Tin'
+  | 'Coffee Tiramisu'
+  | 'Kunafa'
+  | 'Dessert Can'
+  | 'Chocolate Bowl'
+  | 'Baklava'
+  | 'Kunafa Cheese Bomb'
+  | 'Bombolinis'
+  | 'Chocolate Bar';
 
 export interface RecipeIngredient {
   stockItemId: string;

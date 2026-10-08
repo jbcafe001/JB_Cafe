@@ -24,6 +24,17 @@ const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Rice',
   'Shake',
   'Cold Coffee',
+  'Sizzling Brownie',
+  'Cheesecake',
+  'Cookie Tin',
+  'Coffee Tiramisu',
+  'Kunafa',
+  'Dessert Can',
+  'Chocolate Bowl',
+  'Baklava',
+  'Kunafa Cheese Bomb',
+  'Bombolinis',
+  'Chocolate Bar',
 ];
 
 export const AdminMenu: React.FC = () => {
