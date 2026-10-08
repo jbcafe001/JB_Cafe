@@ -115,7 +115,7 @@ export const AdminMenu: React.FC = () => {
         <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar flex-1">
           <button
             onClick={() => setActiveCategory('All')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
               activeCategory === 'All'
                 ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
