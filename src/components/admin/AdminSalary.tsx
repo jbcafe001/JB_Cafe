@@ -493,7 +493,7 @@ export const AdminSalary: React.FC = () => {
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>Staff Directory ({staffMembers.length})</span>
+            <span>Staff Directory</span>
           </button>
 
           <button
@@ -506,7 +506,7 @@ export const AdminSalary: React.FC = () => {
             }`}
           >
             <History className="w-3.5 h-3.5" />
-            <span>Salary History ({salaryHistory.length})</span>
+            <span>Salary History</span>
           </button>
 
           <button
@@ -519,7 +519,7 @@ export const AdminSalary: React.FC = () => {
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
-            <span>Upaad Advances ({upaadRecords.length})</span>
+            <span>Upaad Advances</span>
           </button>
         </div>
       </div>

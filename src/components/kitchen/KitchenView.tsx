@@ -81,9 +81,10 @@ export const KitchenView: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-[#1C1917] flex flex-col select-none">
       {/* Fixed Header & Tabs Container */}
+      {/* Fixed Header & Tabs Container */}
       <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
         {/* Custom Kitchen Header */}
-        <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+        <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-md">
           
           {/* Left: Cafe Name & Logo */}
           <div className="flex items-center space-x-2.5">
@@ -95,14 +96,14 @@ export const KitchenView: React.FC = () => {
               )}
             </div>
             <div className="flex flex-col">
-              <h1 className="text-lg sm:text-xl font-extrabold tracking-tight leading-tight">
+              <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight whitespace-nowrap">
                 {cafeName}
               </h1>
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] sm:text-xs text-white/80 font-medium tracking-wide uppercase">
-                  Kitchen Display (KDS)
+              <div className="flex items-center space-x-1.5 sm:space-x-2">
+                <span className="text-[9px] sm:text-xs text-white/80 font-medium tracking-wide uppercase whitespace-nowrap">
+                  KDS
                 </span>
-                <span className="bg-white/20 text-white border border-white/30 text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
+                <span className="bg-white/20 text-white border border-white/30 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold">
                   Live
                 </span>
               </div>
@@ -110,12 +111,12 @@ export const KitchenView: React.FC = () => {
           </div>
 
           {/* Right: Actions, Clock, Profile */}
-          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto space-x-3 sm:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* KDS Controls */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${
                   soundEnabled
                     ? 'bg-white text-[#B45309] border-transparent'
                     : 'bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white'
@@ -133,7 +134,7 @@ export const KitchenView: React.FC = () => {
             <div className="w-px h-6 bg-white/20 hidden sm:block"></div>
 
             {/* Profile Avatar & Name */}
-            <div className="flex items-center space-x-2.5">
+            <div className="flex items-center space-x-1.5 sm:space-x-2.5">
               <span className="text-sm font-medium hidden sm:inline-block">
                 Hello, {currentUser?.name || 'Cook'}
               </span>
@@ -149,7 +150,7 @@ export const KitchenView: React.FC = () => {
                     { isDestructive: true, confirmText: 'Logout' }
                   );
                 }}
-                className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/10 border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors ml-1"
+                className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/10 border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors"
                 title="Log Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -168,9 +169,9 @@ export const KitchenView: React.FC = () => {
                 : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
-            <Clock className="w-4 h-4" />
-            <span>NEW ORDERS</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            <Clock className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">NEW ORDERS</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
               {newOrders.length}
             </span>
           </button>
@@ -183,9 +184,9 @@ export const KitchenView: React.FC = () => {
                 : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
-            <Flame className="w-4 h-4" />
-            <span>PREPARING</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            <Flame className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">PREPARING</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
               {preparingOrders.length}
             </span>
           </button>
@@ -198,9 +199,9 @@ export const KitchenView: React.FC = () => {
                 : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>READY</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">READY</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
               {readyOrders.length}
             </span>
           </button>
@@ -213,9 +214,9 @@ export const KitchenView: React.FC = () => {
                 : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
-            <Utensils className="w-4 h-4" />
-            <span>SERVED</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono">
+            <Utensils className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">SERVED</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
               {servedOrders.length}
             </span>
           </button>

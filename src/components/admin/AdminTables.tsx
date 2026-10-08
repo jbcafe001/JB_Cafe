@@ -112,10 +112,10 @@ export const AdminTables: React.FC = () => {
             className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs flex flex-col justify-between min-h-[140px] hover:shadow-md transition-shadow"
           >
             <div>
-              <div className="flex items-start justify-between">
-                <span className="font-extrabold text-stone-900 text-lg">{table.name}</span>
+              <div className="flex flex-col items-start gap-1.5">
+                <span className="font-extrabold text-stone-900 text-base sm:text-lg whitespace-nowrap">{table.name}</span>
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(
+                  className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(
                     table.status
                   )}`}
                 >

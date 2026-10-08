@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
+import { WaiterHeader } from './WaiterHeader';
 
 interface WaiterTablesProps {
   onSelectTable: (table: Table) => void;
@@ -140,6 +141,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28 bg-[#F8F6F0]">
+      <WaiterHeader />
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">Café Floor Tables</h2>
