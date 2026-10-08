@@ -157,7 +157,7 @@ export const AdminStock: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header & Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">
             STOCK MANAGEMENT
@@ -167,12 +167,12 @@ export const AdminStock: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {/* Create Material Button */}
           <button
             id="create-material-btn"
             onClick={() => setShowCreateMaterialModal(true)}
-            className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5 text-indigo-600" />
             <span>New Material</span>
@@ -191,7 +191,7 @@ export const AdminStock: React.FC = () => {
               setUseNotes('');
               setShowUseStockModal(true);
             }}
-            className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
           >
             <Minus className="w-3.5 h-3.5 text-stone-600" />
             <span>Use Stock</span>
@@ -208,7 +208,7 @@ export const AdminStock: React.FC = () => {
               }
               setShowAddStockModal(true);
             }}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95"
+            className="flex-1 sm:flex-none justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Stock</span>

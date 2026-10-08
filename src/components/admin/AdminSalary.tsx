@@ -385,7 +385,7 @@ export const AdminSalary: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header section with Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 tracking-tight uppercase">
@@ -400,11 +400,11 @@ export const AdminSalary: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
           <button
             id="give-upaad-btn-header"
             onClick={() => handleOpenGiveUpaad()}
-            className="px-3.5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-amber-400" />
             <span>Give Upaad</span>
@@ -413,7 +413,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="add-staff-btn-header"
             onClick={handleOpenAddStaff}
-            className="px-3.5 py-2.5 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
           >
             <Users className="w-4 h-4" />
             <span>Add Staff</span>

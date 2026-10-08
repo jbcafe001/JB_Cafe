@@ -67,7 +67,7 @@ export const AdminExpenses: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header & Add Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">EXPENSES</h2>
           <p className="text-xs text-stone-500">Record daily café operational and ingredient costs</p>
@@ -76,7 +76,7 @@ export const AdminExpenses: React.FC = () => {
         <button
           id="add-expense-btn"
           onClick={() => setShowAddModal(true)}
-          className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
+          className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add Expense</span>
