@@ -353,7 +353,7 @@ export const AdminOrders: React.FC = () => {
                   <button
                     key={b}
                     onClick={() => setBrandFilter(b)}
-                    className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all whitespace-nowrap ${
                       brandFilter === b
                         ? 'bg-white text-stone-900 shadow-xs'
                         : 'text-stone-500 hover:text-stone-700'
@@ -391,7 +391,7 @@ export const AdminOrders: React.FC = () => {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${
                 statusFilter === st
                   ? 'bg-[#B45309] text-white shadow-xs'
                   : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
