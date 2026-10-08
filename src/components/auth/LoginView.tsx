@@ -19,6 +19,7 @@ export const LoginView: React.FC = () => {
       case 'auth/too-many-requests':
         return 'Too many failed attempts. Please try again later.';
       case 'auth/user-disabled':
+      case 'custom/user-inactive':
         return 'Your account has been disabled. Contact admin.';
       default:
         return 'An unexpected error occurred during login.';
@@ -31,10 +32,21 @@ export const LoginView: React.FC = () => {
     setError('');
 
     try {
-      // Sign in directly with Firebase — CafeContext's onAuthStateChanged
-      // will detect the session, fetch user data (including requiresPasswordChange),
-      // and route accordingly via App.tsx
-      await signInWithEmailAndPassword(auth, email, password);
+      // Sign in directly with Firebase
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Immediately check Firestore status
+      const { getDoc, doc } = await import('firebase/firestore');
+      const { db } = await import('../../firebase');
+      const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+      
+      if (userDoc.exists() && userDoc.data().status === 'inactive') {
+        const { signOut } = await import('firebase/auth');
+        await signOut(auth);
+        throw { code: 'custom/user-inactive' };
+      }
+
+      // If active, CafeContext's onAuthStateChanged will handle the rest
     } catch (err: any) {
       console.error(err);
       setError(getFriendlyError(err.code));
