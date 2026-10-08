@@ -26,12 +26,24 @@ export interface Table {
 
 export type MenuItemCategory =
   | 'All'
-  | 'Coffee'
-  | 'Tea'
-  | 'Beverages'
+  | 'Tea & Coffee'
   | 'Snacks'
-  | 'Main Course'
-  | 'Desserts';
+  | 'Sandwich'
+  | 'Burger'
+  | 'Garlic Bread'
+  | 'Pizza'
+  | 'Hot Dog'
+  | 'Frankie'
+  | 'Maggi'
+  | 'Pasta'
+  | 'French Fries'
+  | 'Starter'
+  | 'Noodles'
+  | 'Mocktail'
+  | 'Soup'
+  | 'Rice'
+  | 'Shake'
+  | 'Cold Coffee';
 
 export interface RecipeIngredient {
   stockItemId: string;

@@ -6,11 +6,24 @@ import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
 const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
-  'Coffee',
-  'Tea',
-  'Beverages',
+  'Tea & Coffee',
   'Snacks',
-  'Desserts',
+  'Sandwich',
+  'Burger',
+  'Garlic Bread',
+  'Pizza',
+  'Hot Dog',
+  'Frankie',
+  'Maggi',
+  'Pasta',
+  'French Fries',
+  'Starter',
+  'Noodles',
+  'Mocktail',
+  'Soup',
+  'Rice',
+  'Shake',
+  'Cold Coffee',
 ];
 
 export const AdminMenu: React.FC = () => {
