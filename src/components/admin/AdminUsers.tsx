@@ -186,43 +186,49 @@ export const AdminUsers: React.FC = () => {
                     </td>
                     <td className="py-3 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => toggleUserStatus(usr.id)}
-                          className="text-xs font-semibold text-stone-600 hover:text-stone-900 px-2 py-1 rounded-lg hover:bg-stone-100 inline-flex items-center space-x-1"
-                        >
-                          {isActive ? (
-                            <>
-                              <ToggleRight className="w-4 h-4 text-emerald-600" />
-                              <span>Disable</span>
-                            </>
-                          ) : (
-                            <>
-                              <ToggleLeft className="w-4 h-4 text-stone-400" />
-                              <span>Enable</span>
-                            </>
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleOpenEdit(usr)}
-                          className="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                          title="Edit User"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            showConfirm(
-                              'Delete User',
-                              `Are you sure you want to completely remove ${usr.name}? This action cannot be undone.`,
-                              () => deleteUser(usr.id),
-                              { isDestructive: true, confirmText: 'Delete' }
-                            );
-                          }}
-                          className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {usr.role !== 'admin' ? (
+                          <>
+                            <button
+                              onClick={() => toggleUserStatus(usr.id)}
+                              className="text-xs font-semibold text-stone-600 hover:text-stone-900 px-2 py-1 rounded-lg hover:bg-stone-100 inline-flex items-center space-x-1"
+                            >
+                              {isActive ? (
+                                <>
+                                  <ToggleRight className="w-4 h-4 text-emerald-600" />
+                                  <span>Disable</span>
+                                </>
+                              ) : (
+                                <>
+                                  <ToggleLeft className="w-4 h-4 text-stone-400" />
+                                  <span>Enable</span>
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleOpenEdit(usr)}
+                              className="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              title="Edit User"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                showConfirm(
+                                  'Delete User',
+                                  `Are you sure you want to completely remove ${usr.name}? This action cannot be undone.`,
+                                  () => deleteUser(usr.id),
+                                  { isDestructive: true, confirmText: 'Delete' }
+                                );
+                              }}
+                              className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                              title="Delete User"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider px-2">Protected</span>
+                        )}
                       </div>
                     </td>
                   </tr>
