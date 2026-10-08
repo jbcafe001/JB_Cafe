@@ -194,7 +194,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [salaryHistory, setSalaryHistory] = useState<SalaryPaymentRecord[]>([]);
   const [notifications, setNotifications] = useState<CafeNotification[]>([]);
   const [settings, setSettings] = useState<CafeSettings>({
-    cafeName: 'BREW & BITE Café',
+    cafeName: 'JB PAVILION & CAFE',
+    logoUrl: '/logo.png',
     currencySymbol: 'INR (₹)',
     outletTerminal: 'Main Dining Floor — POS #01',
     taxConfig: '5% Inclusive CGST + SGST'

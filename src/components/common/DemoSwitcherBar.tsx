@@ -41,14 +41,12 @@ export const DemoSwitcherBar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
           {/* Brand & Demo Pill */}
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#B45309] rounded-lg flex items-center justify-center text-white shadow-xs">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746-3.332.477-4.5 1.253" />
-              </svg>
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-0.5" />
             </div>
             <div>
               <h1 className="text-base sm:text-xl font-bold tracking-tight text-stone-900 leading-none">
-                BREW & BITE
+                JB PAVILION & CAFE
               </h1>
               <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mt-0.5">
                 Café Management
@@ -247,7 +245,7 @@ export const DemoSwitcherBar: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-stone-900 text-lg sm:text-xl tracking-tight">
-                    Brew & Bite Walkthrough
+                    JB Pavilion & Cafe Walkthrough
                   </h3>
                   <p className="text-stone-500 text-sm font-medium">
                     Experience the complete synchronized café flow in 4 phases

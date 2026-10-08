@@ -24,7 +24,7 @@ export const WaiterProfile: React.FC = () => {
       <div className="bg-white border border-stone-200/80 rounded-2xl p-4 shadow-xs">
         <div className="flex items-center space-x-3 text-xs text-stone-600">
           <Coffee className="w-4 h-4 text-amber-600" />
-          <span>BREW & BITE Café — Branch Terminal #01</span>
+          <span>JB PAVILION & CAFE — Branch Terminal #01</span>
         </div>
       </div>
 

@@ -9,7 +9,7 @@ export const WaiterHeader: React.FC = () => {
 
   useModalClose(() => setIsAvatarMenuOpen(false), isAvatarMenuOpen);
 
-  const cafeName = settings?.cafeName || 'BREW & BITE Café';
+  const cafeName = settings?.cafeName || 'JB PAVILION & CAFE';
 
   const initials = (currentUser?.name || 'Rahul')
     .split(' ')
@@ -22,8 +22,12 @@ export const WaiterHeader: React.FC = () => {
     <div className="bg-[#B45309] text-white px-4 py-3.5 sm:py-4 -mx-4 -mt-4 mb-4 flex items-center justify-between shadow-md">
       {/* Left: Cafe Name & Logo */}
       <div className="flex items-center space-x-2.5">
-        <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner">
-          <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner overflow-hidden">
+          {settings?.logoUrl ? (
+            <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+          ) : (
+            <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
+          )}
         </div>
         <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">
           {cafeName}

@@ -90,7 +90,7 @@ export const KitchenView: React.FC = () => {
           <div className="flex items-center space-x-2.5 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-inner shrink-0">
               {settings?.logoUrl ? (
-                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-lg" />
+                <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
               ) : (
                 <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
