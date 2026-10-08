@@ -40,12 +40,22 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
     // Fetch role from Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data.status === 'inactive') {
+        await signOut(auth);
+        throw {
+          message: 'Your account has been disabled. Contact admin.',
+          status: 403,
+          toast: true
+        };
+      }
+
       const appUser: AppUser = {
         uid: user.uid,
         email: user.email!,
-        name: userDoc.data().name,
-        role: userDoc.data().role,
-        requiresPasswordChange: userDoc.data().requiresPasswordChange ?? false,
+        name: data.name,
+        role: data.role,
+        requiresPasswordChange: data.requiresPasswordChange ?? false,
       };
 
       return {

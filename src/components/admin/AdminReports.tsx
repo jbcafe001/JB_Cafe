@@ -21,7 +21,26 @@ export const AdminReports: React.FC = () => {
   const netProfit = totalSales - totalExpenses;
 
   // Best selling items ranking
-  const bestSellers: { rank: number; name: string; count: number; revenue: number; percent: number }[] = [];
+  const itemMap = new Map<string, { name: string; count: number; revenue: number }>();
+  completed.forEach(order => {
+    order.items.forEach(item => {
+      const existing = itemMap.get(item.name) || { name: item.name, count: 0, revenue: 0 };
+      existing.count += item.quantity;
+      existing.revenue += item.price * item.quantity;
+      itemMap.set(item.name, existing);
+    });
+  });
+
+  const allItems = Array.from(itemMap.values()).sort((a, b) => b.count - a.count);
+  const maxCount = allItems.length > 0 ? allItems[0].count : 1;
+
+  const bestSellers: { rank: number; name: string; count: number; revenue: number; percent: number }[] = allItems.slice(0, 5).map((item, index) => ({
+    rank: index + 1,
+    name: item.name,
+    count: item.count,
+    revenue: item.revenue,
+    percent: (item.count / maxCount) * 100,
+  }));
 
   return (
     <div className="space-y-6">
@@ -110,30 +129,36 @@ export const AdminReports: React.FC = () => {
           </div>
 
           <div className="space-y-4">
-            {bestSellers.map((item) => (
-              <div key={item.name} className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs sm:text-sm">
-                  <div className="flex items-center space-x-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 font-bold text-stone-700 text-xs flex items-center justify-center">
-                      {item.rank}
-                    </span>
-                    <span className="font-bold text-stone-900">{item.name}</span>
+            {bestSellers.length > 0 ? (
+              bestSellers.map((item) => (
+                <div key={item.name} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs sm:text-sm">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 font-bold text-stone-700 text-xs flex items-center justify-center">
+                        {item.rank}
+                      </span>
+                      <span className="font-bold text-stone-900">{item.name}</span>
+                    </div>
+                    <div className="text-right font-medium text-stone-600">
+                      <strong className="text-stone-900">{item.count} sold</strong>
+                      <span className="text-stone-400 ml-1.5">(₹{item.revenue.toLocaleString()})</span>
+                    </div>
                   </div>
-                  <div className="text-right font-medium text-stone-600">
-                    <strong className="text-stone-900">{item.count} sold</strong>
-                    <span className="text-stone-400 ml-1.5">(₹{item.revenue.toLocaleString()})</span>
-                  </div>
-                </div>
 
-                {/* Relative progress bar */}
-                <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
-                  <div
-                    style={{ width: `${item.percent}%` }}
-                    className="bg-amber-500 h-full rounded-full transition-all duration-500"
-                  />
+                  {/* Relative progress bar */}
+                  <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      style={{ width: `${item.percent}%` }}
+                      className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-stone-400 italic p-3 text-sm border border-dashed border-stone-200 rounded-xl bg-stone-50 text-center">
+                No sales data available yet.
+              </p>
+            )}
           </div>
         </div>
 

@@ -228,19 +228,25 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
-            const restoredUser = {
-              id: firebaseUser.uid,
-              name: data.name,
-              email: firebaseUser.email!,
-              role: data.role,
-              status: 'active' as const,
-            };
-            setCurrentUser(restoredUser);
-            setCurrentRole(data.role);
-            setIsLoggedIn(true);
-            // Check if user still needs to change their password
-            if (data.requiresPasswordChange === true) {
-              setRequiresPasswordChange(true);
+            if (data.status === 'inactive') {
+              import('../services/auth').then(({ logoutUser }) => logoutUser());
+              setIsLoggedIn(false);
+              setCurrentUser(null);
+            } else {
+              const restoredUser = {
+                id: firebaseUser.uid,
+                name: data.name,
+                email: firebaseUser.email!,
+                role: data.role,
+                status: data.status || 'active',
+              };
+              setCurrentUser(restoredUser);
+              setCurrentRole(data.role);
+              setIsLoggedIn(true);
+              // Check if user still needs to change their password
+              if (data.requiresPasswordChange === true) {
+                setRequiresPasswordChange(true);
+              }
             }
           }
         } catch (err) {
@@ -263,7 +269,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const attachListener = (collName: string, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
       const unsub = onSnapshot(collection(db, collName), (snap) => {
-        setter(snap.docs.map(d => d.data()));
+        setter(snap.docs.map(d => ({ id: d.id, ...d.data() })));
         setIsSyncing(false);
       });
       unsubs.push(unsub);
