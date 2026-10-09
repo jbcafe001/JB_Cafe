@@ -109,14 +109,19 @@ export const AdminMenu: React.FC = () => {
     e.preventDefault();
     if (!name.trim() || !price) return;
 
+    const parsedIngredients = ingredients.map(ing => ({
+      ...ing,
+      amount: parseFloat(ing.amount as unknown as string) || 0
+    }));
+
     if (editingItem) {
       updateMenuItem(editingItem.id, {
         name: name.trim(),
         category,
         price: parseFloat(price) || 0,
-        description: description.trim() || undefined,
+        description: description.trim() || "",
         brand,
-        ingredients,
+        ingredients: parsedIngredients,
       });
     } else {
       addMenuItem({
@@ -124,9 +129,9 @@ export const AdminMenu: React.FC = () => {
         category,
         price: parseFloat(price) || 0,
         available: true,
-        description: description.trim() || undefined,
+        description: description.trim() || "",
         brand,
-        ingredients,
+        ingredients: parsedIngredients,
       });
     }
 
@@ -363,8 +368,8 @@ export const AdminMenu: React.FC = () => {
                   ) : (
                     <div className="space-y-2 mb-2">
                       {ingredients.map((ing, idx) => (
-                        <div key={idx} className="flex items-center space-x-2">
-                          <div className="flex-1 min-w-[150px]">
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="flex-1 min-w-0">
                             <CustomSelect
                               value={ing.stockItemId}
                               onChange={(val) => {
@@ -389,13 +394,14 @@ export const AdminMenu: React.FC = () => {
                             required
                             min="0"
                             placeholder={`Amt${ing.unit ? ` (${ing.unit})` : ''}`}
-                            value={ing.amount || ''}
+                            value={ing.amount === 0 && (ing as any)._raw === undefined ? '' : ((ing as any)._raw ?? ing.amount)}
                             onChange={(e) => {
                               const newIngs = [...ingredients];
+                              (newIngs[idx] as any)._raw = e.target.value;
                               newIngs[idx].amount = parseFloat(e.target.value) || 0;
                               setIngredients(newIngs);
                             }}
-                            className="w-20 px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                            className="w-20 sm:w-28 shrink-0 px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                           />
                           <button
                             type="button"
@@ -404,7 +410,7 @@ export const AdminMenu: React.FC = () => {
                               newIngs.splice(idx, 1);
                               setIngredients(newIngs);
                             }}
-                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
