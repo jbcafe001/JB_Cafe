@@ -6,7 +6,7 @@ import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminUsers: React.FC = () => {
-  const { users, addUser, updateUser, deleteUser, toggleUserStatus, showConfirm } = useCafe();
+  const { users, addUser, updateUser, deleteUser, toggleUserStatus, showConfirm, currentRole } = useCafe();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -124,6 +124,13 @@ export const AdminUsers: React.FC = () => {
     }
   };
 
+  const displayedUsers = users.filter((usr) => {
+    if (currentRole === 'admin_kunafa') {
+      return usr.role === 'admin_kunafa' || usr.brand === 'KUNAFA';
+    }
+    return true;
+  });
+
   return (
     <div className="space-y-6">
       {/* Header & Add Button */}
@@ -152,12 +159,13 @@ export const AdminUsers: React.FC = () => {
                 <th className="pb-2.5">Staff Name</th>
                 <th className="pb-2.5">Email / Login ID</th>
                 <th className="pb-2.5">Role</th>
+                {currentRole !== 'admin_kunafa' && <th className="pb-2.5">Brand</th>}
                 <th className="pb-2.5">Status</th>
                 <th className="pb-2.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 text-stone-800">
-              {users.map((usr) => {
+              {displayedUsers.map((usr) => {
                 const roleBadge = getRoleBadge(usr.role);
                 const isActive = usr.status === 'active';
 
@@ -178,6 +186,21 @@ export const AdminUsers: React.FC = () => {
                         <span>{roleBadge.label}</span>
                       </span>
                     </td>
+                    {currentRole !== 'admin_kunafa' && (
+                      <td className="py-3">
+                        {['waiter', 'cook', 'others'].includes(usr.role) ? (
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
+                            usr.brand === 'KUNAFA' 
+                              ? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                          }`}>
+                            {usr.brand || 'JB Cafe'}
+                          </span>
+                        ) : (
+                          <span className="text-stone-300">-</span>
+                        )}
+                      </td>
+                    )}
                     <td className="py-3">
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
