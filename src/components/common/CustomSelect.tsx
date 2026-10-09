@@ -14,6 +14,7 @@ interface CustomSelectProps {
   placeholder?: string;
   id?: string;
   placement?: 'top' | 'bottom';
+  searchable?: boolean;
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -24,11 +25,17 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   placeholder = 'Select\u2026',
   id,
   placement = 'bottom',
+  searchable = false,
 }) => {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const selected = options.find((o) => o.value === value);
+  const filteredOptions = searchable 
+    ? options.filter(o => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
 
   // Close on outside click
   useEffect(() => {
@@ -49,6 +56,15 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, []);
+
+  // Focus search input when opened and clear query when closed
+  useEffect(() => {
+    if (open && searchable) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    } else {
+      setQuery('');
+    }
+  }, [open, searchable]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`} id={id}>
@@ -81,9 +97,26 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               : 'mt-1.5 slide-in-from-top-1 origin-top'
           }`}
         >
+          {searchable && (
+            <div className="p-2 border-b border-stone-100">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="w-full px-2 py-1.5 text-xs bg-stone-50 border border-stone-200 rounded-lg focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+              />
+            </div>
+          )}
           <ul className="max-h-52 overflow-y-auto py-1 divide-y divide-stone-50">
-            {options.map((opt) => {
-              const isSelected = opt.value === value;
+            {filteredOptions.length === 0 ? (
+              <li className="px-3.5 py-3 text-xs text-stone-400 text-center">No results found</li>
+            ) : (
+              filteredOptions.map((opt) => {
+                const isSelected = opt.value === value;
               return (
                 <li key={opt.value}>
                   <button
@@ -103,7 +136,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
                   </button>
                 </li>
               );
-            })}
+            })
+            )}
           </ul>
         </div>
       )}

@@ -383,6 +383,7 @@ export const AdminMenu: React.FC = () => {
                             options={stockItems.map((s) => ({ value: s.id, label: `${s.name} (${s.unit})` }))}
                             placeholder="Select Material"
                             placement="top"
+                            searchable
                           />
                         </div>
                         <input
