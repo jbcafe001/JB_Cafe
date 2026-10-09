@@ -199,7 +199,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       {/* Main Grid: Orders Table + Right Side Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Left Column (Col 8) */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
+        <div className="lg:col-span-8 flex flex-col gap-6 h-full">
           {/* Recent Live Orders Table */}
           <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col flex-1">
           <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
@@ -360,7 +360,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
         {/* Right Column: Table Availability + Dark Stock Alert Card (Col 4) */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
+        <div className="lg:col-span-4 flex flex-col gap-6 h-full">
           {/* Table Availability Card */}
           {currentRole !== 'admin_kunafa' && (
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
@@ -485,24 +485,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </button>
             </div>
 
-            <div className="space-y-2 text-xs divide-y divide-stone-100 mt-auto pt-4">
-              <div className="flex justify-between pt-1 text-stone-600">
+            <div className="flex-1 flex flex-col justify-around mt-4 text-xs divide-y divide-stone-100">
+              <div className="flex justify-between items-center pt-2 pb-1 text-stone-600">
                 <span>Total Monthly Salary</span>
                 <span className="font-bold text-stone-900">₹{totalMonthlySalary.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between pt-1.5 text-amber-700">
+              <div className="flex justify-between items-center pt-2 pb-1 text-amber-700">
                 <span>Upaad Given</span>
                 <span className="font-bold">₹{totalUpaadGiven.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between pt-1.5 text-stone-700">
+              <div className="flex justify-between items-center pt-2 pb-1 text-stone-700">
                 <span>Salary Remaining</span>
                 <span className="font-bold text-stone-900">₹{totalSalaryDue.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between pt-1.5 text-emerald-700">
+              <div className="flex justify-between items-center pt-2 pb-1 text-emerald-700">
                 <span>Salary Paid</span>
                 <span className="font-bold">₹{totalSalaryPaid.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between pt-1.5 font-bold text-amber-900">
+              <div className="flex justify-between items-center pt-2 pb-1 font-bold text-amber-900">
                 <span>Salary Pending</span>
                 <span className="text-amber-800">₹{totalSalaryDue.toLocaleString()}</span>
               </div>
