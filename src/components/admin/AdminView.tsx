@@ -203,7 +203,7 @@ export const AdminView: React.FC = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-4 sm:p-8 overflow-y-auto max-w-7xl">
+      <main className="flex-1 p-4 sm:p-8 overflow-y-auto min-w-0">
         {activeTab === 'dashboard' && <AdminDashboard onNavigate={(t) => setActiveTab(t as AdminTab)} />}
         {activeTab === 'orders' && <AdminOrders />}
         {activeTab === 'sales' && <AdminSales />}

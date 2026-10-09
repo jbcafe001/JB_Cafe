@@ -197,11 +197,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
       {/* Main Grid: Orders Table + Right Side Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="flex flex-col lg:flex-row gap-6 items-stretch">
         {/* Left Column (Col 8) */}
-        <div className="lg:col-span-8 flex flex-col gap-6 h-full">
+        <div className="w-full lg:w-2/3 flex flex-col gap-6">
           {/* Recent Live Orders Table */}
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col flex-1">
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
             <h2 className="font-bold text-stone-800">Recent Live Orders</h2>
             <button
@@ -321,7 +321,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
         {/* 17. Upcoming Salaries Section (Moved here from right column) */}
         {currentRole !== 'admin_kunafa' && (
-          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col flex-1">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-stone-900 text-sm">Upcoming Salaries</h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
@@ -329,7 +329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 mt-3">
               {upcomingSalaries.map((emp) => (
                 <div
                   key={emp.id}
@@ -351,7 +351,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
             <button
               id="view-staff-salary-upcoming-btn"
               onClick={() => onNavigate('salary')}
-              className="w-full py-2 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl transition-colors text-center"
+              className="mt-auto w-full py-2 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl transition-colors text-center"
             >
               View Staff Salary
             </button>
@@ -360,7 +360,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
         {/* Right Column: Table Availability + Dark Stock Alert Card (Col 4) */}
-        <div className="lg:col-span-4 flex flex-col gap-6 h-full">
+        <div className="w-full lg:w-1/3 flex flex-col gap-6">
           {/* Table Availability Card */}
           {currentRole !== 'admin_kunafa' && (
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
@@ -485,7 +485,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </button>
             </div>
 
-            <div className="flex-1 flex flex-col justify-around mt-4 text-xs divide-y divide-stone-100">
+            <div className="mt-4 text-xs divide-y divide-stone-100">
               <div className="flex justify-between items-center pt-2 pb-1 text-stone-600">
                 <span>Total Monthly Salary</span>
                 <span className="font-bold text-stone-900">₹{totalMonthlySalary.toLocaleString()}</span>
