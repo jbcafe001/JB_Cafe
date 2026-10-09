@@ -188,6 +188,7 @@ export interface Expense {
   category: ExpenseCategory;
   date: string;
   note?: string;
+  brand?: 'JB Cafe' | 'KUNAFA';
 }
 
 export interface CafeNotification {

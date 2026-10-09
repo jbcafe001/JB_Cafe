@@ -1014,6 +1014,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         category: 'Ingredients',
         date: new Date().toISOString().split('T')[0],
         note: 'Inventory replenishment',
+        brand: stockItem.brand,
       });
     }
 

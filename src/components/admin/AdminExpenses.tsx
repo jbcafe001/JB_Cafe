@@ -23,9 +23,13 @@ const CATEGORIES: ExpenseCategory[] = [
 ];
 
 export const AdminExpenses: React.FC = () => {
-  const { expenses, addExpense } = useCafe();
+  const { expenses, addExpense, currentUser } = useCafe();
+
+  const isKunafaAdmin = currentUser?.role === 'admin_kunafa';
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [filterBrand, setFilterBrand] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [expenseBrand, setExpenseBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<ExpenseCategory>('Ingredients');
@@ -35,14 +39,21 @@ export const AdminExpenses: React.FC = () => {
   const handleCloseModal = () => setShowAddModal(false);
   useModalClose(handleCloseModal, showAddModal);
 
+  const displayedExpenses = expenses.filter(e => {
+    const b = e.brand || 'JB Cafe';
+    if (isKunafaAdmin) return b === 'KUNAFA';
+    if (filterBrand !== 'All') return b === filterBrand;
+    return true;
+  });
+
   // Summaries
   const todayStr = new Date().toISOString().split('T')[0];
-  const todayTotal = expenses
+  const todayTotal = displayedExpenses
     .filter((e) => e.date === todayStr)
     .reduce((sum, e) => sum + e.amount, 0);
 
   // For demo, weekly is all current expenses
-  const weekTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const weekTotal = displayedExpenses.reduce((sum, e) => sum + e.amount, 0);
   const monthTotal = weekTotal; // True month total based on DB
 
   const handleAddSubmit = (e: React.FormEvent) => {
@@ -55,6 +66,7 @@ export const AdminExpenses: React.FC = () => {
       category,
       date,
       note: note.trim() || undefined,
+      brand: isKunafaAdmin ? 'KUNAFA' : expenseBrand,
     });
 
     // Reset form
@@ -72,15 +84,34 @@ export const AdminExpenses: React.FC = () => {
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">EXPENSES</h2>
           <p className="text-xs text-stone-500">Record daily café operational and ingredient costs</p>
         </div>
-
-        <button
-          id="add-expense-btn"
-          onClick={() => setShowAddModal(true)}
-          className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Expense</span>
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {!isKunafaAdmin && (
+            <div className="flex bg-stone-100 p-1 rounded-lg w-full sm:w-auto">
+              {(['All', 'JB Cafe', 'KUNAFA'] as const).map(b => (
+                <button
+                  key={b}
+                  onClick={() => setFilterBrand(b)}
+                  className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                    filterBrand === b ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            id="add-expense-btn"
+            onClick={() => {
+              setExpenseBrand(isKunafaAdmin ? 'KUNAFA' : 'JB Cafe');
+              setShowAddModal(true);
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Expense</span>
+          </button>
+        </div>
       </div>
 
       {/* 3 Summary Cards (Section 12) */}
@@ -114,7 +145,7 @@ export const AdminExpenses: React.FC = () => {
       <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-extrabold text-stone-900 text-base">Expense Log</h3>
-          <span className="text-xs text-stone-400">{expenses.length} records</span>
+          <span className="text-xs text-stone-400">{displayedExpenses.length} records</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -129,9 +160,16 @@ export const AdminExpenses: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 text-stone-800">
-              {expenses.map((exp) => (
+              {displayedExpenses.map((exp) => (
                 <tr key={exp.id} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-3 font-bold text-stone-900">{exp.name}</td>
+                  <td className="py-3 font-bold text-stone-900">
+                    {exp.name}
+                    {!isKunafaAdmin && (
+                      <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase">
+                        {exp.brand || 'JB Cafe'}
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
                       {exp.category}
@@ -220,6 +258,17 @@ export const AdminExpenses: React.FC = () => {
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                 />
               </div>
+
+              {!isKunafaAdmin && (
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Brand</label>
+                  <CustomSelect
+                    value={expenseBrand}
+                    onChange={(val) => setExpenseBrand(val as 'JB Cafe' | 'KUNAFA')}
+                    options={[{value: 'JB Cafe', label: 'JB Cafe'}, {value: 'KUNAFA', label: 'KUNAFA'}]}
+                  />
+                </div>
+              )}
 
               <div className="pt-2 flex items-center justify-end space-x-2">
                 <button
