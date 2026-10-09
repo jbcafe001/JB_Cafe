@@ -18,7 +18,9 @@ export const AdminSales: React.FC = () => {
   const { filteredOrders: orders, menuItems, currentRole } = useCafe();
   const [selectedFilter, setSelectedFilter] = useState<DateFilter>('All Time');
   const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
-  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
+    currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const todayStr = new Date().toISOString().split('T')[0];

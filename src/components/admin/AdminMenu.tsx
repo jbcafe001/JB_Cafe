@@ -38,10 +38,12 @@ const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
 ];
 
 export const AdminMenu: React.FC = () => {
-  const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter } = useCafe();
+  const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter, currentRole } = useCafe();
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
+    currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
@@ -163,21 +165,23 @@ export const AdminMenu: React.FC = () => {
         </div>
 
         {/* Brand Filter */}
-        <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
-          {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-            <button
-              key={b}
-              onClick={() => setListBrandFilter(b)}
-              className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                listBrandFilter === b
-                  ? 'bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-500 hover:text-stone-700'
-              }`}
-            >
-              {b}
-            </button>
-          ))}
-        </div>
+        {currentRole !== 'admin_kunafa' && (
+          <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
+            {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+              <button
+                key={b}
+                onClick={() => setListBrandFilter(b)}
+                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                  listBrandFilter === b
+                    ? 'bg-white text-stone-900 shadow-xs'
+                    : 'text-stone-500 hover:text-stone-700'
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Menu Cards Grid */}

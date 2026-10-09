@@ -263,7 +263,9 @@ export const AdminOrders: React.FC = () => {
   const { filteredOrders: orders, menuItems, currentRole } = useCafe();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
+    currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
+  );
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);

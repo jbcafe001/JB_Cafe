@@ -19,7 +19,9 @@ interface AdminDashboardProps {
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { filteredOrders: allOrders, menuItems, expenses, stockItems, tables, staffMembers, upaadRecords, salaryHistory, currentRole } = useCafe();
 
-  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+  const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
+    currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
+  );
 
   // Filter orders by brand
   const orders = React.useMemo(() => {
@@ -120,21 +122,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         </div>
         
         {/* Brand Filter */}
-        <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
-          {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-            <button
-              key={b}
-              onClick={() => setBrandFilter(b)}
-              className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                brandFilter === b
-                  ? 'bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-500 hover:text-stone-700'
-              }`}
-            >
-              {b}
-            </button>
-          ))}
-        </div>
+        {currentRole !== 'admin_kunafa' && (
+          <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
+            {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+              <button
+                key={b}
+                onClick={() => setBrandFilter(b)}
+                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                  brandFilter === b
+                    ? 'bg-white text-stone-900 shadow-xs'
+                    : 'text-stone-500 hover:text-stone-700'
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Top Section: Clean Minimalism Metric Cards */}
