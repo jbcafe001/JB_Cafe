@@ -1113,6 +1113,30 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return usage;
   }, [orders, menuItems, materialUsageLogs]);
 
+  // Sync today's stock usage to database
+  const prevUsageRef = useRef<string>('');
+  useEffect(() => {
+    if (currentRole === 'admin' || currentRole === 'admin_kunafa') {
+      const currentString = JSON.stringify(todayStockUsage);
+      if (prevUsageRef.current === currentString) return;
+      prevUsageRef.current = currentString;
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      
+      Object.entries(todayStockUsage).forEach(([stockItemId, data]: [string, any]) => {
+        const docId = `${todayStr}_${stockItemId}`;
+        setDoc(doc(db, 'dailyStockUsage', docId), {
+          date: todayStr,
+          stockItemId,
+          name: data.name,
+          amount: data.amount,
+          unit: data.unit,
+          updatedAt: new Date().toISOString()
+        }, { merge: true }).catch(console.error);
+      });
+    }
+  }, [todayStockUsage, currentRole]);
+
   // Expenses
   const addExpense = (exp: Omit<Expense, 'id'>) => {
     const newExp: Expense = {
