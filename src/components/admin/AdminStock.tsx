@@ -47,6 +47,7 @@ export const AdminStock: React.FC = () => {
   const [newMaterialUnit, setNewMaterialUnit] = useState('KG');
   const [newMaterialMinThreshold, setNewMaterialMinThreshold] = useState('5');
   const [newMaterialCost, setNewMaterialCost] = useState('100');
+  const [newMaterialBrand, setNewMaterialBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
 
   // Material Usage Log filter
   const [selectedMaterialFilter, setSelectedMaterialFilter] = useState('all');
@@ -121,12 +122,14 @@ export const AdminStock: React.FC = () => {
       minThreshold: parseFloat(newMaterialMinThreshold) || 0,
       costPerUnit: parseFloat(newMaterialCost) || 0,
       status: 'out',
-      lastRestocked: new Date().toISOString().split('T')[0]
+      lastRestocked: new Date().toISOString().split('T')[0],
+      brand: newMaterialBrand
     });
 
     setNewMaterialName('');
     setNewMaterialMinThreshold('5');
     setNewMaterialCost('100');
+    setNewMaterialBrand('JB Cafe');
     setShowCreateMaterialModal(false);
   };
 
@@ -391,7 +394,16 @@ export const AdminStock: React.FC = () => {
             <tbody className="divide-y divide-stone-100 text-stone-800">
               {stockItems.map((st) => (
                 <tr key={st.id} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-3 font-bold text-stone-900">{st.name}</td>
+                  <td className="py-3 font-bold text-stone-900">
+                    <div className="flex flex-col">
+                      <span>{st.name}</span>
+                      {st.brand && (
+                        <span className="text-[9px] font-bold mt-0.5 text-stone-400">
+                          {st.brand.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="py-3 text-stone-500">{st.unit}</td>
                   <td className="py-3">
                     <span className="font-extrabold text-stone-900 text-sm">
@@ -883,6 +895,18 @@ export const AdminStock: React.FC = () => {
                   onChange={(e) => setNewMaterialCost(e.target.value)}
                   placeholder="e.g. 100"
                   className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">Brand *</label>
+                <CustomSelect
+                  value={newMaterialBrand}
+                  onChange={(val) => setNewMaterialBrand(val as 'JB Cafe' | 'KUNAFA')}
+                  options={[
+                    { value: 'JB Cafe', label: 'JB Cafe' },
+                    { value: 'KUNAFA', label: 'KUNAFA' },
+                  ]}
                 />
               </div>
 

@@ -118,6 +118,7 @@ export interface Material {
   unit: string;
   minThreshold: number;
   costPerUnit: number;
+  brand?: 'JB Cafe' | 'KUNAFA';
 }
 
 export interface StockBalance {
@@ -126,6 +127,7 @@ export interface StockBalance {
   available: number;
   status: 'good' | 'low' | 'out';
   lastRestocked?: string;
+  brand?: 'JB Cafe' | 'KUNAFA';
 }
 
 export interface StockItem {
@@ -137,6 +139,7 @@ export interface StockItem {
   costPerUnit: number;
   status: 'good' | 'low' | 'out';
   lastRestocked?: string;
+  brand?: 'JB Cafe' | 'KUNAFA';
 }
 
 export interface StockUsageEntry {

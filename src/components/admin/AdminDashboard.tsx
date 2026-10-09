@@ -36,7 +36,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   // Completed orders today
   const completedOrders = orders.filter((o) => o.status === 'completed');
-  const todaySales = completedOrders.reduce((sum, o) => sum + o.total, 0);
+  
+  // Refined total sales based on brand filter (only summing the relevant items)
+  const todaySales = completedOrders.reduce((sum, o) => {
+    if (brandFilter === 'All') return sum + o.total;
+    
+    if (brandFilter === 'KUNAFA') {
+      const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+      return sum + o.items.filter(i => kunafaItemNames.has(i.name)).reduce((s, i) => s + (i.price * i.quantity), 0);
+    } else {
+      const jbItemNames = new Set(menuItems.filter(m => m.brand === 'JB Cafe').map(m => m.name));
+      return sum + o.items.filter(i => jbItemNames.has(i.name)).reduce((s, i) => s + (i.price * i.quantity), 0);
+    }
+  }, 0);
+  
   const activeOrders = orders.filter(
     (o) => o.status === 'new' || o.status === 'preparing' || o.status === 'ready' || o.status === 'served'
   );
@@ -84,8 +97,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   const upcomingSalaries = staffPayables.filter((s) => !s.isPaid).slice(0, 4);
 
-  // Hourly Sales Data for Chart (10 AM to 8 PM)
+  // Hourly Sales Data for Chart (8 AM to 8 PM)
   const hourlyLabels = [
+    '8 AM',
+    '9 AM',
     '10 AM',
     '11 AM',
     '12 PM',
@@ -99,13 +114,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
     '8 PM',
   ];
 
-  const hourlySales = new Array(11).fill(0);
+  const hourlySales = new Array(13).fill(0);
   completedOrders.forEach((o) => {
     const timeStr = o.completedAt || o.createdAt;
     if (!timeStr) return;
     
     let hour = -1;
-    if (timeStr.toUpperCase().includes('AM') || timeStr.toUpperCase().includes('PM')) {
+    if (timeStr.includes('T') || timeStr.includes('-')) {
+      const d = new Date(timeStr);
+      if (!isNaN(d.getTime())) hour = d.getHours();
+    } else {
       const match = timeStr.match(/(\d+):/);
       if (match) {
         let h = parseInt(match[1], 10);
@@ -113,13 +131,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         if (timeStr.toUpperCase().includes('AM') && h === 12) h = 0;
         hour = h;
       }
-    } else {
-      const d = new Date(timeStr);
-      if (!isNaN(d.getTime())) hour = d.getHours();
     }
 
-    if (hour >= 10 && hour <= 20) {
-      hourlySales[hour - 10] += o.total;
+    if (hour >= 8 && hour <= 20) {
+      // Extract brand-specific total if needed, or use order total
+      let salesToAdd = o.total;
+      
+      // If filtering by KUNAFA, only sum KUNAFA items
+      if (brandFilter === 'KUNAFA') {
+        const kunafaItemNames = new Set(menuItems.filter(m => m.brand === 'KUNAFA').map(m => m.name));
+        salesToAdd = o.items.filter(i => kunafaItemNames.has(i.name)).reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      } else if (brandFilter === 'JB Cafe') {
+        const jbItemNames = new Set(menuItems.filter(m => m.brand === 'JB Cafe').map(m => m.name));
+        salesToAdd = o.items.filter(i => jbItemNames.has(i.name)).reduce((sum, i) => sum + (i.price * i.quantity), 0);
+      }
+      
+      hourlySales[hour - 8] += salesToAdd;
     }
   });
   const maxSaleHour = Math.max(...hourlySales, 1);

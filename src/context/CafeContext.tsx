@@ -165,10 +165,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [tables, setTables] = useState<Table[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  
+
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockBalances, setStockBalances] = useState<StockBalance[]>([]);
-  
+
   const stockItems: StockItem[] = useMemo(() => {
     return materials.map(m => {
       const balance = stockBalances.find(b => b.materialId === m.id) || { available: 0, status: 'out' as const, lastRestocked: undefined };
@@ -405,7 +405,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       role,
       status: 'active'
     };
-    
+
     setCurrentUser(matchedUser);
     setCurrentRole(role);
     setIsLoggedIn(true);
@@ -453,7 +453,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const createdOrders: Order[] = [];
     const table = tables.find((t) => t.id === tableId);
     const tableNumStr = table ? table.name : 'Table';
-    
+
     // Base for order number in YYMMDD format
     const now = new Date();
     const yy = String(now.getFullYear()).slice(-2);
@@ -474,7 +474,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return parseInt(numStr, 10);
           })
           .filter((n) => !isNaN(n));
-          
+
         nextN = existingNs.length > 0 ? Math.max(...existingNs) + 1 : 1;
       } else {
         nextN++;
@@ -517,7 +517,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Notify Kitchen
       addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
-      
+
       createdOrders.push(newOrder);
     };
 
@@ -536,12 +536,12 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const tableNumStr = existingOrder.tableNumber;
     const ordNum = existingOrder.orderNumber;
     const updatedTableId = existingOrder.tableId;
-    
+
     const nextBatch = Math.max(...existingOrder.items.map(i => i.batch || 1)) + 1;
     const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
     const updatedItems = [...existingOrder.items, ...itemsWithBatch];
     const subtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    
+
     let combinedNotes = existingOrder.notes;
     if (additionalNotes) {
       combinedNotes = combinedNotes ? `${combinedNotes} | ${additionalNotes}` : additionalNotes;
@@ -592,7 +592,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Write to Firebase so all clients (waiter) see the updated table status
       updateDoc(doc(db, 'tables', updatedTableId), { status: 'preparing' }).catch(console.error);
     }
-    
+
     addToast('Started preparing order', 'info');
   };
 
@@ -668,10 +668,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const incrementItemPrepared = (orderId: string, itemIndex: number, amount: number = 1) => {
     const existingOrder = orders.find(o => o.id === orderId);
     if (!existingOrder) return;
-    
+
     const updatedItems = [...existingOrder.items];
     const item = updatedItems[itemIndex];
-    
+
     const currentPrepared = item.prepared || 0;
     const remaining = item.quantity - currentPrepared;
     if (remaining <= 0) return; // already fully prepared
@@ -679,7 +679,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const validAmount = Math.min(amount, remaining);
 
     item.prepared = currentPrepared + validAmount;
-    
+
     // Deduct stock for the prepared quantity of this item
     const menuItem = menuItems.find((m) => m.id === item.menuItemId || m.name === item.name);
     if (menuItem && menuItem.ingredients) {
@@ -692,7 +692,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       });
     }
-    
+
     const allPrepared = updatedItems.every(i => (i.prepared || 0) >= i.quantity);
 
     if (allPrepared && existingOrder.status === 'preparing') {
@@ -723,7 +723,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const indices = Array.isArray(itemIndex) ? itemIndex : [itemIndex];
     const existingOrder = orders.find(o => o.id === orderId);
     if (!existingOrder) return;
-    
+
     const updatedItems = [...existingOrder.items];
     indices.forEach(idx => {
       updatedItems[idx] = {
@@ -733,35 +733,35 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     const allServed = updatedItems.every(i => i.served);
-    
+
     if (allServed && existingOrder.status !== 'served') {
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const updatedTableId = existingOrder.tableId;
 
-      updateDoc(doc(db, 'orders', orderId), { 
+      updateDoc(doc(db, 'orders', orderId), {
         items: updatedItems,
         status: 'served',
         servedAt: timeStr
       }).catch(console.error);
-      
+
       if (updatedTableId) {
         updateDoc(doc(db, 'tables', updatedTableId), { status: 'served' }).catch(console.error);
       }
-      
+
       addToast('All items served! Order marked as served.', 'success');
     } else {
       let nextStatus = existingOrder.status;
       // If we are un-serving an item and the order was marked 'served', revert it to 'ready'
       if (!allServed && existingOrder.status === 'served') {
-         nextStatus = 'ready';
-         if (existingOrder.tableId) {
-             updateDoc(doc(db, 'tables', existingOrder.tableId), { status: 'ready' }).catch(console.error);
-         }
+        nextStatus = 'ready';
+        if (existingOrder.tableId) {
+          updateDoc(doc(db, 'tables', existingOrder.tableId), { status: 'ready' }).catch(console.error);
+        }
       }
-      
-      updateDoc(doc(db, 'orders', orderId), { 
-         items: updatedItems,
-         status: nextStatus 
+
+      updateDoc(doc(db, 'orders', orderId), {
+        items: updatedItems,
+        status: nextStatus
       }).catch(console.error);
     }
   };
@@ -790,7 +790,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const allServed = updatedItems.every(i => i.served);
       let nextStatus = existingOrder.status;
       let servedAt = existingOrder.servedAt;
-      
+
       if (allServed) {
         nextStatus = 'served';
         servedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -822,7 +822,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sortedIndices.forEach(idx => {
       updatedItems.splice(idx, 1);
     });
-    
+
     if (updatedItems.length === 0) {
       cancelOrder(orderId);
       addToast('Order auto-cancelled as all items were removed', 'info');
@@ -830,7 +830,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    
+
     updateDoc(doc(db, 'orders', orderId), {
       items: updatedItems,
       subtotal: newSubtotal,
@@ -842,7 +842,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const completeOrder = (orderId: string, paymentMethod: PaymentMethod) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const completedOrder = orders.find(o => o.id === orderId);
-    
+
     if (!completedOrder) return;
 
     updateDoc(doc(db, 'orders', orderId), {
@@ -896,11 +896,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const newQty = Math.max(0, Math.round((st.available - deduction) * 100) / 100);
         const newStatus =
           newQty <= 0 ? 'out' : newQty <= st.minThreshold ? 'low' : 'good';
-        
+
         if (newStatus === 'low' && st.status !== 'low') {
           addNotification(`Alert: ${st.name} stock is low (${newQty} ${st.unit} remaining)`, 'admin');
         }
-        
+
         updateDoc(doc(db, 'stockItems', st.id), {
           available: newQty,
           status: newStatus,
@@ -1166,7 +1166,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // First, create the user in Firebase Auth using the secondary app
       // This assigns them the provided password (or default "password123") without logging the current admin out!
       const uid = await registerNewUser(usr.email, password);
-      
+
       const newUser: User = {
         ...usr,
         id: uid,
@@ -1419,7 +1419,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetDemoData = async () => {
     try {
       const { getDocs } = await import('firebase/firestore');
-      
+
       const collectionsToClear = ['materials', 'stockBalances', 'stockItems', 'materialUsageLogs', 'stockAdditions', 'orders', 'expenses'];
       for (const coll of collectionsToClear) {
         const snap = await getDocs(collection(db, coll));
@@ -1518,7 +1518,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }}
     >
       {children}
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={confirmConfig?.isOpen || false}
         title={confirmConfig?.title || ''}
         message={confirmConfig?.message || ''}
