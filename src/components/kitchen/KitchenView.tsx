@@ -88,7 +88,7 @@ export const KitchenView: React.FC = () => {
       <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
         {/* Custom Kitchen Header */}
         <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-md">
-          
+
           {/* Left: Cafe Name & Logo */}
           <div className="flex items-center space-x-2.5 min-w-0 flex-1">
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-md overflow-hidden shrink-0 border-2 border-white/20">
@@ -119,11 +119,10 @@ export const KitchenView: React.FC = () => {
             <div className="flex items-center space-x-1.5 sm:space-x-2">
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`p-1.5 sm:p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${
-                  soundEnabled
+                className={`p-1.5 sm:p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${soundEnabled
                     ? 'bg-white text-[#B45309] border-transparent'
                     : 'bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white'
-                }`}
+                  }`}
                 title="Toggle Kitchen Chime"
               >
                 {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -187,8 +186,8 @@ export const KitchenView: React.FC = () => {
             id="kds-tab-new"
             onClick={() => setActiveTab('new')}
             className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'new'
-                ? 'bg-[#B45309] text-white shadow-xs'
-                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              ? 'bg-[#B45309] text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
             <Clock className="w-4 h-4 shrink-0" />
@@ -202,8 +201,8 @@ export const KitchenView: React.FC = () => {
             id="kds-tab-preparing"
             onClick={() => setActiveTab('preparing')}
             className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'preparing'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              ? 'bg-stone-900 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
             <Flame className="w-4 h-4 shrink-0" />
@@ -217,8 +216,8 @@ export const KitchenView: React.FC = () => {
             id="kds-tab-ready"
             onClick={() => setActiveTab('ready')}
             className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'ready'
-                ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              ? 'bg-emerald-700 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
             <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -232,8 +231,8 @@ export const KitchenView: React.FC = () => {
             id="kds-tab-served"
             onClick={() => setActiveTab('served')}
             className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'served'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
               }`}
           >
             <Utensils className="w-4 h-4 shrink-0" />
@@ -272,12 +271,12 @@ export const KitchenView: React.FC = () => {
                   key={order.id}
                   id={`kds-card-${order.orderNumber.replace('#', '')}`}
                   className={`bg-white border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${isNew
-                      ? 'border-amber-400 ring-2 ring-amber-400/20'
-                      : isPrep
-                        ? 'border-stone-800 ring-2 ring-stone-800/15'
-                        : isRdy
-                          ? 'border-emerald-500 ring-2 ring-emerald-500/25'
-                          : 'border-stone-200 opacity-80'
+                    ? 'border-amber-400 ring-2 ring-amber-400/20'
+                    : isPrep
+                      ? 'border-stone-800 ring-2 ring-stone-800/15'
+                      : isRdy
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/25'
+                        : 'border-stone-200 opacity-80'
                     }`}
                 >
                   {/* Card Header */}
@@ -325,7 +324,7 @@ export const KitchenView: React.FC = () => {
                                 const preparedCount = item.prepared || 0;
                                 const totalCount = item.quantity;
                                 const unservedReady = preparedCount > (item.servedCount || 0) ? preparedCount - (item.servedCount || 0) : 0;
-                                
+
                                 // In the 'served' tab, if it's partially served, we only want to show the items that have SOME served count.
                                 if (activeTab === 'served' && (item.servedCount || 0) === 0 && order.status !== 'served' && !isAllItemsServed) return null;
                                 // In the 'ready' tab, we only want to show the items that have unserved prepared count.
@@ -333,11 +332,11 @@ export const KitchenView: React.FC = () => {
                                 // In the 'preparing' tab, we might only want to show items that are not fully prepared.
                                 if (activeTab === 'preparing' && preparedCount >= totalCount) return null;
 
-                                const displayCount = 
-                                  (activeTab === 'ready' && order.status !== 'ready' && unservedReady > 0 && preparedCount < totalCount) 
-                                    ? unservedReady 
-                                    : (activeTab === 'served' && (item.servedCount || 0) > 0 && (item.servedCount || 0) < totalCount) 
-                                      ? item.servedCount 
+                                const displayCount =
+                                  (activeTab === 'ready' && order.status !== 'ready' && unservedReady > 0 && preparedCount < totalCount)
+                                    ? unservedReady
+                                    : (activeTab === 'served' && (item.servedCount || 0) > 0 && (item.servedCount || 0) < totalCount)
+                                      ? item.servedCount
                                       : totalCount;
 
                                 const isItemFullyServedOrPartiallyServedInServedTab = item.served || (activeTab === 'served' && (item.servedCount || 0) > 0);
@@ -398,7 +397,7 @@ export const KitchenView: React.FC = () => {
                                     </div>
                                   </div>
                                 );
-                            })}
+                              })}
                           </div>
                         </div>
                       ))}
@@ -469,7 +468,7 @@ export const KitchenView: React.FC = () => {
                 <span className="text-xl leading-none">&times;</span>
               </button>
             </div>
-            
+
             <div className="p-5 space-y-4">
               <p className="text-sm text-stone-600">
                 Enter quantity prepared. Maximum available: <span className="font-bold text-stone-900">{bulkPrepareModal.maxRemaining}</span>

@@ -22,6 +22,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
     currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
   );
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Filter orders by brand
   const orders = React.useMemo(() => {
@@ -100,17 +101,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   const hourlySales = new Array(11).fill(0);
   completedOrders.forEach((o) => {
-    if (!o.completedAt && !o.createdAt) return;
-    const d = new Date(o.completedAt || o.createdAt);
-    const hour = d.getHours();
+    const timeStr = o.completedAt || o.createdAt;
+    if (!timeStr) return;
+    
+    let hour = -1;
+    if (timeStr.toUpperCase().includes('AM') || timeStr.toUpperCase().includes('PM')) {
+      const match = timeStr.match(/(\d+):/);
+      if (match) {
+        let h = parseInt(match[1], 10);
+        if (timeStr.toUpperCase().includes('PM') && h < 12) h += 12;
+        if (timeStr.toUpperCase().includes('AM') && h === 12) h = 0;
+        hour = h;
+      }
+    } else {
+      const d = new Date(timeStr);
+      if (!isNaN(d.getTime())) hour = d.getHours();
+    }
+
     if (hour >= 10 && hour <= 20) {
       hourlySales[hour - 10] += o.total;
     }
   });
   const maxSaleHour = Math.max(...hourlySales, 1);
 
-  // Recent 6 orders
-  const recentOrders = orders.slice(0, 6);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const paginatedOrders = orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="space-y-6">
@@ -182,8 +198,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
       {/* Main Grid: Orders Table + Right Side Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Recent Live Orders Table (Col 8) */}
-        <div className="lg:col-span-8 bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col">
+        {/* Left Column (Col 8) */}
+        <div className="lg:col-span-8 flex flex-col gap-6">
+          {/* Recent Live Orders Table */}
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col">
           <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
             <h2 className="font-bold text-stone-800">Recent Live Orders</h2>
             <button
@@ -208,7 +226,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100 text-sm">
-                {recentOrders.map((ord) => {
+                {paginatedOrders.map((ord) => {
                   const summary = ord.items
                     .map((it) => `${it.quantity}x ${it.name}`)
                     .slice(0, 2)
@@ -277,7 +295,69 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </tbody>
             </table>
           </div>
+          
+          <div className="p-4 border-t border-stone-100 flex items-center justify-between bg-stone-50/50">
+            <span className="text-xs text-stone-500 font-medium">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, orders.length)} of {orders.length} orders
+            </span>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 text-xs font-bold text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="px-3 py-1.5 text-xs font-bold text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* 17. Upcoming Salaries Section (Moved here from right column) */}
+        {currentRole !== 'admin_kunafa' && (
+          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-stone-900 text-sm">Upcoming Salaries</h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                30 Sep Due
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {upcomingSalaries.map((emp) => (
+                <div
+                  key={emp.id}
+                  className="p-2.5 rounded-xl bg-stone-50 border border-stone-100 flex items-center justify-between text-xs"
+                >
+                  <div>
+                    <p className="font-bold text-stone-900">{emp.name}</p>
+                    <p className="text-[10px] text-stone-400">
+                      due on {emp.salaryDateDisplay}
+                    </p>
+                  </div>
+                  <span className="font-black text-stone-900">
+                    ₹{emp.payable.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              id="view-staff-salary-upcoming-btn"
+              onClick={() => onNavigate('salary')}
+              className="w-full py-2 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl transition-colors text-center"
+            >
+              View Staff Salary
+            </button>
+          </div>
+        )}
+      </div>
 
         {/* Right Column: Table Availability + Dark Stock Alert Card (Col 4) */}
         <div className="lg:col-span-4 flex flex-col gap-6">
@@ -430,44 +510,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           </div>
           )}
 
-          {/* 17. Upcoming Salaries Section (Section 17) */}
-          {currentRole !== 'admin_kunafa' && (
-          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-stone-900 text-sm">Upcoming Salaries</h3>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                30 Sep Due
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              {upcomingSalaries.map((emp) => (
-                <div
-                  key={emp.id}
-                  className="p-2.5 rounded-xl bg-stone-50 border border-stone-100 flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <p className="font-bold text-stone-900">{emp.name}</p>
-                    <p className="text-[10px] text-stone-400">
-                      due on {emp.salaryDateDisplay}
-                    </p>
-                  </div>
-                  <span className="font-black text-stone-900">
-                    ₹{emp.payable.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <button
-              id="view-staff-salary-upcoming-btn"
-              onClick={() => onNavigate('salary')}
-              className="w-full py-2 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl transition-colors text-center"
-            >
-              View Staff Salary
-            </button>
-          </div>
-          )}
+          {/* Upcoming Salaries was moved to the left column */}
         </div>
       </div>
 

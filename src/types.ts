@@ -9,6 +9,7 @@ export interface User {
   avatar?: string;
   phone?: string;
   requiresPasswordChange?: boolean;
+  brand?: 'JB Cafe' | 'KUNAFA';
 }
 
 export type TableStatus = 'available' | 'occupied' | 'preparing' | 'ready' | 'served';

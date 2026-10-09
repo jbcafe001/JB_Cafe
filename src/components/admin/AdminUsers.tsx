@@ -16,6 +16,7 @@ export const AdminUsers: React.FC = () => {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState<UserRole>('waiter');
+  const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
 
   const handleCloseModal = () => {
     setShowAddModal(false);
@@ -37,6 +38,7 @@ export const AdminUsers: React.FC = () => {
           email: email.trim(),
           phone: phone.trim() || undefined,
           role,
+          ...( ['waiter', 'cook', 'others'].includes(role) ? { brand } : { brand: undefined } ),
         });
       } else {
         await addUser({
@@ -45,6 +47,7 @@ export const AdminUsers: React.FC = () => {
           phone: phone.trim() || undefined,
           role,
           status: 'active',
+          ...( ['waiter', 'cook', 'others'].includes(role) ? { brand } : { brand: undefined } ),
         }, password);
       }
 
@@ -65,6 +68,7 @@ export const AdminUsers: React.FC = () => {
     setEmail(usr.email);
     setPhone(usr.phone || '');
     setRole(usr.role);
+    setBrand(usr.brand || 'JB Cafe');
     setShowAddModal(true);
   };
 
@@ -75,6 +79,7 @@ export const AdminUsers: React.FC = () => {
     setPassword('');
     setPhone('');
     setRole('waiter');
+    setBrand('JB Cafe');
     setShowAddModal(true);
   };
 
@@ -306,6 +311,20 @@ export const AdminUsers: React.FC = () => {
                   ]}
                 />
               </div>
+
+              {['waiter', 'cook', 'others'].includes(role) && (
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Associated Brand *</label>
+                  <CustomSelect
+                    value={brand}
+                    onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
+                    options={[
+                      { value: 'JB Cafe', label: 'JB Cafe' },
+                      { value: 'KUNAFA', label: 'KUNAFA' },
+                    ]}
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">Phone Number (Optional)</label>
