@@ -910,7 +910,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
           addNotification(`Alert: ${st.name} stock is low (${newQty} ${st.unit} remaining)`, 'admin');
         }
 
-        updateDoc(doc(db, 'stockItems', st.id), {
+        updateDoc(doc(db, 'stockBalances', st.id), {
           available: newQty,
           status: newStatus,
         }).catch(console.error);
@@ -1101,8 +1101,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 amount: 0,
                 unit: ing.unit,
               };
-              // Add modest incremental amounts
-              current.amount = Math.round((current.amount + ing.amount * item.quantity * 0.05) * 100) / 100;
+              current.amount = Math.round((current.amount + ing.amount * item.quantity) * 100) / 100;
               usage[ing.stockItemId] = current;
             });
           }
