@@ -68,7 +68,7 @@ export const AdminUsers: React.FC = () => {
     setEmail(usr.email);
     setPhone(usr.phone || '');
     setRole(usr.role);
-    setBrand(usr.brand || 'JB Cafe');
+    setBrand(usr.brand || (currentRole === 'admin_kunafa' ? 'KUNAFA' : 'JB Cafe'));
     setShowAddModal(true);
   };
 
@@ -79,7 +79,7 @@ export const AdminUsers: React.FC = () => {
     setPassword('');
     setPhone('');
     setRole('waiter');
-    setBrand('JB Cafe');
+    setBrand(currentRole === 'admin_kunafa' ? 'KUNAFA' : 'JB Cafe');
     setShowAddModal(true);
   };
 
@@ -328,14 +328,16 @@ export const AdminUsers: React.FC = () => {
                   options={[
                     { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
                     { value: 'cook', label: 'Cook (KDS Display)' },
-                    { value: 'admin', label: 'Admin (Full Management)' },
-                    { value: 'admin_kunafa', label: 'Admin (KUNAFA)' },
                     { value: 'others', label: 'Others (Limited Access)' },
+                    ...(currentRole !== 'admin_kunafa' ? [
+                      { value: 'admin', label: 'Admin (Full Management)' },
+                      { value: 'admin_kunafa', label: 'Admin (KUNAFA)' },
+                    ] : [])
                   ]}
                 />
               </div>
 
-              {['waiter', 'cook', 'others'].includes(role) && (
+              {['waiter', 'cook', 'others'].includes(role) && currentRole !== 'admin_kunafa' && (
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">Associated Brand *</label>
                   <CustomSelect
