@@ -197,11 +197,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
       {/* Main Grid: Orders Table + Right Side Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Left Column (Col 8) */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* Recent Live Orders Table */}
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col flex-1">
           <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
             <h2 className="font-bold text-stone-800">Recent Live Orders</h2>
             <button
@@ -296,7 +296,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
             </table>
           </div>
           
-          <div className="p-4 border-t border-stone-100 flex items-center justify-between bg-stone-50/50">
+          <div className="p-4 border-t border-stone-100 flex items-center justify-between bg-stone-50/50 mt-auto">
             <span className="text-xs text-stone-500 font-medium">
               Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, orders.length)} of {orders.length} orders
             </span>
@@ -431,7 +431,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           )}
 
           {/* Dark Stock Inventory Alert Card */}
-          <div className="bg-stone-900 text-white p-5 rounded-2xl shadow-xl">
+          <div className={`bg-stone-900 text-white p-5 rounded-2xl shadow-xl flex flex-col ${currentRole === 'admin_kunafa' ? 'flex-1' : ''}`}>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-white text-sm">Stock Inventory Alert</h2>
               <button
@@ -442,7 +442,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 mt-auto">
               {stockItems.slice(0, 3).map((item) => {
                 const ratio = Math.min(100, Math.round((item.available / item.targetStock) * 100));
                 const isVeryLow = item.available <= item.minThreshold;
@@ -469,7 +469,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
           {/* 16. Staff Salary Summary Card (Section 16) */}
           {currentRole !== 'admin_kunafa' && (
-          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+          <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col flex-1">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-stone-900 text-sm">Staff Salary</h3>
@@ -485,7 +485,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
               </button>
             </div>
 
-            <div className="space-y-2 text-xs divide-y divide-stone-100">
+            <div className="space-y-2 text-xs divide-y divide-stone-100 mt-auto pt-4">
               <div className="flex justify-between pt-1 text-stone-600">
                 <span>Total Monthly Salary</span>
                 <span className="font-bold text-stone-900">₹{totalMonthlySalary.toLocaleString()}</span>
