@@ -37,8 +37,24 @@ const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Chocolate Bar',
 ];
 
+const KUNAFA_CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
+  'Sizzling Brownie',
+  'Cheesecake',
+  'Cookie Tin',
+  'Coffee Tiramisu',
+  'Kunafa',
+  'Dessert Can',
+  'Chocolate Bowl',
+  'Baklava',
+  'Kunafa Cheese Bomb',
+  'Bombolinis',
+  'Chocolate Bar',
+];
+
 export const AdminMenu: React.FC = () => {
   const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter, currentRole } = useCafe();
+
+  const displayedCategories = currentRole === 'admin_kunafa' ? KUNAFA_CATEGORIES : CATEGORIES;
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
@@ -149,7 +165,7 @@ export const AdminMenu: React.FC = () => {
           >
             All Items
           </button>
-          {CATEGORIES.map((cat) => (
+          {displayedCategories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
@@ -306,7 +322,7 @@ export const AdminMenu: React.FC = () => {
                   <CustomSelect
                     value={category}
                     onChange={(val) => setCategory(val as Exclude<MenuItemCategory, 'All'>)}
-                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                    options={displayedCategories.map((cat) => ({ value: cat, label: cat }))}
                   />
                 </div>
 

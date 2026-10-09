@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Order, OrderStatus } from '../../types';
+import { useModalClose } from '../../hooks/useModalClose';
 import {
   ChefHat,
   Clock,
@@ -23,6 +24,8 @@ type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 export const KitchenView: React.FC = () => {
   const { orders, startPreparingOrder, markOrderReady, incrementItemPrepared, logout, currentUser, settings, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  useModalClose(() => setIsAvatarMenuOpen(false), isAvatarMenuOpen);
   const [bulkPrepareModal, setBulkPrepareModal] = useState<{
     isOpen: boolean;
     orderId: string;
@@ -134,27 +137,46 @@ export const KitchenView: React.FC = () => {
             <div className="w-px h-6 bg-white/20 hidden sm:block"></div>
 
             {/* Profile Avatar & Name */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2.5">
+            <div className="flex items-center space-x-2.5 relative">
               <span className="text-sm font-medium hidden sm:inline-block">
                 Hello, {currentUser?.name || 'Cook'}
               </span>
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] shrink-0">
+              <span className="text-sm font-medium sm:hidden">
+                {currentUser?.name?.split(' ')[0] || 'Cook'}
+              </span>
+              <div
+                onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] shrink-0 cursor-pointer hover:bg-stone-50 transition-colors"
+              >
                 {initials}
               </div>
-              <button
-                onClick={() => {
-                  showConfirm(
-                    'Logout',
-                    'Are you sure you want to log out?',
-                    () => logout(),
-                    { isDestructive: true, confirmText: 'Logout' }
-                  );
-                }}
-                className="p-1.5 rounded-lg text-white/60 hover:text-white bg-white/10 border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors"
-                title="Log Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+
+              {/* Dropdown Menu */}
+              {isAvatarMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 overflow-hidden z-50 animate-in slide-in-from-top-2 duration-200">
+                  <div className="p-3 border-b border-stone-100 text-stone-800">
+                    <p className="text-xs font-bold truncate">{currentUser?.name || 'Cook'}</p>
+                    <p className="text-[10px] text-stone-500 truncate">{currentUser?.email || 'cook@cafe.com'}</p>
+                  </div>
+                  <div className="p-1.5">
+                    <button
+                      onClick={() => {
+                        setIsAvatarMenuOpen(false);
+                        showConfirm(
+                          'Logout',
+                          'Are you sure you want to log out?',
+                          () => logout(),
+                          { isDestructive: true, confirmText: 'Logout' }
+                        );
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                    >
+                      <LogOut className="w-4 h-4 text-red-500" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
