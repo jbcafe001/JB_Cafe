@@ -19,6 +19,7 @@ import {
   Clock,
   User,
   Info,
+  Search,
 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
@@ -55,15 +56,20 @@ export const AdminStock: React.FC = () => {
   // Brand Filter for main admin
   const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
 
+  // Search query for materials
+  const [searchQuery, setSearchQuery] = useState('');
+
   useModalClose(() => setShowUseStockModal(false), showUseStockModal);
   useModalClose(() => setShowAddStockModal(false), showAddStockModal);
   useModalClose(() => setShowCreateMaterialModal(false), showCreateMaterialModal);
 
-  // Filtered Stock Items based on brand toggle
+  // Filtered Stock Items based on brand toggle and search query
   const filteredStockItems = stockItems.filter(st => {
-    if (listBrandFilter === 'All') return true;
-    if (listBrandFilter === 'JB Cafe') return st.brand === 'JB Cafe' || !st.brand;
-    return st.brand === 'KUNAFA';
+    const matchesBrand = listBrandFilter === 'All' 
+      ? true 
+      : (listBrandFilter === 'JB Cafe' ? (st.brand === 'JB Cafe' || !st.brand) : st.brand === 'KUNAFA');
+    const matchesSearch = st.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesBrand && matchesSearch;
   });
 
   // Overview metrics
@@ -387,24 +393,38 @@ export const AdminStock: React.FC = () => {
             <p className="text-xs text-stone-400">Inventory levels, consumption, and threshold monitoring</p>
           </div>
           
-          {/* Brand Filter */}
-          {currentRole !== 'admin_kunafa' && (
-            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
-              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
-                <button
-                  key={b}
-                  onClick={() => setListBrandFilter(b)}
-                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
-                    listBrandFilter === b
-                      ? 'bg-white text-stone-900 shadow-xs'
-                      : 'text-stone-500 hover:text-stone-700'
-                  }`}
-                >
-                  {b}
-                </button>
-              ))}
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            {/* Search Bar */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+              <input
+                type="text"
+                placeholder="Search materials..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+              />
             </div>
-          )}
+
+            {/* Brand Filter */}
+            {currentRole !== 'admin_kunafa' && (
+              <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
+                {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => setListBrandFilter(b)}
+                    className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                      listBrandFilter === b
+                        ? 'bg-white text-stone-900 shadow-xs'
+                        : 'text-stone-500 hover:text-stone-700'
+                    }`}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
