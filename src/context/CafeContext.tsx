@@ -169,7 +169,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [materials, setMaterials] = useState<Material[]>([]);
   const [stockBalances, setStockBalances] = useState<StockBalance[]>([]);
 
-  const stockItems: StockItem[] = useMemo(() => {
+  const allStockItems: StockItem[] = useMemo(() => {
     return materials.map(m => {
       const balance = stockBalances.find(b => b.materialId === m.id) || { available: 0, status: 'out' as const, lastRestocked: undefined };
       return {
@@ -180,10 +180,19 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         minThreshold: m.minThreshold,
         costPerUnit: m.costPerUnit,
         status: balance.status,
-        lastRestocked: balance.lastRestocked
+        lastRestocked: balance.lastRestocked,
+        brand: m.brand,
       };
     });
   }, [materials, stockBalances]);
+
+  // For admin_kunafa: only show KUNAFA materials; for admin: show all
+  const stockItems: StockItem[] = useMemo(() => {
+    if (currentRole === 'admin_kunafa') {
+      return allStockItems.filter(s => s.brand === 'KUNAFA');
+    }
+    return allStockItems;
+  }, [allStockItems, currentRole]);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);

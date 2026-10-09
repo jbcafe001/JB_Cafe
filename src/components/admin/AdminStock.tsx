@@ -24,7 +24,7 @@ import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
 
 export const AdminStock: React.FC = () => {
-  const { stockItems, createStockItem, addStock, useStock, todayStockUsage, materialUsageLogs } = useCafe();
+  const { stockItems, createStockItem, addStock, useStock, todayStockUsage, materialUsageLogs, currentRole } = useCafe();
 
   const [showAddStockModal, setShowAddStockModal] = useState(false);
   const [showUseStockModal, setShowUseStockModal] = useState(false);
@@ -52,17 +52,27 @@ export const AdminStock: React.FC = () => {
   // Material Usage Log filter
   const [selectedMaterialFilter, setSelectedMaterialFilter] = useState('all');
 
+  // Brand Filter for main admin
+  const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>('All');
+
   useModalClose(() => setShowUseStockModal(false), showUseStockModal);
   useModalClose(() => setShowAddStockModal(false), showAddStockModal);
   useModalClose(() => setShowCreateMaterialModal(false), showCreateMaterialModal);
 
-  // Overview metrics
-  const totalItems = stockItems.length;
-  const lowStockCount = stockItems.filter((s) => s.status === 'low').length;
-  const outOfStockCount = stockItems.filter((s) => s.status === 'out').length;
-  const totalStockValue = stockItems.reduce((sum, s) => sum + s.available * s.costPerUnit, 0);
+  // Filtered Stock Items based on brand toggle
+  const filteredStockItems = stockItems.filter(st => {
+    if (listBrandFilter === 'All') return true;
+    if (listBrandFilter === 'JB Cafe') return st.brand === 'JB Cafe' || !st.brand;
+    return st.brand === 'KUNAFA';
+  });
 
-  const selectedItem = stockItems.find((s) => s.id === selectedStockItemId);
+  // Overview metrics
+  const totalItems = filteredStockItems.length;
+  const lowStockCount = filteredStockItems.filter((s) => s.status === 'low').length;
+  const outOfStockCount = filteredStockItems.filter((s) => s.status === 'out').length;
+  const totalStockValue = filteredStockItems.reduce((sum, s) => sum + s.available * s.costPerUnit, 0);
+
+  const selectedItem = filteredStockItems.find((s) => s.id === selectedStockItemId);
 
   // Auto-calculate purchase cost based on quantity entered and unit cost
   useEffect(() => {
@@ -371,11 +381,30 @@ export const AdminStock: React.FC = () => {
 
       {/* Current Stock Table */}
       <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
             <h3 className="font-extrabold text-stone-900 text-base">Current Stock & Ingredients</h3>
             <p className="text-xs text-stone-400">Inventory levels, consumption, and threshold monitoring</p>
           </div>
+          
+          {/* Brand Filter */}
+          {currentRole !== 'admin_kunafa' && (
+            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
+              {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setListBrandFilter(b)}
+                  className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                    listBrandFilter === b
+                      ? 'bg-white text-stone-900 shadow-xs'
+                      : 'text-stone-500 hover:text-stone-700'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -392,7 +421,7 @@ export const AdminStock: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 text-stone-800">
-              {stockItems.map((st) => (
+              {filteredStockItems.map((st) => (
                 <tr key={st.id} className="hover:bg-stone-50/80 transition-colors">
                   <td className="py-3 font-bold text-stone-900">
                     <div className="flex flex-col">
