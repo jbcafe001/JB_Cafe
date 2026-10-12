@@ -54,6 +54,7 @@ interface CafeContextType {
   filteredOrders: Order[];          // KUNAFA-filtered for admin_kunafa, all orders for admin
   brandFilter: 'JB Cafe' | 'KUNAFA' | null; // null = no filter (regular admin)
   stockItems: StockItem[];
+  materials: Material[];
   orders: Order[];
   expenses: Expense[];
   stockAdditions: StockAddition[];
@@ -90,8 +91,10 @@ interface CafeContextType {
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
   cancelOrder: (orderId: string) => void;
 
-  // Stock
+  // Stock & Materials
   createStockItem: (item: Omit<StockItem, 'id'>) => void;
+  updateMaterial: (id: string, updates: Partial<Material>) => void;
+  deleteMaterial: (id: string) => void;
   addStock: (stockItemId: string, quantity: number, purchaseCost: number) => void;
   useStock: (stockItemId: string, quantity: number, purpose?: string, notes?: string, showToast?: boolean) => void;
   todayStockUsage: Record<string, { name: string; amount: number; unit: string }>;
@@ -959,7 +962,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addToast('Order cancelled successfully', 'error');
   };
 
-  // Stock Management
+  // Stock & Material Management
   const createStockItem = (item: Omit<StockItem, 'id'>) => {
     const id = `st-${Date.now()}`;
     const newMaterial: Material = {
@@ -968,18 +971,45 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       unit: item.unit,
       minThreshold: item.minThreshold,
       costPerUnit: item.costPerUnit,
+      brand: item.brand || 'JB Cafe',
     };
     const newBalance: StockBalance = {
       id,
       materialId: id,
-      available: item.available,
-      status: item.status,
-      lastRestocked: item.lastRestocked,
+      available: item.available ?? 0,
+      status: (item.available ?? 0) <= item.minThreshold ? ((item.available ?? 0) <= 0 ? 'out' : 'low') : 'good',
+      lastRestocked: item.lastRestocked || new Date().toISOString().split('T')[0],
+      brand: item.brand || 'JB Cafe',
     };
     setDoc(doc(db, 'materials', id), newMaterial).catch(console.error);
     setDoc(doc(db, 'stockBalances', id), newBalance).catch(console.error);
     addNotification(`New material added: ${newMaterial.name}`, 'admin');
     addToast('Material added successfully!');
+  };
+
+  const updateMaterial = (id: string, updates: Partial<Material>) => {
+    updateDoc(doc(db, 'materials', id), updates).then(() => {
+      if (updates.brand) {
+        updateDoc(doc(db, 'stockBalances', id), { brand: updates.brand }).catch(() => {});
+      }
+      addNotification(`Material updated: ${updates.name || id}`, 'admin');
+      addToast('Material updated successfully!');
+    }).catch((err) => {
+      console.error(err);
+      addToast('Failed to update material', 'error');
+    });
+  };
+
+  const deleteMaterial = (id: string) => {
+    const mat = materials.find((m) => m.id === id);
+    deleteDoc(doc(db, 'materials', id)).then(() => {
+      deleteDoc(doc(db, 'stockBalances', id)).catch(() => {});
+      addNotification(`Material deleted: ${mat?.name || id}`, 'admin');
+      addToast('Material deleted successfully!');
+    }).catch((err) => {
+      console.error(err);
+      addToast('Failed to delete material', 'error');
+    });
   };
 
   const addStock = (stockItemId: string, quantity: number, purchaseCost: number) => {
@@ -1524,6 +1554,9 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         completeOrder,
         cancelOrder,
         createStockItem,
+        updateMaterial,
+        deleteMaterial,
+        materials,
         addStock,
         useStock,
         todayStockUsage,

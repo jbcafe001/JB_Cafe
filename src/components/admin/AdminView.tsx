@@ -5,6 +5,7 @@ import { AdminOrders } from './AdminOrders';
 import { AdminSales } from './AdminSales';
 import { AdminExpenses } from './AdminExpenses';
 import { AdminStock } from './AdminStock';
+import { AdminRawMaterial } from './AdminRawMaterial';
 import { AdminMenu } from './AdminMenu';
 import { AdminTables } from './AdminTables';
 import { AdminSalary } from './AdminSalary';
@@ -29,6 +30,7 @@ import {
   LogOut,
   Bell,
   Sparkles,
+  Boxes,
 } from 'lucide-react';
 
 type AdminTab =
@@ -37,6 +39,7 @@ type AdminTab =
   | 'sales'
   | 'expenses'
   | 'stock'
+  | 'raw-material'
   | 'menu'
   | 'tables'
   | 'salary'
@@ -72,6 +75,11 @@ export const AdminView: React.FC = () => {
       label: 'Stock',
       icon: <Package className="w-4 h-4" />,
       badge: lowStockCount > 0 ? lowStockCount : undefined,
+    },
+    {
+      id: 'raw-material',
+      label: 'Raw Material',
+      icon: <Boxes className="w-4 h-4" />,
     },
     { id: 'menu', label: 'Menu', icon: <UtensilsCrossed className="w-4 h-4" /> },
     { id: 'tables', label: 'Tables', icon: <Grid className="w-4 h-4" /> },
@@ -209,6 +217,7 @@ export const AdminView: React.FC = () => {
         {activeTab === 'sales' && <AdminSales />}
         {activeTab === 'expenses' && <AdminExpenses />}
         {activeTab === 'stock' && <AdminStock />}
+        {activeTab === 'raw-material' && <AdminRawMaterial />}
         {activeTab === 'menu' && <AdminMenu />}
         {activeTab === 'tables' && currentRole !== 'admin_kunafa' && <AdminTables />}
         {activeTab === 'salary' && currentRole !== 'admin_kunafa' && <AdminSalary />}
