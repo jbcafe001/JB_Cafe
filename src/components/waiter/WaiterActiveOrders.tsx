@@ -244,6 +244,7 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                         </span>
                       </div>
                       <span className="text-[11px] text-stone-500 mt-0.5 block">
+                        {order.customerName ? <strong className="text-stone-800 font-bold mr-1.5">Cust: {order.customerName} •</strong> : null}
                         Waiter: {order.waiterName} • Placed {order.createdAt}
                         {order.readyAt && ` • Ready at ${order.readyAt}`}
                         {order.servedAt && ` • Served at ${order.servedAt}`}

@@ -292,6 +292,11 @@ export const KitchenView: React.FC = () => {
                         <h3 className="text-2xl font-black tracking-tight text-stone-900 mt-1">
                           {order.tableNumber}
                         </h3>
+                        {order.customerName && (
+                          <span className="text-xs font-bold text-amber-700 block mt-0.5">
+                            Customer: {order.customerName}
+                          </span>
+                        )}
                       </div>
 
                       <div className="text-right">

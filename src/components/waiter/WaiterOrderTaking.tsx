@@ -16,6 +16,7 @@ import {
   CreditCard,
   Coffee,
   Sparkles,
+  User,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 
@@ -84,6 +85,8 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Record<string, OrderItem>>({});
+  const [customerName, setCustomerName] = useState('');
+  const [customerNameError, setCustomerNameError] = useState(false);
   const [notes, setNotes] = useState('');
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -197,6 +200,11 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const subtotal = cartItemsList.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleReviewConfirm = () => {
+    if (!customerName.trim()) {
+      setCustomerNameError(true);
+      return;
+    }
+    setCustomerNameError(false);
     setShowReviewModal(false);
     setShowPaymentModal(true);
     setCashTendered(subtotal);
@@ -204,11 +212,18 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
   const handleSendToKitchen = () => {
     if (cartItemsList.length === 0) return;
+    if (!customerName.trim()) {
+      setShowPaymentModal(false);
+      setShowReviewModal(true);
+      setCustomerNameError(true);
+      return;
+    }
 
     // Always create a new order instead of appending
     createOrder({
       tableId: table.id,
       items: cartItemsList,
+      customerName: customerName.trim(),
       notes: notes.trim() ? notes.trim() : undefined,
       waiterId: currentUser?.id,
       waiterName: currentUser?.name,
@@ -463,8 +478,42 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                 </div>
               ))}
 
-              {/* Special Note Input */}
+              {/* Customer Name Input (Mandatory) */}
               <div className="pt-4">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-extrabold text-stone-700">
+                    Customer Name <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-[10px] text-red-500 font-extrabold uppercase tracking-wider">
+                    Mandatory
+                  </span>
+                </div>
+                <div className="relative">
+                  <User className={`w-4 h-4 absolute left-3 top-2.5 ${customerNameError ? 'text-red-500' : 'text-stone-400'}`} />
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (e.target.value.trim()) setCustomerNameError(false);
+                    }}
+                    placeholder="Enter customer name..."
+                    className={`w-full pl-9 pr-3 py-2 bg-stone-50 border ${
+                      customerNameError
+                        ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20 placeholder-red-300'
+                        : 'border-stone-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                    } rounded-xl text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:outline-hidden transition-all`}
+                  />
+                </div>
+                {customerNameError && (
+                  <p className="text-[11px] text-red-500 font-bold mt-1.5 flex items-center gap-1">
+                    Customer name is required before proceeding to payment.
+                  </p>
+                )}
+              </div>
+
+              {/* Special Note Input */}
+              <div className="pt-3">
                 <label className="block text-xs font-semibold text-stone-600 mb-1">
                   Optional Kitchen Note
                 </label>
@@ -518,7 +567,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                   Collect Payment
                 </h3>
                 <p className="text-xs text-stone-500 font-mono">
-                  {table.name}
+                  {table.name}{customerName ? ` • Customer: ${customerName}` : ''}
                 </p>
               </div>
               <button

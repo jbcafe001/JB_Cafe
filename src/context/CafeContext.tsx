@@ -31,6 +31,7 @@ import { getCafeBusinessDate, getCafeOrderPrefix } from '../utils/dateUtils';
 interface CreateOrderParams {
   tableId: string;
   items: OrderItem[];
+  customerName?: string;
   notes?: string;
   waiterId?: string;
   waiterName?: string;
@@ -444,7 +445,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Order Actions
-  const createOrder = ({ tableId, items, notes, waiterId, waiterName, paymentMethod }: CreateOrderParams): Order | Order[] => {
+  const createOrder = ({ tableId, items, customerName, notes, waiterId, waiterName, paymentMethod }: CreateOrderParams): Order | Order[] => {
     // 1. Group items by brand
     const brandGroups: Record<string, OrderItem[]> = {
       'JB Cafe': [],
@@ -498,6 +499,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         orderNumber,
         tableId,
         tableNumber: tableNumStr,
+        customerName: customerName ? customerName.trim() : undefined,
         waiterId: waiterId || currentUser?.id || 'u-waiter-1',
         waiterName: waiterName || currentUser?.name || 'Rahul Sharma',
         items: groupItems.map(i => ({ ...i, batch: 1 })),

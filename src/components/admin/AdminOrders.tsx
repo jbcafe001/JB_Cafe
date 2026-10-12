@@ -93,8 +93,9 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
             </div>
 
             {/* Meta row */}
-            <div className="mt-5 grid grid-cols-3 gap-3">
+            <div className={`mt-5 grid ${order.customerName ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'} gap-2.5`}>
               {[
+                ...(order.customerName ? [{ icon: <User className="w-3.5 h-3.5 text-amber-400" />, label: 'Customer', value: order.customerName }] : []),
                 { icon: <Table className="w-3.5 h-3.5" />, label: 'Table', value: order.tableNumber },
                 { icon: <User className="w-3.5 h-3.5" />,  label: 'Waiter', value: order.waiterName },
                 { icon: paymentIcon[paymentKey] || <Banknote className="w-3.5 h-3.5" />, label: 'Payment', value: (order.paymentMethod || 'Cash').toUpperCase() },
@@ -284,6 +285,7 @@ export const AdminOrders: React.FC = () => {
     const matchesSearch =
       o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
       o.tableNumber.toLowerCase().includes(search.toLowerCase()) ||
+      (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase())) ||
       o.waiterName.toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
@@ -477,7 +479,10 @@ export const AdminOrders: React.FC = () => {
                           })()}
                         </td>
                       )}
-                      <td className="px-5 py-4 font-semibold text-stone-700">{ord.tableNumber}</td>
+                      <td className="px-5 py-4 font-semibold text-stone-700">
+                        <div>{ord.tableNumber}</div>
+                        {ord.customerName && <div className="text-[11px] text-amber-700 font-bold">{ord.customerName}</div>}
+                      </td>
                       <td className="px-5 py-4 text-stone-600">{ord.waiterName}</td>
                       <td className="px-5 py-4 text-stone-400 max-w-xs truncate text-xs">
                         {ord.items.map((i) => `${i.quantity}× ${i.name}`).join(', ')}

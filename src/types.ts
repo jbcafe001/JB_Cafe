@@ -95,6 +95,7 @@ export interface Order {
   orderNumber: string; // e.g. "#1042"
   tableId: string;
   tableNumber: string; // "Table 04"
+  customerName?: string;
   waiterId: string;
   waiterName: string;
   items: OrderItem[];
