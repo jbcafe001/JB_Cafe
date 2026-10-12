@@ -24,6 +24,7 @@ const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Rice',
   'Shake',
   'Cold Coffee',
+  'Soft Drink',
   'Sizzling Brownie',
   'Cheesecake',
   'Cookie Tin',

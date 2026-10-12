@@ -45,6 +45,7 @@ export type MenuItemCategory =
   | 'Rice'
   | 'Shake'
   | 'Cold Coffee'
+  | 'Soft Drink'
   | 'Sizzling Brownie'
   | 'Cheesecake'
   | 'Cookie Tin'
