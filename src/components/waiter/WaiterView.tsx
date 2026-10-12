@@ -75,11 +75,11 @@ export const WaiterView: React.FC = () => {
           {/* Brand Selection Modal */}
           {brandSelectionTable && (
             <div
-              className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+              className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
               onClick={() => setBrandSelectionTable(null)}
             >
               <div
-                className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-stone-100 flex flex-col space-y-4 animate-in zoom-in-95 duration-150"
+                className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-stone-200/80 flex flex-col space-y-4 animate-modal-spring"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between pb-2 border-b border-stone-100">
@@ -92,7 +92,7 @@ export const WaiterView: React.FC = () => {
                   </div>
                   <button
                     onClick={() => setBrandSelectionTable(null)}
-                    className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors cursor-pointer"
+                    className="btn-interactive p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -103,9 +103,9 @@ export const WaiterView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleBrandSelect('JB Cafe')}
-                    className="group text-left p-4 rounded-2xl border-2 border-amber-200/90 hover:border-amber-600 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:from-amber-100/70 hover:to-orange-100/50 transition-all duration-150 active:scale-98 shadow-xs hover:shadow-md flex items-center space-x-3.5 cursor-pointer"
+                    className="card-interactive group text-left p-4 rounded-2xl border-2 border-amber-200/90 hover:border-amber-600 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:from-amber-100/70 hover:to-orange-100/50 transition-all shadow-sm flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
                       <Coffee className="w-6 h-6" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -125,9 +125,9 @@ export const WaiterView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleBrandSelect('KUNAFA')}
-                    className="group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all duration-150 active:scale-98 shadow-xs hover:shadow-md flex items-center space-x-3.5 cursor-pointer"
+                    className="card-interactive group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all shadow-sm flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform">
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -150,13 +150,13 @@ export const WaiterView: React.FC = () => {
           {/* Fixed Bottom Navigation (Mobile First Clean Minimalism) */}
           <nav
             id="waiter-bottom-nav"
-            className="fixed bottom-0 left-0 right-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EFE7DA] shadow-sm px-2 py-1.5 flex items-center justify-around"
+            className="fixed bottom-0 left-0 right-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EFE7DA] shadow-lg px-2 py-1.5 flex items-center justify-around"
           >
             <button
               id="waiter-nav-home"
               onClick={() => setActiveTab('home')}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'home'
-                  ? 'text-amber-800 font-extrabold bg-amber-100/70 border border-amber-200'
+              className={`btn-interactive flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all ${activeTab === 'home'
+                  ? 'text-amber-900 font-black bg-amber-100/90 border border-amber-300 shadow-xs'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >
@@ -167,15 +167,15 @@ export const WaiterView: React.FC = () => {
             <button
               id="waiter-nav-orders"
               onClick={() => setActiveTab('orders')}
-              className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'orders'
-                  ? 'text-sky-800 font-extrabold bg-sky-100/70 border border-sky-200'
+              className={`btn-interactive relative flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all ${activeTab === 'orders'
+                  ? 'text-sky-900 font-black bg-sky-100/90 border border-sky-300 shadow-xs'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >
               <ClipboardList className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Orders</span>
               {activeOrdersCount > 0 && (
-                <span className="absolute top-0.5 right-2 w-4 h-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-[9px] font-extrabold flex items-center justify-center shadow-xs">
+                <span className="absolute top-1 right-2 w-4 h-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-[9px] font-black flex items-center justify-center shadow-xs animate-live-pulse">
                   {activeOrdersCount}
                 </span>
               )}
@@ -184,16 +184,14 @@ export const WaiterView: React.FC = () => {
             <button
               id="waiter-nav-tables"
               onClick={() => setActiveTab('tables')}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'tables'
-                  ? 'text-emerald-800 font-extrabold bg-emerald-100/70 border border-emerald-200'
+              className={`btn-interactive flex flex-col items-center justify-center py-1.5 px-4 rounded-2xl transition-all ${activeTab === 'tables'
+                  ? 'text-emerald-900 font-black bg-emerald-100/90 border border-emerald-300 shadow-xs'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >
               <Grid className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Tables</span>
             </button>
-
-
           </nav>
         </>
       )}

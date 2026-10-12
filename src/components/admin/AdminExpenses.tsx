@@ -78,7 +78,7 @@ export const AdminExpenses: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header & Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -87,13 +87,13 @@ export const AdminExpenses: React.FC = () => {
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           {!isKunafaAdmin && (
-            <div className="flex bg-stone-100 p-1 rounded-lg w-full sm:w-auto">
+            <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto">
               {(['All', 'JB Cafe', 'KUNAFA'] as const).map(b => (
                 <button
                   key={b}
                   onClick={() => setFilterBrand(b)}
-                  className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
-                    filterBrand === b ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'
+                  className={`btn-interactive flex-1 sm:flex-none px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    filterBrand === b ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-500 hover:text-stone-700'
                   }`}
                 >
                   {b}
@@ -107,7 +107,7 @@ export const AdminExpenses: React.FC = () => {
               setExpenseBrand(isKunafaAdmin ? 'KUNAFA' : 'JB Cafe');
               setShowAddModal(true);
             }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
+            className="btn-interactive w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-xl shadow-md shadow-amber-600/20 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Add Expense</span>
@@ -117,7 +117,7 @@ export const AdminExpenses: React.FC = () => {
 
       {/* 3 Summary Cards (Section 12) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 border border-rose-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-1 bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 border border-rose-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 block mb-1">
             Today's Expenses
           </span>
@@ -125,7 +125,7 @@ export const AdminExpenses: React.FC = () => {
           <span className="text-[11px] text-rose-600/70 mt-1 inline-block">Daily logged spend</span>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-2 bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
             This Week's Expenses
           </span>
@@ -133,7 +133,7 @@ export const AdminExpenses: React.FC = () => {
           <span className="text-[11px] text-amber-600/70 mt-1 inline-block">Current 7-day period</span>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 border border-purple-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-3 bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 border border-purple-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700 block mb-1">
             This Month's Expenses
           </span>
@@ -180,7 +180,7 @@ export const AdminExpenses: React.FC = () => {
                 };
 
                 return (
-                  <tr key={exp.id} className="hover:bg-stone-50/80 transition-colors">
+                  <tr key={exp.id} className="table-row-interactive hover:bg-stone-50/80 transition-colors">
                     <td className="py-3 font-bold text-stone-900">
                       {exp.name}
                       {!isKunafaAdmin && (
@@ -213,13 +213,13 @@ export const AdminExpenses: React.FC = () => {
 
       {/* + Add Expense Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150 border border-stone-200" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 rounded-t-2xl">
+        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={handleCloseModal}>
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80">
               <h3 className="font-extrabold text-stone-900 text-base">Record New Expense</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100"
+                className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
               >
                 <X className="w-5 h-5" />
               </button>

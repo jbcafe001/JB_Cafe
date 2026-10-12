@@ -232,8 +232,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         </div>
 
         {/* Tables Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {tables.map((table) => {
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-page-enter">
+          {tables.map((table, idx) => {
             const activeOrders = getActiveOrdersForTable(table.id);
             
             const isAllItemsServed = (o: Order) => o.items.length > 0 && o.items.every(i => i.served);
@@ -272,9 +272,10 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
               <div
                 key={table.id}
                 id={`table-card-${table.number}`}
+                style={{ animationDelay: `${(idx % 9) * 40}ms` }}
                 onClick={() => handleTableCardClick(table)}
-                className={`bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm hover:shadow-md active:scale-98 flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${isReady
-                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20'
+                className={`card-interactive bg-white rounded-3xl border p-5 sm:p-6 cursor-pointer transition-all shadow-sm flex flex-col justify-between min-h-[180px] sm:min-h-[200px] ${isReady
+                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20 shadow-emerald-500/10'
                   : isServed
                     ? 'border-indigo-300 ring-1 ring-indigo-400/20 bg-indigo-50/10'
                     : table.status === 'occupied'

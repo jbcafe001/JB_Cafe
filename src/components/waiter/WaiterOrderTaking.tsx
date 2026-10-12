@@ -481,13 +481,10 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
               {/* Customer Name Input (Mandatory) */}
               <div className="pt-4">
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1">
                   <label className="text-xs font-extrabold text-stone-700">
                     Customer Name <span className="text-red-500">*</span>
                   </label>
-                  <span className="text-[10px] text-red-500 font-extrabold uppercase tracking-wider">
-                    Mandatory
-                  </span>
                 </div>
                 <div className="relative">
                   <User className={`w-4 h-4 absolute left-3 top-2.5 ${customerNameError ? 'text-red-500' : 'text-stone-400'}`} />

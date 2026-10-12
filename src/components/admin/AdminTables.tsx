@@ -103,7 +103,7 @@ export const AdminTables: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header & Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -114,7 +114,7 @@ export const AdminTables: React.FC = () => {
         <button
           id="add-table-btn"
           onClick={handleOpenAdd}
-          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+          className="btn-interactive w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-black text-xs rounded-xl shadow-md shadow-teal-700/15 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add Table</span>
@@ -123,16 +123,20 @@ export const AdminTables: React.FC = () => {
 
       {/* Tables Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {tables.map((table) => (
+        {tables.map((table, idx) => (
           <div
             key={table.id}
-            className={`border rounded-2xl p-4 shadow-2xs flex flex-col justify-between min-h-[140px] hover:shadow-xs transition-all ${getTableCardBg(table.status)}`}
+            style={{ animationDelay: `${(idx % 10) * 40}ms` }}
+            className={`card-interactive border rounded-2xl p-4 shadow-sm flex flex-col justify-between min-h-[148px] ${getTableCardBg(table.status)}`}
           >
             <div>
               <div className="flex flex-col items-start gap-1.5">
-                <span className="font-extrabold text-stone-900 text-base sm:text-lg whitespace-nowrap">{table.name}</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-extrabold text-stone-900 text-base sm:text-lg whitespace-nowrap">{table.name}</span>
+                  <span className={`w-2.5 h-2.5 rounded-full ${table.status === 'available' ? 'bg-emerald-500 animate-emerald-pulse' : 'bg-amber-500 animate-live-pulse'}`} />
+                </div>
                 <span
-                  className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(
+                  className={`text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(
                     table.status
                   )}`}
                 >
@@ -155,7 +159,7 @@ export const AdminTables: React.FC = () => {
             <div className="pt-3 border-t border-stone-100 flex items-center justify-between">
               <button
                 onClick={() => handleOpenEdit(table)}
-                className="text-xs text-stone-600 hover:text-stone-900 font-semibold flex items-center space-x-1"
+                className="btn-interactive text-xs text-stone-600 hover:text-stone-900 font-semibold flex items-center space-x-1 px-1.5 py-1 rounded-lg"
               >
                 <Edit className="w-3 h-3" />
                 <span>Edit</span>
@@ -164,7 +168,7 @@ export const AdminTables: React.FC = () => {
               {table.status !== 'available' && (
                 <button
                   onClick={() => updateTable(table.id, { status: 'available', currentOrderId: undefined })}
-                  className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md hover:bg-emerald-100"
+                  className="btn-interactive text-[10px] text-emerald-800 font-bold bg-emerald-100/80 px-2 py-1 rounded-lg hover:bg-emerald-200 transition-colors shadow-2xs"
                 >
                   Free Table
                 </button>
@@ -176,15 +180,15 @@ export const AdminTables: React.FC = () => {
 
       {/* Add / Edit Table Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
+        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={handleCloseModal}>
+          <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
               <h3 className="font-extrabold text-stone-900 text-base">
                 {editingTable ? 'Edit Table' : '+ Add Café Table'}
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+                className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -199,14 +203,14 @@ export const AdminTables: React.FC = () => {
                   value={number}
                   onChange={(e) => { setNumber(e.target.value); setNumberError(''); }}
                   placeholder="11"
-                  className={`w-full px-3 py-2 bg-stone-50 border rounded-xl focus:ring-1 focus:outline-hidden ${
+                  className={`w-full px-3 py-2 bg-stone-50 border rounded-xl focus:ring-1 focus:outline-hidden transition-all ${
                     numberError
                       ? 'border-red-400 focus:ring-red-400'
                       : 'border-stone-200 focus:ring-amber-500'
                   }`}
                 />
                 {numberError && (
-                  <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1">
+                  <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1 animate-slide-in-right">
                     <span>⚠</span> {numberError}
                   </p>
                 )}
@@ -231,14 +235,14 @@ export const AdminTables: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
+                  className="btn-interactive px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   id="save-table-btn"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs"
+                  className="btn-interactive px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md shadow-amber-600/20"
                 >
                   {editingTable ? 'Save Table' : 'Add Table'}
                 </button>

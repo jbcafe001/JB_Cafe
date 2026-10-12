@@ -159,7 +159,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const paginatedOrders = orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Dashboard Header & Filters */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -190,10 +190,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       {/* Top Section: Multi-colored Pastel Cafe Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Today's Sales - Matcha / Fresh Sage */}
-        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white p-5 rounded-2xl border border-emerald-200/80 shadow-2xs hover:shadow-xs transition-all">
+        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white p-5 rounded-2xl border border-emerald-200/80 shadow-2xs card-interactive animate-page-enter stagger-1 group">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Today's Sales</p>
-            <div className="w-7 h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
               <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -202,10 +202,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         </div>
 
         {/* Active Orders - Sky Breeze */}
-        <div className="col-span-1 bg-gradient-to-br from-sky-50/80 via-blue-50/40 to-white p-5 rounded-2xl border border-sky-200/80 shadow-2xs hover:shadow-xs transition-all">
+        <div className="col-span-1 bg-gradient-to-br from-sky-50/80 via-blue-50/40 to-white p-5 rounded-2xl border border-sky-200/80 shadow-2xs card-interactive animate-page-enter stagger-2 group">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-sky-800 uppercase tracking-wider">Active Orders</p>
-            <div className="w-7 h-7 rounded-lg bg-sky-100/80 flex items-center justify-center text-sky-700">
+            <div className="w-7 h-7 rounded-lg bg-sky-100/80 flex items-center justify-center text-sky-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
               <ShoppingBag className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -214,10 +214,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         </div>
 
         {/* Estimated Net Profit - Honey Caramel */}
-        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-white p-5 rounded-2xl border border-amber-200/80 shadow-2xs hover:shadow-xs transition-all">
+        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-white p-5 rounded-2xl border border-amber-200/80 shadow-2xs card-interactive animate-page-enter stagger-3 group">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Est. Net Profit</p>
-            <div className="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700">
+            <div className="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
               <Coins className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -228,10 +228,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         </div>
 
         {/* Stock Alert - Apricot Peach */}
-        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-orange-50/40 to-white p-5 rounded-2xl border border-rose-200/80 shadow-2xs hover:shadow-xs transition-all">
+        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-orange-50/40 to-white p-5 rounded-2xl border border-rose-200/80 shadow-2xs card-interactive animate-page-enter stagger-4 group">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Stock Alert</p>
-            <div className="w-7 h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700">
+            <div className="w-7 h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
               <AlertTriangle className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -588,15 +588,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
             const heightPercent = Math.round((amount / maxSaleHour) * 100);
 
             return (
-              <div key={hour} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                <div className="absolute -top-7 hidden group-hover:flex bg-amber-950/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm z-10">
+              <div key={hour} className="flex-1 flex flex-col items-center group relative h-full justify-end cursor-pointer">
+                <div className="absolute -top-7 hidden group-hover:flex bg-amber-950/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-md z-10 animate-modal-spring pointer-events-none">
                   ₹{amount}
                 </div>
                 <div
-                  style={{ height: `${heightPercent}%` }}
-                  className="w-full bg-gradient-to-t from-amber-500 via-orange-400 to-amber-300 group-hover:from-amber-600 group-hover:to-orange-500 rounded-t-lg transition-all duration-300 shadow-2xs"
+                  style={{ 
+                    height: `${heightPercent}%`,
+                    animationDelay: `${idx * 45}ms`
+                  }}
+                  className="w-full bg-gradient-to-t from-amber-500 via-orange-400 to-amber-300 group-hover:from-amber-600 group-hover:to-orange-500 rounded-t-lg transition-all duration-300 shadow-2xs animate-bar-grow group-hover:scale-y-105"
                 />
-                <span className="text-[10px] sm:text-xs text-stone-400 font-medium mt-2 whitespace-nowrap">
+                <span className="text-[10px] sm:text-xs text-stone-400 font-medium mt-2 whitespace-nowrap group-hover:text-amber-800 transition-colors">
                   {hour}
                 </span>
               </div>

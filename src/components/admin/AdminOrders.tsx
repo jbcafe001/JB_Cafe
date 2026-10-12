@@ -62,15 +62,14 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]"
+        className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md animate-fade-in"
         onClick={onClose}
       />
 
       {/* Panel */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-lg max-h-[90vh] bg-[#FAFAF9] rounded-3xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden"
-          style={{ animation: 'slideUp 0.22s ease-out' }}
+          className="pointer-events-auto w-full max-w-lg max-h-[90vh] bg-[#FAFAF9] rounded-3xl shadow-2xl border border-stone-200/80 flex flex-col overflow-hidden animate-modal-spring"
           onClick={e => e.stopPropagation()}
         >
           <div className="overflow-y-auto flex-1">
@@ -314,7 +313,7 @@ export const AdminOrders: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 animate-page-enter">
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -463,7 +462,7 @@ export const AdminOrders: React.FC = () => {
                     <tr
                       key={ord.id}
                       onClick={() => setSelectedOrder(ord)}
-                      className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
+                      className="table-row-interactive hover:bg-amber-50/50 cursor-pointer group"
                     >
                       <td className="px-5 py-4 text-stone-600 font-medium whitespace-nowrap">
                         {ord.date 

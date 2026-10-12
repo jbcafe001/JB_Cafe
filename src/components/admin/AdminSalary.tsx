@@ -383,7 +383,7 @@ export const AdminSalary: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header section with Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -404,7 +404,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="give-upaad-btn-header"
             onClick={() => handleOpenGiveUpaad()}
-            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+            className="btn-interactive flex-1 sm:flex-none justify-center px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-md shadow-amber-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-amber-200" />
             <span>Give Upaad</span>
@@ -413,7 +413,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="add-staff-btn-header"
             onClick={handleOpenAddStaff}
-            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+            className="btn-interactive flex-1 sm:flex-none justify-center px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs rounded-xl shadow-md shadow-teal-700/20 flex items-center space-x-1.5 transition-all whitespace-nowrap"
           >
             <Users className="w-4 h-4" />
             <span>Add Staff</span>
@@ -424,7 +424,7 @@ export const AdminSalary: React.FC = () => {
       {/* 2. STAFF SALARY DASHBOARD — Simple Overview Cards (Section 2) */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
         {/* Total Staff */}
-        <div className="bg-gradient-to-br from-sky-50 via-sky-50/40 to-blue-50/30 p-4 rounded-2xl border border-sky-200/90 shadow-2xs">
+        <div className="card-interactive stagger-1 bg-gradient-to-br from-sky-50 via-sky-50/40 to-blue-50/30 p-4 rounded-2xl border border-sky-200/90 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">Total Staff</p>
             <Users className="w-4 h-4 text-sky-600" />
@@ -434,7 +434,7 @@ export const AdminSalary: React.FC = () => {
         </div>
 
         {/* Total Monthly Salary */}
-        <div className="bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 p-4 rounded-2xl border border-emerald-200/90 shadow-2xs">
+        <div className="card-interactive stagger-2 bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 p-4 rounded-2xl border border-emerald-200/90 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Total Monthly Salary</p>
             <Wallet className="w-4 h-4 text-emerald-600" />
@@ -446,7 +446,7 @@ export const AdminSalary: React.FC = () => {
         </div>
 
         {/* Total Upaad Given */}
-        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 p-4 rounded-2xl border border-amber-200/90 shadow-2xs">
+        <div className="card-interactive stagger-3 bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 p-4 rounded-2xl border border-amber-200/90 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Total Upaad Given</p>
             <Receipt className="w-4 h-4 text-amber-600" />
@@ -458,7 +458,7 @@ export const AdminSalary: React.FC = () => {
         </div>
 
         {/* Salary Due */}
-        <div className="bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 p-4 rounded-2xl border border-rose-200/90 shadow-2xs">
+        <div className="card-interactive stagger-4 bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 p-4 rounded-2xl border border-rose-200/90 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-rose-700 uppercase tracking-wider">Salary Due</p>
             <Clock className="w-4 h-4 text-rose-600" />
@@ -470,7 +470,7 @@ export const AdminSalary: React.FC = () => {
         </div>
 
         {/* Next Salary Date */}
-        <div className="col-span-2 md:col-span-1 bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 p-4 rounded-2xl border border-purple-200/90 shadow-2xs">
+        <div className="card-interactive stagger-5 col-span-2 md:col-span-1 bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 p-4 rounded-2xl border border-purple-200/90 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-purple-700 uppercase tracking-wider">Next Salary Date</p>
             <Calendar className="w-4 h-4 text-purple-600" />
@@ -486,7 +486,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-staff-list"
             onClick={() => setActiveTab('staff')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
+            className={`btn-interactive px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'staff'
                 ? 'bg-sky-100/90 text-sky-950 border-sky-300 shadow-xs'
                 : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
@@ -499,7 +499,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-salary-history"
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
+            className={`btn-interactive px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'history'
                 ? 'bg-emerald-100/90 text-emerald-950 border-emerald-300 shadow-xs'
                 : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
@@ -512,7 +512,7 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-upaad-log"
             onClick={() => setActiveTab('upaad')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
+            className={`btn-interactive px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'upaad'
                 ? 'bg-amber-100/90 text-amber-950 border-amber-300 shadow-xs'
                 : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'

@@ -83,7 +83,7 @@ export const AdminSales: React.FC = () => {
     .reduce((sum, o) => sum + o.total, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header & Date Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -176,7 +176,7 @@ export const AdminSales: React.FC = () => {
       {/* 6 Summary Cards (Section 11) */}
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
         {/* Total Sales */}
-        <div className="col-span-2 sm:col-span-1 bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 border border-emerald-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-1 col-span-2 sm:col-span-1 bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 border border-emerald-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block mb-1">
             Total Sales
           </span>
@@ -184,7 +184,7 @@ export const AdminSales: React.FC = () => {
         </div>
 
         {/* Total Orders */}
-        <div className="bg-gradient-to-br from-sky-50 via-sky-50/40 to-blue-50/30 border border-sky-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-2 bg-gradient-to-br from-sky-50 via-sky-50/40 to-blue-50/30 border border-sky-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 block mb-1">
             Total Orders
           </span>
@@ -192,7 +192,7 @@ export const AdminSales: React.FC = () => {
         </div>
 
         {/* Average Order Value */}
-        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-orange-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-3 bg-gradient-to-br from-amber-50 via-amber-50/40 to-orange-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-sm">
           <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
             Avg Value
           </span>
@@ -200,7 +200,7 @@ export const AdminSales: React.FC = () => {
         </div>
 
         {/* Cash Sales */}
-        <div className="bg-gradient-to-br from-orange-50 via-orange-50/40 to-amber-50/30 border border-orange-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-4 bg-gradient-to-br from-orange-50 via-orange-50/40 to-amber-50/30 border border-orange-200/90 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center space-x-1 text-orange-700 mb-1">
             <Banknote className="w-3.5 h-3.5 text-orange-600" />
             <span className="text-[11px] font-bold uppercase tracking-wider">Cash</span>
@@ -209,7 +209,7 @@ export const AdminSales: React.FC = () => {
         </div>
 
         {/* UPI Sales */}
-        <div className="bg-gradient-to-br from-teal-50 via-teal-50/40 to-emerald-50/30 border border-teal-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-5 bg-gradient-to-br from-teal-50 via-teal-50/40 to-emerald-50/30 border border-teal-200/90 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center space-x-1 text-teal-700 mb-1">
             <QrCode className="w-3.5 h-3.5 text-teal-600" />
             <span className="text-[11px] font-bold uppercase tracking-wider">UPI</span>
@@ -218,7 +218,7 @@ export const AdminSales: React.FC = () => {
         </div>
 
         {/* Card Sales */}
-        <div className="bg-gradient-to-br from-indigo-50 via-indigo-50/40 to-purple-50/30 border border-indigo-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="card-interactive stagger-6 bg-gradient-to-br from-indigo-50 via-indigo-50/40 to-purple-50/30 border border-indigo-200/90 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center space-x-1 text-indigo-700 mb-1">
             <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
             <span className="text-[11px] font-bold uppercase tracking-wider">Card</span>
@@ -260,7 +260,7 @@ export const AdminSales: React.FC = () => {
                 const timeDisplay = ord.completedAt || ord.createdAt;
 
                 return (
-                  <tr key={ord.id} className="hover:bg-stone-50/80 transition-colors">
+                  <tr key={ord.id} className="table-row-interactive hover:bg-stone-50/80 transition-colors">
                     <td className="py-3 font-mono font-bold text-stone-900">{ord.orderNumber}</td>
                     {currentRole !== 'admin_kunafa' && (
                       <td className="py-3 font-semibold text-stone-700">

@@ -106,7 +106,8 @@ export const KitchenView: React.FC = () => {
                 <span className="text-[9px] sm:text-xs text-amber-800 font-bold tracking-wide uppercase whitespace-nowrap">
                   KITCHEN
                 </span>
-                <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold whitespace-nowrap">
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[8px] sm:text-[9px] font-mono px-2 py-0.5 rounded-full uppercase font-black whitespace-nowrap flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-emerald-pulse"></span>
                   Live
                 </span>
               </div>
@@ -119,8 +120,8 @@ export const KitchenView: React.FC = () => {
             <div className="flex items-center space-x-1.5 sm:space-x-2">
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`p-1.5 sm:p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${soundEnabled
-                    ? 'bg-amber-100/80 text-amber-900 border-amber-200'
+                className={`btn-interactive p-1.5 sm:p-2 rounded-xl border text-xs flex items-center justify-center transition-all ${soundEnabled
+                    ? 'bg-amber-100/80 text-amber-900 border-amber-300 shadow-2xs'
                     : 'bg-stone-100 text-stone-400 border-stone-200 hover:bg-stone-200 hover:text-stone-700'
                   }`}
                 title="Toggle Kitchen Chime"
@@ -128,7 +129,7 @@ export const KitchenView: React.FC = () => {
                 {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               </button>
 
-              <div className="bg-amber-100/70 px-2.5 py-1.5 rounded-lg border border-amber-200 font-mono text-xs font-bold text-amber-950 hidden sm:block">
+              <div className="bg-amber-100/80 px-3 py-1.5 rounded-xl border border-amber-200/80 font-mono text-xs font-black text-amber-950 hidden sm:block shadow-2xs">
                 {currentTime}
               </div>
             </div>
@@ -185,7 +186,7 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-new"
             onClick={() => setActiveTab('new')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'new'
+            className={`btn-interactive flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'new'
               ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs'
               : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
@@ -202,7 +203,7 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-preparing"
             onClick={() => setActiveTab('preparing')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'preparing'
+            className={`btn-interactive flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'preparing'
               ? 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs'
               : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
@@ -219,7 +220,7 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-ready"
             onClick={() => setActiveTab('ready')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'ready'
+            className={`btn-interactive flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'ready'
               ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs'
               : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
@@ -236,7 +237,7 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-served"
             onClick={() => setActiveTab('served')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'served'
+            className={`btn-interactive flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'served'
               ? 'bg-purple-100 text-purple-950 border-purple-300 shadow-xs'
               : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
@@ -266,8 +267,8 @@ export const KitchenView: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {displayedOrders.map((order) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 animate-page-enter">
+            {displayedOrders.map((order, idx) => {
               const isAllItemsServed = order.items.length > 0 && order.items.every(i => i.served);
               const isServed = order.status === 'served' || isAllItemsServed;
               const isNew = order.status === 'new' && !isAllItemsServed;
@@ -278,12 +279,13 @@ export const KitchenView: React.FC = () => {
                 <div
                   key={order.id}
                   id={`kds-card-${order.orderNumber.replace('#', '')}`}
-                  className={`bg-white border rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${isNew
+                  style={{ animationDelay: `${(idx % 12) * 40}ms` }}
+                  className={`card-interactive bg-white border rounded-3xl p-4 sm:p-5 flex flex-col justify-between shadow-sm transition-all ${isNew
                     ? 'border-amber-400 ring-2 ring-amber-400/20'
                     : isPrep
                       ? 'border-stone-800 ring-2 ring-stone-800/15'
                       : isRdy
-                        ? 'border-emerald-500 ring-2 ring-emerald-500/25'
+                        ? 'border-emerald-500 ring-2 ring-emerald-500/25 shadow-emerald-500/10'
                         : 'border-stone-200 opacity-80'
                     }`}
                 >
@@ -396,10 +398,10 @@ export const KitchenView: React.FC = () => {
                                               incrementItemPrepared(order.id, originalIdx, 1);
                                             }
                                           }}
-                                          className="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-md font-extrabold tracking-wide hover:bg-emerald-200 transition-colors shadow-sm flex items-center space-x-1 whitespace-nowrap"
+                                          className="btn-interactive text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-xl font-extrabold tracking-wide hover:bg-emerald-200 transition-all shadow-sm flex items-center space-x-1 whitespace-nowrap"
                                         >
                                           <span>PREPARED</span>
-                                          <span className="bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded-sm">{preparedCount}/{totalCount}</span>
+                                          <span className="bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded-md">{preparedCount}/{totalCount}</span>
                                         </button>
                                       )}
                                       {activeTab === 'ready' && unservedReady > 0 && preparedCount < totalCount && (
@@ -431,7 +433,7 @@ export const KitchenView: React.FC = () => {
                       <button
                         id={`start-prep-btn-${order.orderNumber.replace('#', '')}`}
                         onClick={() => startPreparingOrder(order.id)}
-                        className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
+                        className="btn-interactive w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black text-xs sm:text-sm rounded-xl shadow-md shadow-amber-600/20 flex items-center justify-center space-x-2 transition-all whitespace-nowrap"
                       >
                         <Flame className="w-4 h-4 text-amber-200" />
                         <span>START PREPARING</span>
@@ -439,8 +441,8 @@ export const KitchenView: React.FC = () => {
                     )}
 
                     {isRdy && (
-                      <div className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                      <div className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-black text-xs rounded-xl flex items-center justify-center space-x-2 shadow-sm animate-emerald-pulse">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                         <span>READY FOR WAITER PICKUP</span>
                       </div>
                     )}

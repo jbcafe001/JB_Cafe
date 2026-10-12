@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { MenuItem, MenuItemCategory, RecipeIngredient } from '../../types';
 import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee, Trash2 } from 'lucide-react';
@@ -166,7 +167,7 @@ export const AdminMenu: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header & Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -177,7 +178,7 @@ export const AdminMenu: React.FC = () => {
         <button
           id="add-menu-item-btn"
           onClick={handleOpenAdd}
-          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+          className="btn-interactive w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-black text-xs rounded-xl shadow-md shadow-amber-600/15 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add Menu Item</span>
@@ -189,7 +190,7 @@ export const AdminMenu: React.FC = () => {
         <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar flex-1">
           <button
             onClick={() => setActiveCategory('All')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${activeCategory === 'All'
+            className={`btn-interactive px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${activeCategory === 'All'
                 ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold shadow-2xs'
                 : 'bg-white border-[#EFE7DA] text-stone-600 hover:bg-[#FAF7F2]'
               }`}
@@ -210,7 +211,7 @@ export const AdminMenu: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
+                className={`btn-interactive px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
                   isCatActive
                     ? `${activeColor} font-bold shadow-2xs`
                     : 'bg-white border-[#EFE7DA] text-stone-600 hover:bg-[#FAF7F2]'
@@ -232,7 +233,7 @@ export const AdminMenu: React.FC = () => {
                   setListBrandFilter(b);
                   setActiveCategory('All');
                 }}
-                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                className={`btn-interactive flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
                   listBrandFilter === b
                     ? b === 'KUNAFA'
                       ? 'bg-rose-100 text-rose-900 shadow-2xs border border-rose-200'
@@ -251,10 +252,11 @@ export const AdminMenu: React.FC = () => {
 
       {/* Menu Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredItems.map((item) => (
+        {filteredItems.map((item, idx) => (
           <div
             key={item.id}
-            className={`bg-white rounded-2xl border p-4 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs ${
+            style={{ animationDelay: `${(idx % 12) * 35}ms` }}
+            className={`card-interactive bg-white rounded-2xl border p-4 shadow-sm flex flex-col justify-between ${
               item.available ? 'border-stone-200/90' : 'border-stone-200 opacity-60 bg-stone-50/50'
             }`}
           >
@@ -276,7 +278,7 @@ export const AdminMenu: React.FC = () => {
                   )}
                   <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
                 </div>
-                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs">
                   ₹{item.price}
                 </span>
               </div>
@@ -296,7 +298,7 @@ export const AdminMenu: React.FC = () => {
             <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
               <button
                 onClick={() => toggleMenuItemAvailability(item.id)}
-                className={`flex items-center space-x-1.5 text-xs font-bold px-2.5 py-1 rounded-lg transition-colors ${item.available
+                className={`btn-interactive flex items-center space-x-1.5 text-xs font-bold px-2.5 py-1 rounded-lg transition-colors ${item.available
                     ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
                     : 'text-stone-500 bg-stone-100 hover:bg-stone-200'
                   }`}
@@ -307,7 +309,7 @@ export const AdminMenu: React.FC = () => {
 
               <button
                 onClick={() => handleOpenEdit(item)}
-                className="text-xs font-semibold text-stone-600 hover:text-stone-900 px-2.5 py-1 rounded-lg hover:bg-stone-100 flex items-center space-x-1"
+                className="btn-interactive text-xs font-semibold text-stone-600 hover:text-stone-900 px-2.5 py-1 rounded-lg hover:bg-stone-100 flex items-center space-x-1"
               >
                 <Edit className="w-3.5 h-3.5" />
                 <span>Edit</span>
@@ -318,17 +320,17 @@ export const AdminMenu: React.FC = () => {
       </div>
 
       {/* Add/Edit Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs overflow-y-auto" onClick={handleCloseModal}>
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-              <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
+      {showAddModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] bg-stone-900/35 backdrop-blur-md overflow-y-auto animate-fade-in flex items-center justify-center p-4" onClick={handleCloseModal}>
+            <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden my-auto" onClick={e => e.stopPropagation()}>
+              <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
                 <h3 className="font-extrabold text-stone-900 text-base">
                   {editingItem ? 'Edit Menu Item' : '+ Add New Menu Item'}
                 </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+                  className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -495,9 +497,9 @@ export const AdminMenu: React.FC = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

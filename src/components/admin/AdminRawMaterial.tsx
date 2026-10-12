@@ -274,7 +274,7 @@ export const AdminRawMaterial: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-enter">
       {/* Header & Main Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -282,7 +282,7 @@ export const AdminRawMaterial: React.FC = () => {
             <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">
               RAW MATERIAL MANAGEMENT
             </h2>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
               Collection: materials
             </span>
           </div>
@@ -296,7 +296,7 @@ export const AdminRawMaterial: React.FC = () => {
           <button
             id="create-material-btn"
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95"
+            className="btn-interactive px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>New Material</span>
@@ -307,7 +307,7 @@ export const AdminRawMaterial: React.FC = () => {
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Total Tracked Raw Materials */}
-        <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white border border-indigo-200/80 rounded-2xl p-4 shadow-2xs">
+        <div className="card-interactive stagger-1 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white border border-indigo-200/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800">
               Total Materials
@@ -322,7 +322,7 @@ export const AdminRawMaterial: React.FC = () => {
 
         {/* Brand Breakdown */}
         {currentRole !== 'admin_kunafa' && (
-          <div className="bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-white border border-amber-200/80 rounded-2xl p-4 shadow-2xs">
+          <div className="card-interactive stagger-2 bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-white border border-amber-200/80 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
                 Brand Catalog
@@ -339,7 +339,7 @@ export const AdminRawMaterial: React.FC = () => {
         )}
 
         {/* Total Stock Value */}
-        <div className="bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-2xs">
+        <div className="card-interactive stagger-3 bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
               Total Valuation
@@ -355,7 +355,7 @@ export const AdminRawMaterial: React.FC = () => {
         </div>
 
         {/* Average Unit Cost */}
-        <div className="bg-gradient-to-br from-yellow-50/80 via-amber-50/30 to-white border border-yellow-200/80 rounded-2xl p-4 shadow-2xs">
+        <div className="card-interactive stagger-4 bg-gradient-to-br from-yellow-50/80 via-amber-50/30 to-white border border-yellow-200/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-800">
               Avg Cost / Unit
@@ -369,7 +369,7 @@ export const AdminRawMaterial: React.FC = () => {
         </div>
 
         {/* Stock Alerts (Low & Out) */}
-        <div className="bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white border border-rose-200/80 rounded-2xl p-4 shadow-2xs">
+        <div className="card-interactive stagger-5 bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white border border-rose-200/80 rounded-2xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800">
               Stock Warnings
