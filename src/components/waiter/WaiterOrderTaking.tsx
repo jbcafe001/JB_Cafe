@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Table, MenuItemCategory, OrderItem, PaymentMethod } from '../../types';
 import {
@@ -14,6 +14,8 @@ import {
   QrCode,
   Banknote,
   CreditCard,
+  Coffee,
+  Sparkles,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 
@@ -21,6 +23,7 @@ interface WaiterOrderTakingProps {
   table: Table;
   onBack: () => void;
   onOrderSent: () => void;
+  initialBrand?: 'JB Cafe' | 'KUNAFA';
 }
 
 const CATEGORIES: MenuItemCategory[] = [
@@ -56,13 +59,29 @@ const CATEGORIES: MenuItemCategory[] = [
   'Chocolate Bar',
 ];
 
+const KUNAFA_CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
+  'Sizzling Brownie',
+  'Cheesecake',
+  'Cookie Tin',
+  'Coffee Tiramisu',
+  'Kunafa',
+  'Dessert Can',
+  'Chocolate Bowl',
+  'Baklava',
+  'Kunafa Cheese Bomb',
+  'Bombolinis',
+  'Chocolate Bar',
+];
+
 export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   table,
   onBack,
   onOrderSent,
+  initialBrand = 'JB Cafe',
 }) => {
   const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems } = useCafe();
 
+  const [selectedBrand, setSelectedBrand] = useState<'JB Cafe' | 'KUNAFA'>(initialBrand);
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Record<string, OrderItem>>({});
@@ -72,6 +91,31 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // Reset category filter when switching brand
+  useEffect(() => {
+    setSelectedCategory('All');
+  }, [selectedBrand]);
+
+  // Dynamically compute categories for the selected brand
+  const brandCategories: MenuItemCategory[] = useMemo(() => {
+    const isKunafa = selectedBrand === 'KUNAFA';
+    const brandItems = menuItems.filter((i) => {
+      const isItemKunafa = i.brand === 'KUNAFA' || KUNAFA_CATEGORIES.includes(i.category as any);
+      return isKunafa ? isItemKunafa : !isItemKunafa;
+    });
+    const presentCats = new Set(brandItems.map((i) => i.category));
+
+    const masterList = isKunafa
+      ? KUNAFA_CATEGORIES
+      : CATEGORIES.filter((c) => c !== 'All' && !KUNAFA_CATEGORIES.includes(c as any));
+
+    const filteredMaster = presentCats.size > 0
+      ? masterList.filter((c) => presentCats.has(c as any))
+      : masterList;
+
+    return ['All', ...filteredMaster];
+  }, [menuItems, selectedBrand]);
 
   // Calculate how much of each stock item is currently reserved in the cart
   const usedStockMap = useMemo(() => {
@@ -108,9 +152,13 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
     else if (showReviewModal) setShowReviewModal(false);
   }, showReviewModal || showPaymentModal);
 
-  // Filter items
+  // Filter items strictly by selected brand and category
   const filteredItems = menuItems.filter((item) => {
     if (!item.available) return false;
+    const isItemKunafa = item.brand === 'KUNAFA' || KUNAFA_CATEGORIES.includes(item.category as any);
+    const itemBrand = isItemKunafa ? 'KUNAFA' : 'JB Cafe';
+    if (itemBrand !== selectedBrand) return false;
+
     const matchesCategory =
       selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -233,6 +281,36 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         )}
       </div>
 
+      {/* Brand Switcher Pill Bar */}
+      <div className="px-3 pt-2.5 pb-1 bg-white border-b border-stone-100">
+        <div className="grid grid-cols-2 p-1 bg-stone-100 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setSelectedBrand('JB Cafe')}
+            className={`py-2 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+              selectedBrand === 'JB Cafe'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Coffee className="w-3.5 h-3.5" />
+            <span>JB Cafe items</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedBrand('KUNAFA')}
+            className={`py-2 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+              selectedBrand === 'KUNAFA'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Kunafa items</span>
+          </button>
+        </div>
+      </div>
+
       {/* Search & Fast Category Filters */}
       <div className="p-3 bg-white border-b border-stone-100 space-y-2">
         <div className="relative">
@@ -241,18 +319,18 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search cappuccino, sandwich..."
+            placeholder={`Search ${selectedBrand === 'KUNAFA' ? 'kunafa, cheesecake...' : 'cappuccino, sandwich...'}`}
             className="w-full pl-9 pr-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm text-stone-800 placeholder-stone-400 focus:outline-hidden focus:ring-1 focus:ring-amber-500"
           />
         </div>
 
         {/* Categories Pills */}
         <div className="flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {CATEGORIES.map((cat) => (
+          {brandCategories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200/80'

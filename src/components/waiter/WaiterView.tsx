@@ -6,7 +6,7 @@ import { WaiterActiveOrders } from './WaiterActiveOrders';
 import { WaiterTables } from './WaiterTables';
 import { WaiterProfile } from './WaiterProfile';
 import { WaiterOrderTaking } from './WaiterOrderTaking';
-import { Home, ClipboardList, Grid, User, Smartphone } from 'lucide-react';
+import { Home, ClipboardList, Grid, User, Smartphone, Coffee, Sparkles, X } from 'lucide-react';
 
 type WaiterTab = 'home' | 'orders' | 'tables' | 'profile';
 
@@ -14,6 +14,8 @@ export const WaiterView: React.FC = () => {
   const { isMobileFrame, orders } = useCafe();
   const [activeTab, setActiveTab] = useState<WaiterTab>('home');
   const [activeTableForOrder, setActiveTableForOrder] = useState<Table | null>(null);
+  const [brandSelectionTable, setBrandSelectionTable] = useState<Table | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
 
   // Active orders badge count (including served & ready)
   const activeOrdersCount = orders.filter(
@@ -21,7 +23,15 @@ export const WaiterView: React.FC = () => {
   ).length;
 
   const handleSelectTable = (table: Table) => {
-    setActiveTableForOrder(table);
+    setBrandSelectionTable(table);
+  };
+
+  const handleBrandSelect = (brand: 'JB Cafe' | 'KUNAFA') => {
+    if (brandSelectionTable) {
+      setSelectedBrand(brand);
+      setActiveTableForOrder(brandSelectionTable);
+      setBrandSelectionTable(null);
+    }
   };
 
   const handleOrderSent = () => {
@@ -36,6 +46,7 @@ export const WaiterView: React.FC = () => {
       {activeTableForOrder ? (
         <WaiterOrderTaking
           table={activeTableForOrder}
+          initialBrand={selectedBrand}
           onBack={() => setActiveTableForOrder(null)}
           onOrderSent={handleOrderSent}
         />
@@ -60,6 +71,81 @@ export const WaiterView: React.FC = () => {
           )}
 
           {activeTab === 'profile' && <WaiterProfile />}
+
+          {/* Brand Selection Modal */}
+          {brandSelectionTable && (
+            <div
+              className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+              onClick={() => setBrandSelectionTable(null)}
+            >
+              <div
+                className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-5 border border-stone-100 flex flex-col space-y-4 animate-in zoom-in-95 duration-150"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                  <div>
+                    <span className="text-[11px] font-extrabold tracking-wider uppercase text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                      {brandSelectionTable.name || `Table ${brandSelectionTable.number}`}
+                    </span>
+                    <h3 className="text-lg font-black text-stone-900 mt-1">Select Menu Brand</h3>
+                    <p className="text-xs text-stone-500">Which items would you like to take?</p>
+                  </div>
+                  <button
+                    onClick={() => setBrandSelectionTable(null)}
+                    className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-full transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  {/* JB Cafe Card */}
+                  <button
+                    type="button"
+                    onClick={() => handleBrandSelect('JB Cafe')}
+                    className="group text-left p-4 rounded-2xl border-2 border-amber-200/90 hover:border-amber-600 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:from-amber-100/70 hover:to-orange-100/50 transition-all duration-150 active:scale-98 shadow-xs hover:shadow-md flex items-center space-x-3.5 cursor-pointer"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                      <Coffee className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-black text-stone-900 text-base group-hover:text-amber-800 transition-colors">
+                          JB Cafe items
+                        </h4>
+                        <span className="text-amber-700 font-extrabold text-xs">Select &rarr;</span>
+                      </div>
+                      <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                        Tea, Coffee, Pizza, Burger, Snacks & Drinks
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Kunafa Card */}
+                  <button
+                    type="button"
+                    onClick={() => handleBrandSelect('KUNAFA')}
+                    className="group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all duration-150 active:scale-98 shadow-xs hover:shadow-md flex items-center space-x-3.5 cursor-pointer"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                      <Sparkles className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-black text-stone-900 text-base group-hover:text-amber-800 transition-colors">
+                          Kunafa items
+                        </h4>
+                        <span className="text-amber-700 font-extrabold text-xs">Select &rarr;</span>
+                      </div>
+                      <p className="text-xs text-stone-500 line-clamp-1 mt-0.5">
+                        Kunafa, Cheesecakes, Bombolinis & Desserts
+                      </p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Fixed Bottom Navigation (Mobile First Clean Minimalism) */}
           <nav
