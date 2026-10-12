@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { MenuItem, MenuItemCategory, RecipeIngredient } from '../../types';
 import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee, Trash2 } from 'lucide-react';
@@ -52,10 +52,12 @@ const KUNAFA_CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Chocolate Bar',
 ];
 
+const JB_CAFE_CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = CATEGORIES.filter(
+  (c) => !KUNAFA_CATEGORIES.includes(c)
+);
+
 export const AdminMenu: React.FC = () => {
   const { filteredMenuItems: menuItems, addMenuItem, updateMenuItem, toggleMenuItemAvailability, stockItems, brandFilter, currentRole } = useCafe();
-
-  const displayedCategories = currentRole === 'admin_kunafa' ? KUNAFA_CATEGORIES : CATEGORIES;
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [listBrandFilter, setListBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
@@ -64,13 +66,35 @@ export const AdminMenu: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
+  // Filter categories shown in top pills according to the selected brand
+  const displayedCategories = useMemo(() => {
+    if (currentRole === 'admin_kunafa' || listBrandFilter === 'KUNAFA') {
+      return KUNAFA_CATEGORIES;
+    }
+    if (listBrandFilter === 'JB Cafe') {
+      return JB_CAFE_CATEGORIES;
+    }
+    return CATEGORIES;
+  }, [currentRole, listBrandFilter]);
+
+  // Reset activeCategory if it does not exist in the newly displayed categories
+  useEffect(() => {
+    if (activeCategory !== 'All' && !displayedCategories.includes(activeCategory as any)) {
+      setActiveCategory('All');
+    }
+  }, [displayedCategories, activeCategory]);
+
   // Form State
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<Exclude<MenuItemCategory, 'All'>>('Coffee');
+  const [category, setCategory] = useState<Exclude<MenuItemCategory, 'All'>>('Tea & Coffee');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
   const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+
+  const modalCategories = useMemo(() => {
+    return brand === 'KUNAFA' ? KUNAFA_CATEGORIES : JB_CAFE_CATEGORIES;
+  }, [brand]);
 
   const handleCloseModal = () => setShowAddModal(false);
   useModalClose(handleCloseModal, showAddModal);
@@ -78,18 +102,20 @@ export const AdminMenu: React.FC = () => {
   const filteredItems = menuItems.filter(
     (item) => {
       const matchesCat = activeCategory === 'All' || item.category === activeCategory;
-      const itemBrand = item.brand || 'JB Cafe'; // Fallback to JB Cafe if undefined
+      const isItemKunafa = item.brand === 'KUNAFA' || KUNAFA_CATEGORIES.includes(item.category as any);
+      const itemBrand = isItemKunafa ? 'KUNAFA' : (item.brand || 'JB Cafe');
       const matchesBrand = listBrandFilter === 'All' || itemBrand === listBrandFilter;
       return matchesCat && matchesBrand;
     }
   );
 
   const handleOpenAdd = () => {
+    const defaultBrand = listBrandFilter === 'KUNAFA' || brandFilter === 'KUNAFA' ? 'KUNAFA' : 'JB Cafe';
     setName('');
-    setCategory('Coffee');
+    setBrand(defaultBrand);
+    setCategory(defaultBrand === 'KUNAFA' ? 'Kunafa' : 'Tea & Coffee');
     setPrice('');
     setDescription('');
-    setBrand(brandFilter === 'KUNAFA' ? 'KUNAFA' : 'JB Cafe');
     setIngredients([]);
     setEditingItem(null);
     setShowAddModal(true);
@@ -190,7 +216,10 @@ export const AdminMenu: React.FC = () => {
             {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
               <button
                 key={b}
-                onClick={() => setListBrandFilter(b)}
+                onClick={() => {
+                  setListBrandFilter(b);
+                  setActiveCategory('All');
+                }}
                 className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${listBrandFilter === b
                     ? 'bg-white text-stone-900 shadow-xs'
                     : 'text-stone-500 hover:text-stone-700'
@@ -308,7 +337,14 @@ export const AdminMenu: React.FC = () => {
                   ) : (
                     <CustomSelect
                       value={brand}
-                      onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
+                      onChange={(val) => {
+                        const newBrand = val as 'JB Cafe' | 'KUNAFA';
+                        setBrand(newBrand);
+                        const targetCats = newBrand === 'KUNAFA' ? KUNAFA_CATEGORIES : JB_CAFE_CATEGORIES;
+                        if (!targetCats.includes(category)) {
+                          setCategory(targetCats[0]);
+                        }
+                      }}
                       options={[
                         { value: 'JB Cafe', label: 'JB Cafe' },
                         { value: 'KUNAFA', label: 'KUNAFA' },
@@ -323,7 +359,7 @@ export const AdminMenu: React.FC = () => {
                     <CustomSelect
                       value={category}
                       onChange={(val) => setCategory(val as Exclude<MenuItemCategory, 'All'>)}
-                      options={displayedCategories.map((cat) => ({ value: cat, label: cat }))}
+                      options={modalCategories.map((cat) => ({ value: cat, label: cat }))}
                     />
                   </div>
 
