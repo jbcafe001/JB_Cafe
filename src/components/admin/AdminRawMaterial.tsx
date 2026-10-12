@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { StockItem, Material } from '../../types';
 import {
@@ -866,10 +867,10 @@ export const AdminRawMaterial: React.FC = () => {
       )}
 
       {/* CREATE NEW MATERIAL MODAL */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/40 backdrop-blur-xs">
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      {showCreateModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowCreateModal(false)}>
+            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-modal-spring my-auto overflow-hidden" onClick={e => e.stopPropagation()}>
               <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
                 <div className="flex items-center space-x-2">
                   <Plus className="w-5 h-5 text-indigo-600" />
@@ -1000,15 +1001,15 @@ export const AdminRawMaterial: React.FC = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* EDIT MATERIAL MODAL */}
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/40 backdrop-blur-xs">
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      {showEditModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowEditModal(false)}>
+            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-modal-spring my-auto overflow-hidden" onClick={e => e.stopPropagation()}>
               <div className="px-5 py-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
                 <div className="flex items-center space-x-2">
                   <Edit2 className="w-5 h-5 text-amber-600" />
@@ -1110,15 +1111,15 @@ export const AdminRawMaterial: React.FC = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* COMPLETE MATERIAL SPECIFICATION SHEET (DETAIL MODAL) */}
-      {showDetailModal && selectedMaterial && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/40 backdrop-blur-xs">
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+      {showDetailModal && selectedMaterial &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] overflow-y-auto bg-stone-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowDetailModal(false)}>
+            <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-modal-spring overflow-hidden my-auto" onClick={e => e.stopPropagation()}>
               {/* Header */}
               <div className="px-6 py-5 bg-stone-900 text-white flex items-center justify-between">
                 <div>
@@ -1312,9 +1313,9 @@ export const AdminRawMaterial: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

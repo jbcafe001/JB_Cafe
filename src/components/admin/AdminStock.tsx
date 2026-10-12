@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { StockItem } from '../../types';
 import {
@@ -583,10 +584,10 @@ export const AdminStock: React.FC = () => {
       </div>
 
       {/* − Record Material Used Modal */}
-      {showUseStockModal && (
-        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md overflow-y-auto animate-fade-in" onClick={() => setShowUseStockModal(false)}>
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
+      {showUseStockModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] bg-stone-900/35 backdrop-blur-md overflow-y-auto animate-fade-in flex items-center justify-center p-4" onClick={() => setShowUseStockModal(false)}>
+            <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden my-auto" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
               <div className="flex items-center space-x-2">
                 <div className="w-7 h-7 rounded-lg bg-stone-200 flex items-center justify-center text-stone-700">
@@ -751,15 +752,15 @@ export const AdminStock: React.FC = () => {
               </div>
             </form>
           </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {/* + Add Stock Modal (Restock) */}
-      {showAddStockModal && (
-        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md overflow-y-auto animate-fade-in" onClick={() => setShowAddStockModal(false)}>
-          <div className="min-h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
+      {showAddStockModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] bg-stone-900/35 backdrop-blur-md overflow-y-auto animate-fade-in flex items-center justify-center p-4" onClick={() => setShowAddStockModal(false)}>
+            <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden my-auto" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
               <h3 className="font-extrabold text-stone-900 text-base">Replenish Stock Item</h3>
               <button
@@ -837,9 +838,9 @@ export const AdminStock: React.FC = () => {
               </div>
             </form>
           </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
