@@ -11,20 +11,21 @@ import {
   ArrowDownUp,
   Download,
 } from 'lucide-react';
+import { getCafeBusinessDate, getCafeYesterdayDate } from '../../utils/dateUtils';
 
 type DateFilter = 'All Time' | 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Custom Date';
 
 export const AdminSales: React.FC = () => {
   const { filteredOrders: orders, menuItems, currentRole } = useCafe();
   const [selectedFilter, setSelectedFilter] = useState<DateFilter>('All Time');
-  const [customDate, setCustomDate] = useState(new Date().toISOString().split('T')[0]);
+  const [customDate, setCustomDate] = useState(getCafeBusinessDate());
   const [brandFilter, setBrandFilter] = useState<'All' | 'JB Cafe' | 'KUNAFA'>(
     currentRole === 'admin_kunafa' ? 'KUNAFA' : 'All'
   );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const todayStr = getCafeBusinessDate();
+  const yesterdayStr = getCafeYesterdayDate();
 
   // Filter completed orders according to selection
   const filteredOrders = useMemo(() => {

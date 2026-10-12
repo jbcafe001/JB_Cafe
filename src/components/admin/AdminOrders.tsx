@@ -7,6 +7,7 @@ import {
   ShoppingBag, Banknote, Smartphone,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getCafeBusinessDate } from '../../utils/dateUtils';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -289,7 +290,7 @@ export const AdminOrders: React.FC = () => {
 
     let matchesDate = true;
     if (fromDate || toDate) {
-      const orderDate = o.date || new Date().toISOString().split('T')[0];
+      const orderDate = o.date || getCafeBusinessDate();
       if (fromDate && orderDate < fromDate) matchesDate = false;
       if (toDate && orderDate > toDate) matchesDate = false;
     }

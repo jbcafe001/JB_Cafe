@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   Plus,
 } from 'lucide-react';
+import { getCafeBusinessDate } from '../../utils/dateUtils';
 
 interface AdminDashboardProps {
   onNavigate: (tab: string) => void;
@@ -34,8 +35,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
     });
   }, [allOrders, brandFilter, menuItems]);
 
-  // Completed orders today
-  const completedOrders = orders.filter((o) => o.status === 'completed');
+  const todayBusinessDate = getCafeBusinessDate();
+
+  // Completed orders for current cafe business cycle (5 PM to 5 AM)
+  const completedOrders = orders.filter((o) => o.status === 'completed' && (!o.date || o.date === todayBusinessDate));
   
   // Refined total sales based on brand filter (only summing the relevant items)
   const todaySales = completedOrders.reduce((sum, o) => {
@@ -57,8 +60,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const todayOrdersCount = completedOrders.length;
   const avgOrderValue = todayOrdersCount > 0 ? Math.round(todaySales / todayOrdersCount) : 0;
 
-  // Today's expenses
-  const todayExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  // Today's expenses for current cafe business cycle
+  const todayExpenses = expenses.filter(e => !e.date || e.date === todayBusinessDate).reduce((sum, e) => sum + e.amount, 0);
   const estimatedNet = todaySales - todayExpenses;
 
   // Low stock items

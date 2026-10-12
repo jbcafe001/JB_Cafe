@@ -26,6 +26,7 @@ import {
 import { INITIAL_USERS } from '../data/initialData';
 import { db, registerNewUser } from '../firebase';
 import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { getCafeBusinessDate, getCafeOrderPrefix } from '../utils/dateUtils';
 
 interface CreateOrderParams {
   tableId: string;
@@ -463,12 +464,10 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const table = tables.find((t) => t.id === tableId);
     const tableNumStr = table ? table.name : 'Table';
 
-    // Base for order number in YYMMDD format
+    // Base for order number in YYMMDD format and business date based on 5 PM - 5 AM shift
     const now = new Date();
-    const yy = String(now.getFullYear()).slice(-2);
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const prefix = `${yy}${mm}${dd}`;
+    const businessDate = getCafeBusinessDate(now);
+    const prefix = getCafeOrderPrefix(now);
 
     let nextN = -1;
 
@@ -476,7 +475,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (groupItems.length === 0) return;
 
       if (nextN === -1) {
-        const todayOrders = orders.filter((o) => o.orderNumber.replace('#', '').startsWith(prefix));
+        const todayOrders = orders.filter((o) => o.orderNumber.replace('#', '').startsWith(prefix) || o.date === businessDate);
         const existingNs = todayOrders
           .map((o) => {
             const numStr = o.orderNumber.replace('#', '').slice(prefix.length);
@@ -508,8 +507,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         status: 'new',
         notes: groupNotes,
         paymentMethod,
-        date: new Date().toISOString().split('T')[0],
-        createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: businessDate,
+        createdAt: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
       // Strip undefined values — Firebase rejects them
@@ -1033,7 +1032,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!stockItem || quantity <= 0) return;
 
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getCafeBusinessDate();
 
     const newUsageRecord: MaterialUsageRecord = {
       id: `use-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -1121,7 +1120,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (prevUsageRef.current === currentString) return;
       prevUsageRef.current = currentString;
 
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getCafeBusinessDate();
       
       Object.entries(todayStockUsage).forEach(([stockItemId, data]: [string, any]) => {
         const docId = `${todayStr}_${stockItemId}`;

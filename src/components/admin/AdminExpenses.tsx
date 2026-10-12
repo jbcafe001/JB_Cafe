@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getCafeBusinessDate } from '../../utils/dateUtils';
 
 const CATEGORIES: ExpenseCategory[] = [
   'Ingredients',
@@ -33,7 +34,7 @@ export const AdminExpenses: React.FC = () => {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<ExpenseCategory>('Ingredients');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(getCafeBusinessDate());
   const [note, setNote] = useState('');
 
   const handleCloseModal = () => setShowAddModal(false);
@@ -47,7 +48,7 @@ export const AdminExpenses: React.FC = () => {
   });
 
   // Summaries
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getCafeBusinessDate();
   const todayTotal = displayedExpenses
     .filter((e) => e.date === todayStr)
     .reduce((sum, e) => sum + e.amount, 0);
