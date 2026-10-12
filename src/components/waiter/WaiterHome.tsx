@@ -368,9 +368,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                               e.stopPropagation();
                               activeOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                             }}
-                            className="flex-1 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
+                            className="flex-1 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
                             <span>Free Table</span>
                           </button>
                         </div>
@@ -574,9 +574,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                     activeModalOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                     setSelectedTableForAction(null);
                   }}
-                  className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                  className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <Sparkles className="w-4 h-4 text-emerald-200" />
                   <span>Free Table</span>
                 </button>
               )}

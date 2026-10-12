@@ -404,16 +404,16 @@ export const AdminSalary: React.FC = () => {
           <button
             id="give-upaad-btn-header"
             onClick={() => handleOpenGiveUpaad()}
-            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
           >
-            <Plus className="w-4 h-4 text-amber-400" />
+            <Plus className="w-4 h-4 text-amber-200" />
             <span>Give Upaad</span>
           </button>
 
           <button
             id="add-staff-btn-header"
             onClick={handleOpenAddStaff}
-            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
+            className="flex-1 sm:flex-none justify-center px-3.5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
           >
             <Users className="w-4 h-4" />
             <span>Add Staff</span>
@@ -424,59 +424,59 @@ export const AdminSalary: React.FC = () => {
       {/* 2. STAFF SALARY DASHBOARD — Simple Overview Cards (Section 2) */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
         {/* Total Staff */}
-        <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs">
+        <div className="bg-gradient-to-br from-sky-50 via-sky-50/40 to-blue-50/30 p-4 rounded-2xl border border-sky-200/90 shadow-2xs">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Total Staff</p>
-            <Users className="w-4 h-4 text-stone-400" />
+            <p className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">Total Staff</p>
+            <Users className="w-4 h-4 text-sky-600" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-stone-900 mt-1.5">{overview.totalStaff}</p>
-          <p className="text-[11px] text-stone-500 font-medium mt-0.5">8 active team members</p>
+          <p className="text-2xl sm:text-3xl font-black text-sky-950 mt-1.5">{overview.totalStaff}</p>
+          <p className="text-[11px] text-sky-700/70 font-medium mt-0.5">8 active team members</p>
         </div>
 
         {/* Total Monthly Salary */}
-        <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs">
+        <div className="bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 p-4 rounded-2xl border border-emerald-200/90 shadow-2xs">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Total Monthly Salary</p>
-            <Wallet className="w-4 h-4 text-stone-400" />
+            <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Total Monthly Salary</p>
+            <Wallet className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-stone-900 mt-1.5">
+          <p className="text-2xl sm:text-3xl font-black text-emerald-950 mt-1.5">
             ₹{overview.totalMonthlySalary.toLocaleString()}
           </p>
-          <p className="text-[11px] text-stone-500 font-medium mt-0.5">Committed gross payroll</p>
+          <p className="text-[11px] text-emerald-700/70 font-medium mt-0.5">Committed gross payroll</p>
         </div>
 
         {/* Total Upaad Given */}
-        <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs border-l-4 border-l-amber-500">
+        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 p-4 rounded-2xl border border-amber-200/90 shadow-2xs">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Total Upaad Given</p>
             <Receipt className="w-4 h-4 text-amber-600" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-amber-900 mt-1.5">
+          <p className="text-2xl sm:text-3xl font-black text-amber-950 mt-1.5">
             ₹{overview.totalUpaadGiven.toLocaleString()}
           </p>
-          <p className="text-[11px] text-amber-600 font-medium mt-0.5">Salary advances taken</p>
+          <p className="text-[11px] text-amber-700/70 font-medium mt-0.5">Salary advances taken</p>
         </div>
 
         {/* Salary Due */}
-        <div className="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs border-l-4 border-l-stone-900">
+        <div className="bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 p-4 rounded-2xl border border-rose-200/90 shadow-2xs">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold text-stone-600 uppercase tracking-wider">Salary Due</p>
-            <Clock className="w-4 h-4 text-stone-800" />
+            <p className="text-[11px] font-bold text-rose-700 uppercase tracking-wider">Salary Due</p>
+            <Clock className="w-4 h-4 text-rose-600" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-stone-900 mt-1.5">
+          <p className="text-2xl sm:text-3xl font-black text-rose-950 mt-1.5">
             ₹{overview.totalSalaryDue.toLocaleString()}
           </p>
-          <p className="text-[11px] text-stone-500 font-medium mt-0.5">Net balance payable</p>
+          <p className="text-[11px] text-rose-700/70 font-medium mt-0.5">Net balance payable</p>
         </div>
 
         {/* Next Salary Date */}
-        <div className="col-span-2 md:col-span-1 bg-amber-50/70 p-4 rounded-2xl border border-amber-200/80 shadow-2xs">
+        <div className="col-span-2 md:col-span-1 bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 p-4 rounded-2xl border border-purple-200/90 shadow-2xs">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold text-[#B45309] uppercase tracking-wider">Next Salary Date</p>
-            <Calendar className="w-4 h-4 text-[#B45309]" />
+            <p className="text-[11px] font-bold text-purple-700 uppercase tracking-wider">Next Salary Date</p>
+            <Calendar className="w-4 h-4 text-purple-600" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#B45309] mt-1.5">30 Sep</p>
-          <p className="text-[11px] text-amber-800 font-medium mt-0.5">Scheduled settlement</p>
+          <p className="text-2xl sm:text-3xl font-black text-purple-950 mt-1.5">30 Sep</p>
+          <p className="text-[11px] text-purple-700/70 font-medium mt-0.5">Scheduled settlement</p>
         </div>
       </div>
 
@@ -486,10 +486,10 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-staff-list"
             onClick={() => setActiveTab('staff')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'staff'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                ? 'bg-sky-100/90 text-sky-950 border-sky-300 shadow-xs'
+                : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -499,10 +499,10 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-salary-history"
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'history'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                ? 'bg-emerald-100/90 text-emerald-950 border-emerald-300 shadow-xs'
+                : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -512,10 +512,10 @@ export const AdminSalary: React.FC = () => {
           <button
             id="tab-upaad-log"
             onClick={() => setActiveTab('upaad')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 border ${
               activeTab === 'upaad'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                ? 'bg-amber-100/90 text-amber-950 border-amber-300 shadow-xs'
+                : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
             }`}
           >
             <Receipt className="w-3.5 h-3.5" />
@@ -547,10 +547,10 @@ export const AdminSalary: React.FC = () => {
                 <button
                   key={role}
                   onClick={() => setRoleFilter(role)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${
                     roleFilter === role
-                      ? 'bg-[#B45309] text-white shadow-2xs'
-                      : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                      ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-2xs'
+                      : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50'
                   }`}
                 >
                   {role}
@@ -598,7 +598,15 @@ export const AdminSalary: React.FC = () => {
 
                       {/* Role */}
                       <td className="px-4 py-4">
-                        <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+                        <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold border ${
+                          staff.role === 'Waiter'
+                            ? 'bg-sky-50 text-sky-800 border-sky-200'
+                            : staff.role === 'Kitchen'
+                            ? 'bg-orange-50 text-orange-800 border-orange-200'
+                            : staff.role === 'Admin'
+                            ? 'bg-purple-50 text-purple-800 border-purple-200'
+                            : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                        }`}>
                           {staff.role}
                         </span>
                       </td>
@@ -606,8 +614,8 @@ export const AdminSalary: React.FC = () => {
                       {/* Monthly Salary */}
                       <td className="px-4 py-4 font-semibold text-stone-800">
                         <EditableSalary 
-                          staff={staff} 
-                          onUpdate={(id, val) => updateStaffMember(id, { ...staff, monthlySalary: val })}
+                           staff={staff} 
+                           onUpdate={(id, val) => updateStaffMember(id, { ...staff, monthlySalary: val })}
                         />
                       </td>
 
@@ -658,9 +666,9 @@ export const AdminSalary: React.FC = () => {
                             id={`give-upaad-${staff.id}`}
                             onClick={() => handleOpenGiveUpaad(staff)}
                             title="Give early advance"
-                            className="px-2.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-lg transition-colors flex items-center space-x-1"
+                            className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/90 text-xs font-semibold rounded-lg transition-colors flex items-center space-x-1"
                           >
-                            <Plus className="w-3 h-3 text-[#B45309]" />
+                            <Plus className="w-3 h-3 text-amber-600" />
                             <span>Upaad</span>
                           </button>
 
@@ -668,13 +676,13 @@ export const AdminSalary: React.FC = () => {
                             <button
                               id={`pay-salary-${staff.id}`}
                               onClick={() => handleOpenPaySalary(staff)}
-                              className="px-3 py-1.5 bg-[#B45309] hover:bg-amber-800 text-white text-xs font-bold rounded-lg shadow-2xs transition-all active:scale-95 flex items-center space-x-1"
+                              className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg shadow-2xs transition-all active:scale-95 flex items-center space-x-1"
                             >
                               <CreditCard className="w-3 h-3" />
                               <span>Pay</span>
                             </button>
                           ) : (
-                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                               Settled
                             </span>
                           )}

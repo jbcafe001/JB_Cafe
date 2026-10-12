@@ -177,7 +177,7 @@ export const AdminMenu: React.FC = () => {
         <button
           id="add-menu-item-btn"
           onClick={handleOpenAdd}
-          className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
+          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add Menu Item</span>
@@ -189,30 +189,42 @@ export const AdminMenu: React.FC = () => {
         <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar flex-1">
           <button
             onClick={() => setActiveCategory('All')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === 'All'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${activeCategory === 'All'
+                ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold shadow-2xs'
+                : 'bg-white border-[#EFE7DA] text-stone-600 hover:bg-[#FAF7F2]'
               }`}
           >
             All Items
           </button>
-          {displayedCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${activeCategory === cat
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+          {displayedCategories.map((cat) => {
+            const isCatActive = activeCategory === cat;
+            let activeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+            if (cat.includes('Coffee') || cat.includes('Tea')) activeColor = 'bg-amber-100 text-amber-900 border-amber-300';
+            else if (cat.includes('Kunafa') || cat.includes('Dessert') || cat.includes('Cheesecake') || cat.includes('Brownie')) activeColor = 'bg-rose-100 text-rose-900 border-rose-300';
+            else if (cat.includes('Pizza') || cat.includes('Pasta')) activeColor = 'bg-yellow-100 text-yellow-900 border-yellow-300';
+            else if (cat.includes('Burger') || cat.includes('Sandwich') || cat.includes('Frankie') || cat.includes('Fries')) activeColor = 'bg-orange-100 text-orange-900 border-orange-300';
+            else if (cat.includes('Shake') || cat.includes('Mocktail') || cat.includes('Drink')) activeColor = 'bg-sky-100 text-sky-900 border-sky-300';
+            else activeColor = 'bg-emerald-100 text-emerald-900 border-emerald-300';
+
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
+                  isCatActive
+                    ? `${activeColor} font-bold shadow-2xs`
+                    : 'bg-white border-[#EFE7DA] text-stone-600 hover:bg-[#FAF7F2]'
                 }`}
-            >
-              {cat}
-            </button>
-          ))}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
 
         {/* Brand Filter */}
         {currentRole !== 'admin_kunafa' && (
-          <div className="flex bg-stone-100 p-1 rounded-xl w-full sm:w-auto shrink-0">
+          <div className="flex bg-[#FAF7F2] border border-[#EFE7DA] p-1 rounded-xl w-full sm:w-auto shrink-0">
             {(['All', 'JB Cafe', 'KUNAFA'] as const).map((b) => (
               <button
                 key={b}
@@ -220,10 +232,15 @@ export const AdminMenu: React.FC = () => {
                   setListBrandFilter(b);
                   setActiveCategory('All');
                 }}
-                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${listBrandFilter === b
-                    ? 'bg-white text-stone-900 shadow-xs'
+                className={`flex-1 sm:flex-none px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all ${
+                  listBrandFilter === b
+                    ? b === 'KUNAFA'
+                      ? 'bg-rose-100 text-rose-900 shadow-2xs border border-rose-200'
+                      : b === 'JB Cafe'
+                      ? 'bg-amber-100 text-amber-900 shadow-2xs border border-amber-200'
+                      : 'bg-white text-stone-900 shadow-2xs'
                     : 'text-stone-500 hover:text-stone-700'
-                  }`}
+                }`}
               >
                 {b}
               </button>
@@ -237,28 +254,31 @@ export const AdminMenu: React.FC = () => {
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`bg-white rounded-2xl border p-4 shadow-xs flex flex-col justify-between transition-all ${item.available ? 'border-stone-200/90' : 'border-stone-200 opacity-60 bg-stone-50/50'
-              }`}
+            className={`bg-white rounded-2xl border p-4 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs ${
+              item.available ? 'border-stone-200/90' : 'border-stone-200 opacity-60 bg-stone-50/50'
+            }`}
           >
             <div>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                     {item.category}
                   </span>
                   {item.brand === 'KUNAFA' && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
                       KUNAFA
                     </span>
                   )}
                   {(item.brand === 'JB Cafe' || !item.brand) && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                       JB CAFE
                     </span>
                   )}
                   <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
                 </div>
-                <span className="text-base font-black text-stone-900">₹{item.price}</span>
+                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+                  ₹{item.price}
+                </span>
               </div>
 
               <p className="text-xs text-stone-500 mt-1 line-clamp-2">{item.description}</p>

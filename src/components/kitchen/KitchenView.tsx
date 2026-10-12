@@ -87,26 +87,26 @@ export const KitchenView: React.FC = () => {
       {/* Fixed Header & Tabs Container */}
       <div className="sticky top-0 z-20 flex flex-col w-full shadow-2xs">
         {/* Custom Kitchen Header */}
-        <header className="bg-[#B45309] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-md">
+        <header className="bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80 text-stone-900 border-b border-amber-200/80 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between shadow-2xs">
 
           {/* Left: Cafe Name & Logo */}
           <div className="flex items-center space-x-2.5 min-w-0 flex-1">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-md overflow-hidden shrink-0 border-2 border-white/20">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm overflow-hidden shrink-0 border-2 border-amber-200/80">
               {settings?.logoUrl ? (
                 <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain p-0.5" />
               ) : (
-                <Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
+                <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700" />
               )}
             </div>
             <div className="flex flex-col min-w-0">
-              <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight truncate">
+              <h1 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight truncate text-stone-900">
                 {cafeName}
               </h1>
               <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-                <span className="text-[9px] sm:text-xs text-white/80 font-medium tracking-wide uppercase whitespace-nowrap">
+                <span className="text-[9px] sm:text-xs text-amber-800 font-bold tracking-wide uppercase whitespace-nowrap">
                   KITCHEN
                 </span>
-                <span className="bg-white/20 text-white border border-white/30 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold whitespace-nowrap">
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold whitespace-nowrap">
                   Live
                 </span>
               </div>
@@ -120,32 +120,32 @@ export const KitchenView: React.FC = () => {
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
                 className={`p-1.5 sm:p-2 rounded-lg border text-xs flex items-center justify-center transition-colors ${soundEnabled
-                    ? 'bg-white text-[#B45309] border-transparent'
-                    : 'bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white'
+                    ? 'bg-amber-100/80 text-amber-900 border-amber-200'
+                    : 'bg-stone-100 text-stone-400 border-stone-200 hover:bg-stone-200 hover:text-stone-700'
                   }`}
                 title="Toggle Kitchen Chime"
               >
                 {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               </button>
 
-              <div className="bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/20 font-mono text-xs font-bold text-white hidden sm:block">
+              <div className="bg-amber-100/70 px-2.5 py-1.5 rounded-lg border border-amber-200 font-mono text-xs font-bold text-amber-950 hidden sm:block">
                 {currentTime}
               </div>
             </div>
 
-            <div className="w-px h-6 bg-white/20 hidden sm:block"></div>
+            <div className="w-px h-6 bg-stone-200 hidden sm:block"></div>
 
             {/* Profile Avatar & Name */}
             <div className="flex items-center space-x-2.5 relative">
-              <span className="text-sm font-medium hidden sm:inline-block">
+              <span className="text-sm font-semibold text-stone-800 hidden sm:inline-block">
                 Hello, {currentUser?.name || 'Cook'}
               </span>
-              <span className="text-sm font-medium sm:hidden">
+              <span className="text-sm font-semibold text-stone-800 sm:hidden">
                 {currentUser?.name?.split(' ')[0] || 'Cook'}
               </span>
               <div
                 onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] shrink-0 cursor-pointer hover:bg-stone-50 transition-colors"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 text-amber-900 font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-amber-300 shrink-0 cursor-pointer hover:scale-105 transition-all"
               >
                 {initials}
               </div>
@@ -185,14 +185,16 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-new"
             onClick={() => setActiveTab('new')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'new'
-              ? 'bg-[#B45309] text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'new'
+              ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
           >
-            <Clock className="w-4 h-4 shrink-0" />
+            <Clock className="w-4 h-4 shrink-0 text-amber-700" />
             <span className="whitespace-nowrap">NEW ORDERS</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono shrink-0 font-bold ${
+              activeTab === 'new' ? 'bg-amber-200 text-amber-950' : 'bg-stone-200 text-stone-700'
+            }`}>
               {newOrders.length}
             </span>
           </button>
@@ -200,14 +202,16 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-preparing"
             onClick={() => setActiveTab('preparing')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'preparing'
-              ? 'bg-stone-900 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'preparing'
+              ? 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
           >
-            <Flame className="w-4 h-4 shrink-0" />
+            <Flame className="w-4 h-4 shrink-0 text-orange-700" />
             <span className="whitespace-nowrap">PREPARING</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono shrink-0 font-bold ${
+              activeTab === 'preparing' ? 'bg-orange-200 text-orange-950' : 'bg-stone-200 text-stone-700'
+            }`}>
               {preparingOrders.length}
             </span>
           </button>
@@ -215,14 +219,16 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-ready"
             onClick={() => setActiveTab('ready')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'ready'
-              ? 'bg-emerald-700 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'ready'
+              ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
           >
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-700" />
             <span className="whitespace-nowrap">READY</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono shrink-0 font-bold ${
+              activeTab === 'ready' ? 'bg-emerald-200 text-emerald-950' : 'bg-stone-200 text-stone-700'
+            }`}>
               {readyOrders.length}
             </span>
           </button>
@@ -230,14 +236,16 @@ export const KitchenView: React.FC = () => {
           <button
             id="kds-tab-served"
             onClick={() => setActiveTab('served')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${activeTab === 'served'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border border-stone-200'
+            className={`flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all border ${activeTab === 'served'
+              ? 'bg-purple-100 text-purple-950 border-purple-300 shadow-xs'
+              : 'bg-stone-50 text-stone-600 hover:text-stone-900 hover:bg-stone-100 border-stone-200'
               }`}
           >
-            <Utensils className="w-4 h-4 shrink-0" />
+            <Utensils className="w-4 h-4 shrink-0 text-purple-700" />
             <span className="whitespace-nowrap">SERVED</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-mono shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-mono shrink-0 font-bold ${
+              activeTab === 'served' ? 'bg-purple-200 text-purple-950' : 'bg-stone-200 text-stone-700'
+            }`}>
               {servedOrders.length}
             </span>
           </button>
@@ -423,9 +431,9 @@ export const KitchenView: React.FC = () => {
                       <button
                         id={`start-prep-btn-${order.orderNumber.replace('#', '')}`}
                         onClick={() => startPreparingOrder(order.id)}
-                        className="w-full py-3 bg-[#B45309] hover:bg-amber-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
+                        className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-2 transition-all active:scale-98"
                       >
-                        <Flame className="w-4 h-4" />
+                        <Flame className="w-4 h-4 text-amber-200" />
                         <span>START PREPARING</span>
                       </button>
                     )}

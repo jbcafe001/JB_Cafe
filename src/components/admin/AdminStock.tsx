@@ -197,46 +197,55 @@ export const AdminStock: React.FC = () => {
       {/* Stock Overview Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Items */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
-            Total Tracked Items
-          </span>
+        <div className="bg-gradient-to-br from-indigo-50/80 via-sky-50/40 to-white border border-indigo-200/80 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800">
+              Total Tracked Items
+            </span>
+            <Package className="w-4 h-4 text-indigo-500" />
+          </div>
           <div className="text-2xl font-black text-stone-900">{totalItems}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Active raw materials</span>
+          <span className="text-[11px] text-indigo-600/80 mt-1 inline-block">Active raw materials</span>
         </div>
 
         {/* Low Stock */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-gradient-to-br from-amber-50/80 via-orange-50/40 to-white border border-amber-200/80 rounded-2xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
               Low Stock
             </span>
             <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-2xl font-black text-amber-700">{lowStockCount}</div>
-          <span className="text-[11px] text-amber-800 font-semibold mt-1 inline-block">
+          <div className="text-2xl font-black text-amber-800">{lowStockCount}</div>
+          <span className="text-[11px] text-amber-700 font-semibold mt-1 inline-block">
             Needs replenishment
           </span>
         </div>
 
         {/* Out of Stock */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
-            Out of Stock
-          </span>
+        <div className="bg-gradient-to-br from-rose-50/80 via-pink-50/40 to-white border border-rose-200/80 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800">
+              Out of Stock
+            </span>
+            <AlertTriangle className="w-4 h-4 text-rose-500" />
+          </div>
           <div className="text-2xl font-black text-rose-700">{outOfStockCount}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Zero units left</span>
+          <span className="text-[11px] text-rose-600/80 mt-1 inline-block">Zero units left</span>
         </div>
 
         {/* Stock Value */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
-            Total Stock Value
-          </span>
+        <div className="bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-2xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+              Total Stock Value
+            </span>
+            <TrendingDown className="w-4 h-4 text-emerald-500" />
+          </div>
           <div className="text-2xl font-black text-stone-900">
             ₹{Math.round(totalStockValue).toLocaleString()}
           </div>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-1 inline-block">
+          <span className="text-[11px] text-emerald-700 font-semibold mt-1 inline-block">
             Wholesale asset value
           </span>
         </div>
@@ -276,52 +285,52 @@ export const AdminStock: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mt-4">
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Milk</span>
+            <div className="p-2.5 bg-sky-50/90 rounded-xl border border-sky-200/80">
+              <span className="text-[11px] font-bold text-sky-800 block truncate">Milk</span>
               <span className="text-base font-black text-stone-900">
                 {todayStockUsage['st-milk']?.amount || 0} L
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Used today</span>
+              <span className="text-[9px] text-sky-600 block mt-0.5">Used today</span>
             </div>
 
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Coffee Beans</span>
+            <div className="p-2.5 bg-amber-50/90 rounded-xl border border-amber-200/80">
+              <span className="text-[11px] font-bold text-amber-800 block truncate">Coffee Beans</span>
               <span className="text-base font-black text-stone-900">
                 {Math.round((todayStockUsage['st-coffee']?.amount || 0) * 1000)} g
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Espresso bar</span>
+              <span className="text-[9px] text-amber-600 block mt-0.5">Espresso bar</span>
             </div>
 
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Sugar</span>
+            <div className="p-2.5 bg-yellow-50/90 rounded-xl border border-yellow-200/80">
+              <span className="text-[11px] font-bold text-yellow-800 block truncate">Sugar</span>
               <span className="text-base font-black text-stone-900">
                 {todayStockUsage['st-sugar']?.amount || 0} KG
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Sweetener</span>
+              <span className="text-[9px] text-yellow-600 block mt-0.5">Sweetener</span>
             </div>
 
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Bread</span>
+            <div className="p-2.5 bg-orange-50/90 rounded-xl border border-orange-200/80">
+              <span className="text-[11px] font-bold text-orange-800 block truncate">Bread</span>
               <span className="text-base font-black text-stone-900">
                 {Math.round(todayStockUsage['st-bread']?.amount || 0)} packs
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Sandwiches</span>
+              <span className="text-[9px] text-orange-600 block mt-0.5">Sandwiches</span>
             </div>
 
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Cheese</span>
+            <div className="p-2.5 bg-lime-50/90 rounded-xl border border-lime-200/80">
+              <span className="text-[11px] font-bold text-lime-800 block truncate">Cheese</span>
               <span className="text-base font-black text-stone-900">
                 {todayStockUsage['st-cheese']?.amount || 0} KG
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Toasties</span>
+              <span className="text-[9px] text-lime-600 block mt-0.5">Toasties</span>
             </div>
 
-            <div className="p-2.5 bg-stone-50 rounded-xl border border-stone-200">
-              <span className="text-[11px] font-bold text-stone-600 block truncate">Potatoes</span>
+            <div className="p-2.5 bg-teal-50/90 rounded-xl border border-teal-200/80">
+              <span className="text-[11px] font-bold text-teal-800 block truncate">Potatoes</span>
               <span className="text-base font-black text-stone-900">
                 {todayStockUsage['st-potatoes']?.amount || 0} KG
               </span>
-              <span className="text-[9px] text-stone-400 block mt-0.5">Fries prep</span>
+              <span className="text-[9px] text-teal-600 block mt-0.5">Fries prep</span>
             </div>
           </div>
         </div>

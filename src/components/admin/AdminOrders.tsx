@@ -75,19 +75,19 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
         >
           <div className="overflow-y-auto flex-1">
             {/* Header band */}
-            <div className="bg-gradient-to-br from-[#1C1917] to-[#292524] p-6 text-white relative">
+            <div className="bg-gradient-to-br from-amber-50/90 via-[#FFFDF7] to-orange-50/70 p-6 text-stone-900 border-b border-amber-200/80 relative">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-200/70 hover:bg-stone-300/80 text-stone-700 flex items-center justify-center transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-start justify-between pr-10">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-stone-400 mb-1">Order Receipt</p>
-                <h2 className="text-3xl font-black tracking-tight">{order.orderNumber}</h2>
-                <p className="text-sm text-stone-400 mt-0.5">{dateStr} · {order.createdAt || '—'}</p>
+                <p className="text-[10px] uppercase tracking-widest text-amber-800 font-bold mb-1">Order Receipt</p>
+                <h2 className="text-3xl font-black tracking-tight text-stone-900">{order.orderNumber}</h2>
+                <p className="text-sm text-stone-500 mt-0.5">{dateStr} · {order.createdAt || '—'}</p>
               </div>
               <StatusBadge status={order.status} size="md" />
             </div>
@@ -240,7 +240,7 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
           <div className="px-5 pb-5">
             <button
               onClick={onClose}
-              className="w-full py-3 rounded-2xl bg-stone-900 text-white text-sm font-bold hover:bg-stone-800 transition-colors"
+              className="w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition-colors border border-stone-200"
             >
               Close
             </button>
@@ -390,19 +390,28 @@ export const AdminOrders: React.FC = () => {
           </div>
         </div>
 
-        {/* Status chips */}
+        {/* Status chips with distinct pastel colors */}
         <div className="flex space-x-2 overflow-x-auto pb-1 no-scrollbar">
-          {(['all', 'new', 'preparing', 'ready', 'served', 'completed'] as const).map((st) => (
+          {(
+            [
+              { id: 'all', label: `All Orders (${orders.length})`, active: 'bg-amber-100 text-amber-900 border-amber-300' },
+              { id: 'new', label: 'New', active: 'bg-sky-100 text-sky-900 border-sky-300' },
+              { id: 'preparing', label: 'Preparing', active: 'bg-orange-100 text-orange-900 border-orange-300' },
+              { id: 'ready', label: 'Ready', active: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+              { id: 'served', label: 'Served', active: 'bg-purple-100 text-purple-900 border-purple-300' },
+              { id: 'completed', label: 'Completed', active: 'bg-stone-200 text-stone-900 border-stone-300' },
+            ] as const
+          ).map((st) => (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all whitespace-nowrap ${
-                statusFilter === st
-                  ? 'bg-[#B45309] text-white shadow-xs'
-                  : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+              key={st.id}
+              onClick={() => setStatusFilter(st.id)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
+                statusFilter === st.id
+                  ? `${st.active} shadow-2xs`
+                  : 'bg-white border-stone-200 text-stone-600 hover:bg-[#F7F4EE]'
               }`}
             >
-              {st === 'all' ? `All Orders (${orders.length})` : st}
+              {st.label}
             </button>
           ))}
         </div>

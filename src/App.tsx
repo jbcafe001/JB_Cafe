@@ -50,7 +50,7 @@ const MainAppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F8F6] flex flex-col font-sans text-[#1C1917] selection:bg-[#B45309] selection:text-white antialiased">
+    <div className="min-h-screen bg-[#F7F4EE] flex flex-col font-sans text-[#292524] selection:bg-amber-200 selection:text-amber-950 antialiased">
       {/* Main View Router based on Authentication and Current Role */}
       {!isLoggedIn ? (
         <LoginView />

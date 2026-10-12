@@ -136,10 +136,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
       <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
         <button
           onClick={() => setActiveTabFilter('all')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
             activeTabFilter === 'all'
-              ? 'bg-[#B45309] text-white shadow-xs'
-              : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+              ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs'
+              : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
           }`}
         >
           All Active ({activeOrders.length})
@@ -147,10 +147,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
 
         <button
           onClick={() => setActiveTabFilter('ready')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap border ${
             activeTabFilter === 'ready'
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'bg-white border border-emerald-200 text-emerald-800 hover:bg-emerald-50'
+              ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs'
+              : 'bg-white border-emerald-200 text-emerald-800 hover:bg-emerald-50'
           }`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -159,25 +159,25 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
 
         <button
           onClick={() => setActiveTabFilter('served')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap border ${
             activeTabFilter === 'served'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'bg-white border border-indigo-200 text-indigo-800 hover:bg-indigo-50'
+              ? 'bg-purple-100 text-purple-950 border-purple-300 shadow-xs'
+              : 'bg-white border-purple-200 text-purple-800 hover:bg-purple-50'
           }`}
         >
-          <Utensils className="w-3 h-3 text-indigo-500" />
+          <Utensils className="w-3 h-3 text-purple-600" />
           <span>Served & Dining ({servedOrders.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTabFilter('kitchen')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap border ${
             activeTabFilter === 'kitchen'
-              ? 'bg-stone-800 text-white shadow-xs'
-              : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
+              ? 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs'
+              : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
           }`}
         >
-          <Flame className="w-3 h-3 text-amber-500" />
+          <Flame className="w-3 h-3 text-orange-600" />
           <span>In Kitchen ({inKitchenOrders.length})</span>
         </button>
       </div>
@@ -386,9 +386,9 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                             onClick={() => {
                               tableActiveOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                             }}
-                            className="w-full sm:w-auto px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-stone-900 hover:bg-stone-800 text-white shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                            className="w-full sm:w-auto px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                           >
-                            <Sparkles className="w-4 h-4 text-amber-400" />
+                            <Sparkles className="w-4 h-4 text-emerald-200" />
                             <span>Free Table</span>
                           </button>
                         ) : (
@@ -453,7 +453,7 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
               <button
                 id="let-dine-btn"
                 onClick={() => setJustServedOrder(null)}
-                className="w-full py-3 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-95"
+                className="w-full py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition-all active:scale-95"
               >
                 Done (Back to Orders)
               </button>

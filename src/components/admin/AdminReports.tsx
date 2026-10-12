@@ -51,14 +51,14 @@ export const AdminReports: React.FC = () => {
           <p className="text-xs text-stone-500">Consolidated financial, stock usage, and popularity analysis</p>
         </div>
 
-        <div className="flex items-center space-x-1.5 bg-stone-100 p-1 rounded-xl border border-stone-200">
+        <div className="flex items-center space-x-1.5 bg-[#F2EDE4] p-1 rounded-xl border border-[#E5DDCF]">
           {(['Daily', 'Weekly', 'Monthly'] as const).map((tf) => (
             <button
               key={tf}
               onClick={() => setTimeframe(tf)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 timeframe === tf
-                  ? 'bg-white text-stone-900 shadow-xs'
+                  ? 'bg-amber-100/90 text-amber-950 font-bold border border-amber-300 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -70,47 +70,47 @@ export const AdminReports: React.FC = () => {
 
       {/* 3 Main Executive Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+        <div className="bg-gradient-to-br from-emerald-50 via-emerald-50/40 to-teal-50/30 border border-emerald-200/90 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between text-emerald-700 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
               Sales Revenue
             </span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-black text-stone-900">
+          <div className="text-2xl font-black text-emerald-950">
             ₹{(timeframe === 'Monthly' ? totalSales * 4.2 : totalSales).toLocaleString()}
           </div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">
+          <span className="text-[11px] text-emerald-700/70 mt-1 inline-block">
             {timeframe} gross revenue
           </span>
         </div>
 
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between text-stone-400 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+        <div className="bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 border border-rose-200/90 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between text-rose-700 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700">
               Total Expenses
             </span>
             <Receipt className="w-4 h-4 text-rose-600" />
           </div>
-          <div className="text-2xl font-black text-stone-900">
+          <div className="text-2xl font-black text-rose-950">
             ₹{(timeframe === 'Monthly' ? totalExpenses * 3.8 : totalExpenses).toLocaleString()}
           </div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">
+          <span className="text-[11px] text-rose-700/70 mt-1 inline-block">
             Ingredients, utility, maintenance
           </span>
         </div>
 
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 shadow-xs">
+        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between text-amber-700 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider">
               Net Operating Profit
             </span>
-            <Award className="w-4 h-4 text-amber-700" />
+            <Award className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl font-black text-amber-950">
             ₹{(timeframe === 'Monthly' ? netProfit * 4.4 : netProfit).toLocaleString()}
           </div>
-          <span className="text-[11px] text-amber-800 font-semibold mt-1 inline-block">
+          <span className="text-[11px] text-amber-800/80 font-semibold mt-1 inline-block">
             Estimated surplus margin
           </span>
         </div>
@@ -134,7 +134,7 @@ export const AdminReports: React.FC = () => {
                 <div key={item.name} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs sm:text-sm">
                     <div className="flex items-center space-x-2">
-                      <span className="w-5 h-5 rounded-full bg-stone-100 font-bold text-stone-700 text-xs flex items-center justify-center">
+                      <span className="w-5 h-5 rounded-full bg-amber-100 font-bold text-amber-900 text-xs flex items-center justify-center border border-amber-200">
                         {item.rank}
                       </span>
                       <span className="font-bold text-stone-900">{item.name}</span>
@@ -146,10 +146,10 @@ export const AdminReports: React.FC = () => {
                   </div>
 
                   {/* Relative progress bar */}
-                  <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#F2EDE4] h-2 rounded-full overflow-hidden">
                     <div
                       style={{ width: `${item.percent}%` }}
-                      className="bg-amber-500 h-full rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-amber-500 to-orange-400 h-full rounded-full transition-all duration-500"
                     />
                   </div>
                 </div>

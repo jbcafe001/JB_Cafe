@@ -71,17 +71,34 @@ export const AdminTables: React.FC = () => {
   const getStatusBadge = (status: TableStatus) => {
     switch (status) {
       case 'available':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       case 'occupied':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
+        return 'bg-amber-50 text-amber-900 border-amber-200';
       case 'preparing':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
+        return 'bg-orange-50 text-orange-900 border-orange-200';
       case 'ready':
-        return 'bg-emerald-600 text-white border-emerald-700';
+        return 'bg-teal-50 text-teal-900 border-teal-200';
       case 'served':
-        return 'bg-indigo-50 text-indigo-800 border-indigo-200';
+        return 'bg-purple-50 text-purple-900 border-purple-200';
       default:
         return 'bg-stone-50 text-stone-700 border-stone-200';
+    }
+  };
+
+  const getTableCardBg = (status: TableStatus) => {
+    switch (status) {
+      case 'available':
+        return 'bg-gradient-to-br from-emerald-50/40 via-white to-white border-emerald-200/80';
+      case 'occupied':
+        return 'bg-gradient-to-br from-amber-50/50 via-white to-white border-amber-200/90';
+      case 'preparing':
+        return 'bg-gradient-to-br from-orange-50/50 via-white to-white border-orange-200/90';
+      case 'ready':
+        return 'bg-gradient-to-br from-teal-50/50 via-white to-white border-teal-200/90';
+      case 'served':
+        return 'bg-gradient-to-br from-purple-50/50 via-white to-white border-purple-200/90';
+      default:
+        return 'bg-white border-stone-200/90';
     }
   };
 
@@ -97,19 +114,19 @@ export const AdminTables: React.FC = () => {
         <button
           id="add-table-btn"
           onClick={handleOpenAdd}
-          className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
+          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-all active:scale-95 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add Table</span>
         </button>
       </div>
 
-      {/* Tables Grid (Section 17) */}
+      {/* Tables Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {tables.map((table) => (
           <div
             key={table.id}
-            className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs flex flex-col justify-between min-h-[140px] hover:shadow-md transition-shadow"
+            className={`border rounded-2xl p-4 shadow-2xs flex flex-col justify-between min-h-[140px] hover:shadow-xs transition-all ${getTableCardBg(table.status)}`}
           >
             <div>
               <div className="flex flex-col items-start gap-1.5">

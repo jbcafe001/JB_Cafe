@@ -307,41 +307,41 @@ export const AdminRawMaterial: React.FC = () => {
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         {/* Total Tracked Raw Materials */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white border border-indigo-200/80 rounded-2xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800">
               Total Materials
             </span>
-            <Boxes className="w-4 h-4 text-indigo-500" />
+            <Boxes className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-2xl font-black text-stone-900">{totalItemsCount}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">
+          <span className="text-[11px] text-indigo-600/80 mt-1 inline-block">
             Tracked in materials db
           </span>
         </div>
 
         {/* Brand Breakdown */}
         {currentRole !== 'admin_kunafa' && (
-          <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+          <div className="bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-white border border-amber-200/80 rounded-2xl p-4 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
                 Brand Catalog
               </span>
-              <Tag className="w-4 h-4 text-amber-500" />
+              <Tag className="w-4 h-4 text-amber-600" />
             </div>
             <div className="flex items-baseline space-x-2">
               <span className="text-lg font-black text-stone-800">{jbCafeCount} <span className="text-[10px] font-semibold text-stone-400">JB</span></span>
               <span className="text-xs text-stone-300">|</span>
-              <span className="text-lg font-black text-amber-600">{kunafaCount} <span className="text-[10px] font-semibold text-amber-500">KNF</span></span>
+              <span className="text-lg font-black text-amber-700">{kunafaCount} <span className="text-[10px] font-semibold text-amber-600">KNF</span></span>
             </div>
-            <span className="text-[11px] text-stone-400 mt-1 inline-block">Active brand distribution</span>
+            <span className="text-[11px] text-amber-700/80 mt-1 inline-block">Active brand distribution</span>
           </div>
         )}
 
         {/* Total Stock Value */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
               Total Valuation
             </span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
@@ -349,39 +349,39 @@ export const AdminRawMaterial: React.FC = () => {
           <div className="text-2xl font-black text-stone-900">
             ₹{Math.round(totalInventoryValue).toLocaleString()}
           </div>
-          <span className="text-[11px] text-emerald-600 font-semibold mt-1 inline-block">
+          <span className="text-[11px] text-emerald-700 font-semibold mt-1 inline-block">
             Holding asset value
           </span>
         </div>
 
         {/* Average Unit Cost */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-gradient-to-br from-yellow-50/80 via-amber-50/30 to-white border border-yellow-200/80 rounded-2xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-800">
               Avg Cost / Unit
             </span>
-            <Sparkles className="w-4 h-4 text-amber-500" />
+            <Sparkles className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl font-black text-stone-900">
             ₹{Math.round(avgCostPerUnit).toLocaleString()}
           </div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Benchmark avg cost</span>
+          <span className="text-[11px] text-yellow-700/80 mt-1 inline-block">Benchmark avg cost</span>
         </div>
 
         {/* Stock Alerts (Low & Out) */}
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs">
+        <div className="bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white border border-rose-200/80 rounded-2xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800">
               Stock Warnings
             </span>
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
+            <AlertTriangle className="w-4 h-4 text-rose-600" />
           </div>
           <div className="flex items-baseline space-x-2">
             <span className="text-xl font-black text-amber-600">{lowStockCount} <span className="text-[10px] text-amber-500 font-semibold">Low</span></span>
             <span className="text-xs text-stone-300">/</span>
             <span className="text-xl font-black text-rose-600">{outOfStockCount} <span className="text-[10px] text-rose-500 font-semibold">Out</span></span>
           </div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Threshold alerts</span>
+          <span className="text-[11px] text-rose-700/80 mt-1 inline-block">Threshold alerts</span>
         </div>
       </div>
 
@@ -390,7 +390,7 @@ export const AdminRawMaterial: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Brand Filter Tabs */}
           {currentRole !== 'admin_kunafa' ? (
-            <div className="flex items-center space-x-1.5 p-1 bg-stone-100 rounded-xl">
+            <div className="flex items-center space-x-1.5 p-1 bg-[#FAF7F2] border border-[#EFE7DA] rounded-xl">
               <button
                 onClick={() => setBrandFilter('All')}
                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
@@ -405,7 +405,7 @@ export const AdminRawMaterial: React.FC = () => {
                 onClick={() => setBrandFilter('JB Cafe')}
                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   brandFilter === 'JB Cafe'
-                    ? 'bg-white text-stone-900 shadow-2xs'
+                    ? 'bg-amber-100 text-amber-900 shadow-2xs border border-amber-200'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
               >
@@ -415,7 +415,7 @@ export const AdminRawMaterial: React.FC = () => {
                 onClick={() => setBrandFilter('KUNAFA')}
                 className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   brandFilter === 'KUNAFA'
-                    ? 'bg-white text-amber-700 shadow-2xs'
+                    ? 'bg-rose-100 text-rose-900 shadow-2xs border border-rose-200'
                     : 'text-stone-500 hover:text-stone-800'
                 }`}
               >

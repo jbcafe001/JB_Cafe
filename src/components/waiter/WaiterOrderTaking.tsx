@@ -404,25 +404,25 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
       {/* Sticky Bottom Cart Bar */}
       {totalItemCount > 0 && (
-        <div className="fixed sm:sticky bottom-14 sm:bottom-0 left-0 right-0 z-20 bg-stone-900 text-white p-3.5 shadow-2xl border-t border-stone-800">
+        <div className="fixed sm:sticky bottom-14 sm:bottom-0 left-0 right-0 z-20 bg-gradient-to-r from-amber-50 via-[#FFFDF7] to-orange-50 border-t border-amber-200/90 text-stone-900 p-3.5 shadow-2xl">
           <div className="max-w-md mx-auto flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-base">₹{subtotal}</span>
-                <span className="text-xs text-stone-300 bg-stone-800 px-2 py-0.5 rounded-md font-medium">
+                <span className="font-black text-lg text-stone-900">₹{subtotal}</span>
+                <span className="text-xs text-amber-900 bg-amber-100/80 border border-amber-200 px-2 py-0.5 rounded-md font-bold">
                   {totalItemCount} {totalItemCount === 1 ? 'item' : 'items'}
                 </span>
               </div>
-              <p className="text-[11px] text-amber-400/90 font-medium">Ready for {table.name}</p>
+              <p className="text-[11px] text-amber-800 font-bold">Ready for {table.name}</p>
             </div>
 
             <button
               id="view-order-cart-btn"
               onClick={() => setShowReviewModal(true)}
-              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold rounded-xl text-sm shadow-md transition-all flex items-center space-x-1.5 active:scale-95"
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center space-x-1.5 active:scale-95"
             >
               <span>View Order</span>
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 text-amber-200" />
             </button>
           </div>
         </div>
@@ -433,14 +433,14 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowReviewModal(false)}>
           <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+            <div className="p-4 border-b border-amber-200/70 flex items-center justify-between bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80">
               <div>
                 <h3 className="font-extrabold text-stone-900 text-base">{table.name} — Order Review</h3>
                 <p className="text-xs text-stone-500">Confirm items before sending to kitchen</p>
               </div>
               <button
                 onClick={() => setShowReviewModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -562,7 +562,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowPaymentModal(false)}>
           <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-200" onClick={e => e.stopPropagation()}>
-            <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+            <div className="p-4 sm:p-5 border-b border-amber-200/70 flex items-center justify-between bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80">
               <div>
                 <h3 className="font-black text-stone-900 text-lg">
                   Collect Payment
@@ -600,11 +600,11 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                     onClick={() => setPaymentMethod('upi')}
                     className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
                       paymentMethod === 'upi'
-                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        ? 'border-teal-300 bg-teal-50 text-teal-950 ring-2 ring-teal-500/20 shadow-xs'
                         : 'border-stone-200 text-stone-600 bg-white'
                     }`}
                   >
-                    <QrCode className="w-5 h-5 text-amber-600 mb-1" />
+                    <QrCode className="w-5 h-5 text-teal-600 mb-1" />
                     <span className="font-extrabold text-xs">UPI</span>
                     <span className="text-[10px] text-stone-400">QR Code</span>
                   </button>
@@ -614,11 +614,11 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                     onClick={() => setPaymentMethod('cash')}
                     className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
                       paymentMethod === 'cash'
-                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        ? 'border-orange-300 bg-orange-50 text-orange-950 ring-2 ring-orange-500/20 shadow-xs'
                         : 'border-stone-200 text-stone-600 bg-white'
                     }`}
                   >
-                    <Banknote className="w-5 h-5 text-amber-600 mb-1" />
+                    <Banknote className="w-5 h-5 text-orange-600 mb-1" />
                     <span className="font-extrabold text-xs">Cash</span>
                     <span className="text-[10px] text-stone-400">Cash Box</span>
                   </button>
@@ -628,11 +628,11 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                     onClick={() => setPaymentMethod('card')}
                     className={`p-3 rounded-2xl border flex flex-col items-center justify-center transition-all ${
                       paymentMethod === 'card'
-                        ? 'border-amber-600 bg-amber-50/80 text-amber-950 ring-2 ring-amber-500/20 shadow-xs'
+                        ? 'border-indigo-300 bg-indigo-50 text-indigo-950 ring-2 ring-indigo-500/20 shadow-xs'
                         : 'border-stone-200 text-stone-600 bg-white'
                     }`}
                   >
-                    <CreditCard className="w-5 h-5 text-amber-600 mb-1" />
+                    <CreditCard className="w-5 h-5 text-indigo-600 mb-1" />
                     <span className="font-extrabold text-xs">Card</span>
                     <span className="text-[10px] text-stone-400">POS Swipe</span>
                   </button>

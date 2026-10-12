@@ -117,28 +117,28 @@ export const AdminExpenses: React.FC = () => {
 
       {/* 3 Summary Cards (Section 12) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
+        <div className="bg-gradient-to-br from-rose-50 via-rose-50/40 to-orange-50/30 border border-rose-200/90 rounded-2xl p-4 shadow-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 block mb-1">
             Today's Expenses
           </span>
-          <div className="text-2xl font-black text-stone-900">₹{todayTotal.toLocaleString()}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Daily logged spend</span>
+          <div className="text-2xl font-black text-rose-950">₹{todayTotal.toLocaleString()}</div>
+          <span className="text-[11px] text-rose-600/70 mt-1 inline-block">Daily logged spend</span>
         </div>
 
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
+        <div className="bg-gradient-to-br from-amber-50 via-amber-50/40 to-yellow-50/30 border border-amber-200/90 rounded-2xl p-4 shadow-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
             This Week's Expenses
           </span>
-          <div className="text-2xl font-black text-stone-900">₹{weekTotal.toLocaleString()}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Current 7-day period</span>
+          <div className="text-2xl font-black text-amber-950">₹{weekTotal.toLocaleString()}</div>
+          <span className="text-[11px] text-amber-600/70 mt-1 inline-block">Current 7-day period</span>
         </div>
 
-        <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 block mb-1">
+        <div className="bg-gradient-to-br from-purple-50 via-purple-50/40 to-indigo-50/30 border border-purple-200/90 rounded-2xl p-4 shadow-xs">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700 block mb-1">
             This Month's Expenses
           </span>
-          <div className="text-2xl font-black text-stone-900">₹{monthTotal.toLocaleString()}</div>
-          <span className="text-[11px] text-stone-400 mt-1 inline-block">Calendar month total</span>
+          <div className="text-2xl font-black text-purple-950">₹{monthTotal.toLocaleString()}</div>
+          <span className="text-[11px] text-purple-600/70 mt-1 inline-block">Calendar month total</span>
         </div>
       </div>
 
@@ -161,28 +161,51 @@ export const AdminExpenses: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 text-stone-800">
-              {displayedExpenses.map((exp) => (
-                <tr key={exp.id} className="hover:bg-stone-50/80 transition-colors">
-                  <td className="py-3 font-bold text-stone-900">
-                    {exp.name}
-                    {!isKunafaAdmin && (
-                      <span className="ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase">
-                        {exp.brand || 'JB Cafe'}
+              {displayedExpenses.map((exp) => {
+                const getCategoryStyle = (cat: string) => {
+                  switch (cat) {
+                    case 'Ingredients':
+                      return 'bg-emerald-50 text-emerald-800 border-emerald-200/80';
+                    case 'Electricity':
+                      return 'bg-amber-50 text-amber-800 border-amber-200/80';
+                    case 'Rent':
+                      return 'bg-purple-50 text-purple-800 border-purple-200/80';
+                    case 'Staff':
+                      return 'bg-sky-50 text-sky-800 border-sky-200/80';
+                    case 'Maintenance':
+                      return 'bg-orange-50 text-orange-800 border-orange-200/80';
+                    default:
+                      return 'bg-stone-100 text-stone-700 border-stone-200/80';
+                  }
+                };
+
+                return (
+                  <tr key={exp.id} className="hover:bg-stone-50/80 transition-colors">
+                    <td className="py-3 font-bold text-stone-900">
+                      {exp.name}
+                      {!isKunafaAdmin && (
+                        <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold border uppercase ${
+                          exp.brand === 'KUNAFA'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}>
+                          {exp.brand || 'JB Cafe'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getCategoryStyle(exp.category)}`}>
+                        {exp.category}
                       </span>
-                    )}
-                  </td>
-                  <td className="py-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
-                      {exp.category}
-                    </span>
-                  </td>
-                  <td className="py-3 text-stone-500">{exp.date}</td>
-                  <td className="py-3 text-stone-500 text-xs">{exp.note || '—'}</td>
-                  <td className="py-3 font-extrabold text-stone-900 text-right">
-                    ₹{exp.amount.toLocaleString()}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="py-3 text-stone-500">{exp.date}</td>
+                    <td className="py-3 text-stone-500 text-xs">{exp.note || '—'}</td>
+                    <td className="py-3 font-extrabold text-stone-900 text-right">
+                      ₹{exp.amount.toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -190,13 +213,13 @@ export const AdminExpenses: React.FC = () => {
 
       {/* + Add Expense Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150 border border-stone-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 rounded-t-2xl">
               <h3 className="font-extrabold text-stone-900 text-base">Record New Expense</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100"
               >
                 <X className="w-5 h-5" />
               </button>

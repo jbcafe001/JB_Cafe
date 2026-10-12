@@ -48,7 +48,7 @@ export const AdminSettings: React.FC = () => {
             <button
               onClick={handleSaveProfile}
               disabled={isSaving}
-              className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+              className="px-4 py-1.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
             >
               {isSaving ? 'Saving...' : 'Save Settings'}
             </button>
@@ -89,7 +89,7 @@ export const AdminSettings: React.FC = () => {
                   }
                 }}
                 disabled={isKunafaAdmin}
-                className={`w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-stone-900 file:text-white hover:file:bg-stone-800 file:cursor-pointer transition-all ${isKunafaAdmin ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-full file:border file:border-amber-300 file:text-xs file:font-bold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200 file:cursor-pointer transition-all ${isKunafaAdmin ? 'opacity-70 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>
@@ -190,7 +190,7 @@ export const AdminSettings: React.FC = () => {
                 alert('Failed to seed materials');
               }
             }}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-2 transition-colors active:scale-95"
+            className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-2 transition-colors active:scale-95"
           >
             <Check className="w-4 h-4 text-emerald-100" />
             <span>Seed Materials Now</span>

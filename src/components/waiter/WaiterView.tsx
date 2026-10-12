@@ -127,8 +127,8 @@ export const WaiterView: React.FC = () => {
                     onClick={() => handleBrandSelect('KUNAFA')}
                     className="group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all duration-150 active:scale-98 shadow-xs hover:shadow-md flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
-                      <Sparkles className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+                      <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -150,13 +150,13 @@ export const WaiterView: React.FC = () => {
           {/* Fixed Bottom Navigation (Mobile First Clean Minimalism) */}
           <nav
             id="waiter-bottom-nav"
-            className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-sm px-2 py-1.5 flex items-center justify-around"
+            className="fixed bottom-0 left-0 right-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EFE7DA] shadow-sm px-2 py-1.5 flex items-center justify-around"
           >
             <button
               id="waiter-nav-home"
               onClick={() => setActiveTab('home')}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'home'
-                  ? 'text-[#B45309] font-extrabold'
+                  ? 'text-amber-800 font-extrabold bg-amber-100/70 border border-amber-200'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >
@@ -168,14 +168,14 @@ export const WaiterView: React.FC = () => {
               id="waiter-nav-orders"
               onClick={() => setActiveTab('orders')}
               className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'orders'
-                  ? 'text-[#B45309] font-extrabold'
+                  ? 'text-sky-800 font-extrabold bg-sky-100/70 border border-sky-200'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >
               <ClipboardList className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Orders</span>
               {activeOrdersCount > 0 && (
-                <span className="absolute top-0.5 right-2 w-4 h-4 bg-[#B45309] text-white rounded-full text-[9px] font-extrabold flex items-center justify-center shadow-xs">
+                <span className="absolute top-0.5 right-2 w-4 h-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-[9px] font-extrabold flex items-center justify-center shadow-xs">
                   {activeOrdersCount}
                 </span>
               )}
@@ -185,7 +185,7 @@ export const WaiterView: React.FC = () => {
               id="waiter-nav-tables"
               onClick={() => setActiveTab('tables')}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all ${activeTab === 'tables'
-                  ? 'text-[#B45309] font-extrabold'
+                  ? 'text-emerald-800 font-extrabold bg-emerald-100/70 border border-emerald-200'
                   : 'text-stone-400 hover:text-stone-600 font-medium'
                 }`}
             >

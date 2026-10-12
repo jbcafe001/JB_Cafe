@@ -62,12 +62,12 @@ export const LoginView: React.FC = () => {
     <div className="min-h-screen bg-[#F8F6F0] flex flex-col justify-center items-center p-4 sm:p-6 text-stone-800">
       <div className="w-full max-w-md bg-white border border-stone-200/80 rounded-2xl shadow-xl overflow-hidden">
         {/* Café Header Banner */}
-        <div className="bg-stone-900 text-white p-6 text-center relative">
-          <div className="w-20 h-20 mx-auto rounded-full bg-white flex items-center justify-center mb-4 shadow-md overflow-hidden border-4 border-white/10 shrink-0">
+        <div className="bg-gradient-to-br from-amber-50 via-[#FFFDF7] to-orange-50/70 text-stone-900 border-b border-amber-200/80 p-6 text-center relative">
+          <div className="w-20 h-20 mx-auto rounded-full bg-white flex items-center justify-center mb-4 shadow-sm overflow-hidden border-2 border-amber-200/80 shrink-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-1" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">JB PAVILION & CAFE</h1>
-          <p className="text-xs text-amber-300/80 tracking-wide font-medium uppercase mt-1">
+          <h1 className="text-2xl font-extrabold tracking-tight text-stone-900">JB PAVILION & CAFE</h1>
+          <p className="text-xs text-amber-800 tracking-wider font-bold uppercase mt-1">
             Staff Portal Login
           </p>
         </div>
@@ -122,7 +122,7 @@ export const LoginView: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading && <span className="animate-spin h-4 w-4 border-2 border-white/40 border-t-white rounded-full" />}
               <LogIn className="w-4 h-4" />

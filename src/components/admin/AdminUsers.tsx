@@ -88,37 +88,37 @@ export const AdminUsers: React.FC = () => {
       case 'admin':
         return {
           label: 'Admin',
-          icon: <Shield className="w-3.5 h-3.5" />,
+          icon: <Shield className="w-3.5 h-3.5 text-purple-600" />,
           cls: 'bg-purple-50 text-purple-800 border-purple-200',
         };
       case 'admin_kunafa':
         return {
           label: 'Admin (KUNAFA)',
-          icon: <Shield className="w-3.5 h-3.5" />,
-          cls: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          icon: <Shield className="w-3.5 h-3.5 text-rose-600" />,
+          cls: 'bg-rose-50 text-rose-800 border-rose-200',
         };
       case 'cook':
         return {
           label: 'Cook',
-          icon: <ChefHat className="w-3.5 h-3.5" />,
-          cls: 'bg-amber-50 text-amber-800 border-amber-200',
+          icon: <ChefHat className="w-3.5 h-3.5 text-orange-600" />,
+          cls: 'bg-orange-50 text-orange-800 border-orange-200',
         };
       case 'others':
         return {
           label: 'Others',
-          icon: <UserIcon className="w-3.5 h-3.5" />, // Note: Need to import UserIcon or use a generic one
-          cls: 'bg-stone-50 text-stone-800 border-stone-200',
+          icon: <UserIcon className="w-3.5 h-3.5 text-teal-600" />,
+          cls: 'bg-teal-50 text-teal-800 border-teal-200',
         };
       case 'waiter':
         return {
           label: 'Waiter',
-          icon: <Smartphone className="w-3.5 h-3.5" />,
-          cls: 'bg-blue-50 text-blue-800 border-blue-200',
+          icon: <Smartphone className="w-3.5 h-3.5 text-sky-600" />,
+          cls: 'bg-sky-50 text-sky-800 border-sky-200',
         };
       default:
         return {
           label: userRole || 'Unknown',
-          icon: <UserIcon className="w-3.5 h-3.5" />,
+          icon: <UserIcon className="w-3.5 h-3.5 text-stone-500" />,
           cls: 'bg-stone-50 text-stone-800 border-stone-200',
         };
     }
@@ -143,7 +143,7 @@ export const AdminUsers: React.FC = () => {
         <button
           id="add-user-btn"
           onClick={handleOpenAdd}
-          className="w-full sm:w-auto px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
+          className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors active:scale-95 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           <span>Add User</span>
@@ -172,7 +172,7 @@ export const AdminUsers: React.FC = () => {
                 return (
                   <tr key={usr.id} className="hover:bg-stone-50/80 transition-colors">
                     <td className="py-3 font-bold text-stone-900 flex items-center space-x-2">
-                      <div className="w-7 h-7 rounded-full bg-stone-100 font-bold text-stone-600 flex items-center justify-center text-xs">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 font-bold text-amber-900 border border-amber-200/80 flex items-center justify-center text-xs">
                         {usr.name.charAt(0)}
                       </div>
                       <span>{usr.name}</span>
@@ -191,7 +191,7 @@ export const AdminUsers: React.FC = () => {
                         {['waiter', 'cook', 'others'].includes(usr.role) ? (
                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
                             usr.brand === 'KUNAFA' 
-                              ? 'bg-indigo-50 text-indigo-700 border-indigo-200' 
+                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
                               : 'bg-amber-50 text-amber-700 border-amber-200'
                           }`}>
                             {usr.brand || 'JB Cafe'}
@@ -269,13 +269,13 @@ export const AdminUsers: React.FC = () => {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-2xl">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150 border border-stone-200" onClick={e => e.stopPropagation()}>
+            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 rounded-t-2xl">
               <h3 className="font-extrabold text-stone-900 text-base">{editingUserId ? 'Edit Team Member' : 'Add Team Member'}</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700"
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100"
               >
                 <X className="w-5 h-5" />
               </button>

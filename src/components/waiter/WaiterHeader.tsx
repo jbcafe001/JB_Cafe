@@ -19,32 +19,32 @@ export const WaiterHeader: React.FC = () => {
     .toUpperCase();
 
   return (
-    <div className="bg-[#B45309] text-white px-4 py-3.5 sm:py-4 -mx-4 -mt-4 mb-4 flex items-center justify-between shadow-md">
+    <div className="bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80 text-stone-900 border-b border-amber-200/80 px-4 py-3.5 sm:py-4 -mx-4 -mt-4 mb-4 flex items-center justify-between shadow-2xs">
       {/* Left: Cafe Name & Logo */}
       <div className="flex items-center space-x-2.5">
-        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-md overflow-hidden shrink-0 border-2 border-white/20">
+        <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm overflow-hidden shrink-0 border-2 border-amber-200/80">
           {settings?.logoUrl ? (
             <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain p-0.5" />
           ) : (
-            <Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
+            <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700" />
           )}
         </div>
-        <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">
+        <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-stone-900">
           {cafeName}
         </h1>
       </div>
 
       {/* Right: Profile Avatar & Name */}
       <div className="flex items-center space-x-2.5 relative">
-        <span className="text-sm font-medium hidden sm:inline-block">
+        <span className="text-sm font-semibold text-stone-800 hidden sm:inline-block">
           Hello, {currentUser?.name || 'Rahul'}
         </span>
-        <span className="text-sm font-medium sm:hidden">
+        <span className="text-sm font-semibold text-stone-800 sm:hidden">
           {currentUser?.name?.split(' ')[0] || 'Rahul'}
         </span>
         <div
           onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
-          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white text-[#B45309] font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-[#B45309] cursor-pointer hover:bg-stone-50 transition-colors"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-amber-100 to-orange-100 text-amber-900 font-black flex items-center justify-center text-xs sm:text-sm shadow-xs border-2 border-amber-300 cursor-pointer hover:scale-105 transition-all"
         >
           {initials}
         </div>

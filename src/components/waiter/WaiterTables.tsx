@@ -151,26 +151,40 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
       {/* Filter Tabs */}
       <div className="flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {(['all', 'available', 'occupied', 'preparing', 'ready', 'served'] as const).map((st) => (
-          <button
-            key={st}
-            onClick={() => setFilter(st)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize whitespace-nowrap transition-colors ${filter === st
-                ? 'bg-[#B45309] text-white shadow-xs'
-                : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
-              }`}
-          >
-            {st === 'all'
-              ? 'All Tables'
-              : st === 'ready'
-                ? 'Ready to Serve'
-                : st === 'occupied'
-                  ? 'Order Taken'
-                  : st === 'served'
-                    ? 'Served / Dining'
-                    : st}
-          </button>
-        ))}
+        {(['all', 'available', 'occupied', 'preparing', 'ready', 'served'] as const).map((st) => {
+          const getActiveFilterStyle = (status: string) => {
+            switch (status) {
+              case 'all': return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
+              case 'available': return 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs';
+              case 'occupied': return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
+              case 'preparing': return 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs';
+              case 'ready': return 'bg-teal-100 text-teal-950 border-teal-300 shadow-xs';
+              case 'served': return 'bg-purple-100 text-purple-950 border-purple-300 shadow-xs';
+              default: return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
+            }
+          };
+
+          return (
+            <button
+              key={st}
+              onClick={() => setFilter(st)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold capitalize whitespace-nowrap transition-colors border ${filter === st
+                  ? getActiveFilterStyle(st)
+                  : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
+                }`}
+            >
+              {st === 'all'
+                ? 'All Tables'
+                : st === 'ready'
+                  ? 'Ready to Serve'
+                  : st === 'occupied'
+                    ? 'Order Taken'
+                    : st === 'served'
+                      ? 'Served / Dining'
+                      : st}
+            </button>
+          );
+        })}
       </div>
 
       {/* Table Cards Grid */}
@@ -327,9 +341,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                               e.stopPropagation();
                               activeOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                             }}
-                            className="flex-1 text-[10px] sm:text-xs bg-stone-900 hover:bg-stone-800 text-white py-2 rounded-xl font-bold shadow-xs flex items-center justify-center space-x-1.5 whitespace-nowrap"
+                            className="flex-1 text-[10px] sm:text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-2 rounded-xl font-bold shadow-xs flex items-center justify-center space-x-1.5 whitespace-nowrap"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
                             <span>Free Table</span>
                           </button>
                         </div>
@@ -521,9 +535,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                     activeOrdersInModal.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
                     setActiveTableModal(null);
                   }}
-                  className="w-full py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 mb-3"
+                  className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 mb-3"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <Sparkles className="w-4 h-4 text-emerald-200" />
                   <span>Free Table</span>
                 </button>
               )}

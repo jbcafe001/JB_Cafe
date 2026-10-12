@@ -187,41 +187,61 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         )}
       </div>
 
-      {/* Top Section: Clean Minimalism Metric Cards */}
+      {/* Top Section: Multi-colored Pastel Cafe Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* Today's Sales */}
-        <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Today's Sales</p>
-          <p className="text-3xl font-bold mt-2 text-stone-900">₹{todaySales.toLocaleString()}</p>
-          <p className="text-xs text-stone-500 font-medium mt-1">Based on completed orders</p>
+        {/* Today's Sales - Matcha / Fresh Sage */}
+        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white p-5 rounded-2xl border border-emerald-200/80 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Today's Sales</p>
+            <div className="w-7 h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">₹{todaySales.toLocaleString()}</p>
+          <p className="text-xs text-emerald-700/90 font-medium mt-1">Based on completed orders</p>
         </div>
 
-        {/* Active Orders */}
-        <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Active Orders</p>
-          <p className="text-3xl font-bold mt-2 text-stone-900">{activeOrdersCount}</p>
-          <p className="text-xs text-stone-500 font-medium mt-1">Orders in progress</p>
+        {/* Active Orders - Sky Breeze */}
+        <div className="col-span-1 bg-gradient-to-br from-sky-50/80 via-blue-50/40 to-white p-5 rounded-2xl border border-sky-200/80 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-sky-800 uppercase tracking-wider">Active Orders</p>
+            <div className="w-7 h-7 rounded-lg bg-sky-100/80 flex items-center justify-center text-sky-700">
+              <ShoppingBag className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">{activeOrdersCount}</p>
+          <p className="text-xs text-sky-700/90 font-medium mt-1">Orders in progress</p>
         </div>
 
-        {/* Estimated Net Profit */}
-        <div className="col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Est. Net Profit</p>
-          <p className={`text-3xl font-bold mt-2 ${estimatedNet < 0 ? 'text-red-600' : 'text-stone-900'}`}>
+        {/* Estimated Net Profit - Honey Caramel */}
+        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/40 to-white p-5 rounded-2xl border border-amber-200/80 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Est. Net Profit</p>
+            <div className="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700">
+              <Coins className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className={`text-2xl sm:text-3xl font-black mt-2 ${estimatedNet < 0 ? 'text-rose-600' : 'text-stone-900'}`}>
             {estimatedNet < 0 ? '-' : ''}₹{Math.abs(estimatedNet).toLocaleString()}
           </p>
-          <p className="text-xs text-stone-500 font-medium mt-1">Expenses: ₹{todayExpenses.toLocaleString()}</p>
+          <p className="text-xs text-amber-700/90 font-medium mt-1">Expenses: ₹{todayExpenses.toLocaleString()}</p>
         </div>
 
-        {/* Stock Alert (With Left Accent Border) */}
-        <div className={`col-span-1 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm border-l-4 ${lowStockItems.length > 0 ? 'border-l-orange-400' : 'border-l-green-400'}`}>
-          <p className="text-xs font-bold text-stone-400 uppercase tracking-widest">Stock Alert</p>
-          <p className="text-3xl font-bold mt-2 text-stone-900">
+        {/* Stock Alert - Apricot Peach */}
+        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-orange-50/40 to-white p-5 rounded-2xl border border-rose-200/80 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Stock Alert</p>
+            <div className="w-7 h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">
             {lowStockItems.length} {lowStockItems.length === 1 ? 'Item' : 'Items'}
           </p>
           {lowStockItems.length > 0 ? (
-            <p className="text-xs text-orange-600 font-medium mt-1">Action Required</p>
+            <p className="text-xs text-rose-600 font-bold mt-1">Action Required</p>
           ) : (
-            <p className="text-xs text-green-600 font-medium mt-1">All Good</p>
+            <p className="text-xs text-emerald-600 font-bold mt-1">All Good</p>
           )}
         </div>
       </div>
@@ -231,12 +251,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         {/* Left Column (Col 8) */}
         <div className="w-full lg:w-2/3 flex flex-col gap-6">
           {/* Recent Live Orders Table */}
-          <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
-            <h2 className="font-bold text-stone-800">Recent Live Orders</h2>
+          <div className="bg-white rounded-2xl border border-stone-200/90 shadow-2xs overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-[#FAF7F2]/60">
+            <h2 className="font-extrabold text-stone-900 text-sm">Recent Live Orders</h2>
             <button
               onClick={() => onNavigate('orders')}
-              className="text-xs font-bold text-[#B45309] uppercase tracking-wider hover:underline"
+              className="text-xs font-bold text-amber-700 hover:text-amber-900 uppercase tracking-wider hover:underline"
             >
               View All Orders
             </button>
@@ -460,13 +480,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           </div>
           )}
 
-          {/* Dark Stock Inventory Alert Card */}
-          <div className={`bg-stone-900 text-white p-5 rounded-2xl shadow-xl flex flex-col ${currentRole === 'admin_kunafa' ? 'flex-1' : ''}`}>
+          {/* Light Cafe Stock Inventory Alert Card */}
+          <div className={`bg-gradient-to-br from-amber-50/90 via-[#FFFDF7] to-orange-50/60 text-stone-800 p-5 rounded-2xl border border-amber-200/80 shadow-2xs flex flex-col ${currentRole === 'admin_kunafa' ? 'flex-1' : ''}`}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-white text-sm">Stock Inventory Alert</h2>
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                <h2 className="font-extrabold text-stone-900 text-sm">Stock Inventory Alert</h2>
+              </div>
               <button
                 onClick={() => onNavigate('stock')}
-                className="text-[10px] font-bold text-amber-400 uppercase tracking-wider hover:underline"
+                className="text-[10px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded-lg uppercase tracking-wider transition-colors"
               >
                 Restock
               </button>
@@ -474,21 +497,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
             <div className="space-y-3 mt-auto">
               {stockItems.slice(0, 3).map((item) => {
-                const ratio = Math.min(100, Math.round((item.available / item.targetStock) * 100));
                 const isVeryLow = item.available <= item.minThreshold;
 
                 return (
-                  <div key={item.id} className="space-y-1.5">
+                  <div key={item.id} className="space-y-1.5 p-2.5 bg-white/80 rounded-xl border border-amber-100/80">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-stone-300">{item.name} ({item.unit})</span>
-                      <span className={`${isVeryLow ? 'text-red-400' : 'text-orange-400'} font-bold`}>
-                        {item.available} / {item.targetStock}
+                      <span className="text-stone-700 font-semibold">{item.name} ({item.unit})</span>
+                      <span className={`${isVeryLow ? 'text-rose-600' : 'text-amber-800'} font-black`}>
+                        {item.available} {item.unit}
                       </span>
                     </div>
-                    <div className="w-full bg-stone-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-amber-100/70 h-1.5 rounded-full overflow-hidden">
                       <div
-                        style={{ width: `${ratio}%` }}
-                        className={`h-full ${isVeryLow ? 'bg-red-400' : 'bg-orange-400'} rounded-full transition-all duration-300`}
+                        style={{ width: `${Math.min(100, Math.max(10, (item.available / (item.minThreshold * 2 || 10)) * 100))}%` }}
+                        className={`h-full ${isVeryLow ? 'bg-rose-500' : 'bg-amber-500'} rounded-full transition-all duration-300`}
                       />
                     </div>
                   </div>
@@ -545,15 +567,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
       {/* Hourly Sales Chart */}
-      <div className="bg-white border border-stone-200 shadow-sm rounded-2xl p-5 sm:p-6">
+      <div className="bg-gradient-to-br from-white via-[#FCFAF5] to-amber-50/20 border border-stone-200/90 shadow-2xs rounded-2xl p-5 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-bold text-stone-900 text-base">Sales Velocity</h3>
-            <p className="text-xs text-stone-400">Hourly operational transaction volume</p>
+            <h3 className="font-extrabold text-stone-900 text-base">Sales Velocity</h3>
+            <p className="text-xs text-stone-500">Hourly operational transaction volume</p>
           </div>
           <button
             onClick={() => onNavigate('sales')}
-            className="text-xs font-bold text-[#B45309] uppercase tracking-wider hover:underline flex items-center space-x-1"
+            className="text-xs font-bold text-amber-700 hover:text-amber-900 uppercase tracking-wider hover:underline flex items-center space-x-1"
           >
             <span>Sales Analytics</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -567,12 +589,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
             return (
               <div key={hour} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                <div className="absolute -top-7 hidden group-hover:flex bg-stone-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-md z-10">
+                <div className="absolute -top-7 hidden group-hover:flex bg-amber-950/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md whitespace-nowrap shadow-sm z-10">
                   ₹{amount}
                 </div>
                 <div
                   style={{ height: `${heightPercent}%` }}
-                  className="w-full bg-[#B45309] group-hover:bg-amber-800 rounded-t-md transition-all duration-300"
+                  className="w-full bg-gradient-to-t from-amber-500 via-orange-400 to-amber-300 group-hover:from-amber-600 group-hover:to-orange-500 rounded-t-lg transition-all duration-300 shadow-2xs"
                 />
                 <span className="text-[10px] sm:text-xs text-stone-400 font-medium mt-2 whitespace-nowrap">
                   {hour}
