@@ -46,7 +46,7 @@ export const WaiterView: React.FC = () => {
       {activeTableForOrder ? (
         <WaiterOrderTaking
           table={activeTableForOrder}
-          initialBrand={selectedBrand}
+          selectedBrand={selectedBrand}
           onBack={() => setActiveTableForOrder(null)}
           onOrderSent={handleOrderSent}
         />

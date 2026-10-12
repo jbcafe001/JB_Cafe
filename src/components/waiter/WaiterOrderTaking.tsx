@@ -23,7 +23,7 @@ interface WaiterOrderTakingProps {
   table: Table;
   onBack: () => void;
   onOrderSent: () => void;
-  initialBrand?: 'JB Cafe' | 'KUNAFA';
+  selectedBrand?: 'JB Cafe' | 'KUNAFA';
 }
 
 const CATEGORIES: MenuItemCategory[] = [
@@ -77,11 +77,10 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   table,
   onBack,
   onOrderSent,
-  initialBrand = 'JB Cafe',
+  selectedBrand = 'JB Cafe',
 }) => {
   const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems } = useCafe();
 
-  const [selectedBrand, setSelectedBrand] = useState<'JB Cafe' | 'KUNAFA'>(initialBrand);
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<Record<string, OrderItem>>({});
@@ -91,11 +90,6 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
-
-  // Reset category filter when switching brand
-  useEffect(() => {
-    setSelectedCategory('All');
-  }, [selectedBrand]);
 
   // Dynamically compute categories for the selected brand
   const brandCategories: MenuItemCategory[] = useMemo(() => {
@@ -265,6 +259,13 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
               <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 font-medium">
                 {table.seats} Guests
               </span>
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold border ${
+                selectedBrand === 'KUNAFA'
+                  ? 'bg-amber-100 text-amber-900 border-amber-300'
+                  : 'bg-orange-50 text-orange-800 border-orange-200'
+              }`}>
+                {selectedBrand === 'KUNAFA' ? 'Kunafa' : 'JB Cafe'}
+              </span>
             </div>
             <p className="text-[11px] text-stone-500">Taking new order</p>
           </div>
@@ -279,36 +280,6 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             <span>{totalItemCount} items</span>
           </button>
         )}
-      </div>
-
-      {/* Brand Switcher Pill Bar */}
-      <div className="px-3 pt-2.5 pb-1 bg-white border-b border-stone-100">
-        <div className="grid grid-cols-2 p-1 bg-stone-100 rounded-xl">
-          <button
-            type="button"
-            onClick={() => setSelectedBrand('JB Cafe')}
-            className={`py-2 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-              selectedBrand === 'JB Cafe'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
-            }`}
-          >
-            <Coffee className="w-3.5 h-3.5" />
-            <span>JB Cafe items</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedBrand('KUNAFA')}
-            className={`py-2 px-3 rounded-lg text-xs font-black transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-              selectedBrand === 'KUNAFA'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Kunafa items</span>
-          </button>
-        </div>
       </div>
 
       {/* Search & Fast Category Filters */}
