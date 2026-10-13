@@ -11,7 +11,7 @@ import {
   ArrowUpRight,
   Plus,
 } from 'lucide-react';
-import { getCafeBusinessDate } from '../../utils/dateUtils';
+import { getCafeBusinessDate, getCafeYesterdayDate } from '../../utils/dateUtils';
 
 interface AdminDashboardProps {
   onNavigate: (tab: string) => void;
@@ -36,9 +36,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   }, [allOrders, brandFilter, menuItems]);
 
   const todayBusinessDate = getCafeBusinessDate();
+  // When it is after 5 PM, orders placed during this calendar day (before 5 PM)
+  // belong to yesterday's business date, but orders placed AFTER 5 PM today belong
+  // to today's business date (i.e. tomorrow's calendar date per the date utility).
+  // So we need to also include orders whose o.date equals the current calendar day.
+  const calendarToday = new Date();
+  const calendarTodayStr = `${calendarToday.getFullYear()}-${String(calendarToday.getMonth() + 1).padStart(2, '0')}-${String(calendarToday.getDate()).padStart(2, '0')}`;
 
   // Completed orders for current cafe business cycle (5 PM to 5 AM)
-  const completedOrders = orders.filter((o) => o.status === 'completed' && (!o.date || o.date === todayBusinessDate));
+  // Include both todayBusinessDate AND calendarToday so that orders placed any time
+  // today (before AND after the 5 PM cutoff) show on today's dashboard.
+  const completedOrders = orders.filter((o) =>
+    o.status === 'completed' &&
+    (!o.date || o.date === todayBusinessDate || o.date === calendarTodayStr)
+  );
   
   // Refined total sales based on brand filter (only summing the relevant items)
   const todaySales = completedOrders.reduce((sum, o) => {
@@ -61,7 +72,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const avgOrderValue = todayOrdersCount > 0 ? Math.round(todaySales / todayOrdersCount) : 0;
 
   // Today's expenses for current cafe business cycle
-  const todayExpenses = expenses.filter(e => !e.date || e.date === todayBusinessDate).reduce((sum, e) => sum + e.amount, 0);
+  const todayExpenses = expenses.filter(e => !e.date || e.date === todayBusinessDate || e.date === calendarTodayStr).reduce((sum, e) => sum + e.amount, 0);
   const estimatedNet = todaySales - todayExpenses;
 
   // Low stock items
