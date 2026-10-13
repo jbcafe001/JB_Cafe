@@ -176,9 +176,9 @@ export const AdminView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F4EE] flex flex-col md:flex-row select-none">
+    <div className="min-h-screen bg-white flex flex-col md:flex-row select-none">
       {/* Mobile Top bar */}
-      <div className="md:hidden bg-[#FAF7F2] border-b border-[#EFE7DA] text-stone-900 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
+      <div className="md:hidden bg-white border-b border-stone-200 text-stone-900 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
         <div className="flex items-center space-x-2.5">
           <div className="w-10 h-10 rounded-full bg-white border border-[#EFE7DA] overflow-hidden flex items-center justify-center shadow-xs shrink-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-contain p-0.5" />
@@ -199,12 +199,12 @@ export const AdminView: React.FC = () => {
 
       {/* Clean Minimalism Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-0 left-0 z-40 h-[100dvh] md:h-screen w-60 bg-[#FAF7F2] text-stone-700 border-r border-[#EFE7DA] flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
+        className={`fixed md:sticky top-0 left-0 z-40 h-[100dvh] md:h-screen w-60 bg-white text-stone-700 border-r border-stone-200 flex flex-col justify-between transition-transform duration-200 ease-in-out shadow-xs md:shadow-none ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Top category label */}
-        <div className="px-5 py-4 border-b border-[#EFE7DA] bg-[#F5EFE6]/30 hidden md:block">
+        <div className="px-5 py-4 border-b border-stone-200 bg-stone-50/50 hidden md:block">
           <div className="text-[10px] font-bold text-amber-800/60 uppercase tracking-widest">Navigation</div>
           <div className="text-xs font-semibold text-stone-800 mt-0.5">
             {currentRole === 'admin_kunafa' ? (
@@ -238,7 +238,7 @@ export const AdminView: React.FC = () => {
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs tracking-wide transition-all border ${
                   isActive
                     ? `${item.activeClass} font-bold`
-                    : 'text-stone-600 hover:text-stone-900 hover:bg-[#F3ECE0]/60 border-transparent font-medium'
+                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100/80 border-transparent font-medium'
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -263,7 +263,7 @@ export const AdminView: React.FC = () => {
         </nav>
 
         {/* User profile & shift logout */}
-        <div className="p-3 border-t border-[#EFE7DA] bg-[#F5EFE6]/60">
+        <div className="p-3 border-t border-stone-200 bg-stone-50/60">
           <div className="flex items-center justify-between px-2 py-1.5">
             <div className="flex items-center space-x-2.5">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-200 via-orange-200 to-amber-100 border border-amber-300/80 text-amber-950 font-black flex items-center justify-center text-xs shadow-2xs">
