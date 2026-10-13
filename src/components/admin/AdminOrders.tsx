@@ -22,9 +22,9 @@ const statusMeta: Record<string, { label: string; bg: string; text: string; dot:
 };
 
 const paymentIcon: Record<string, React.ReactNode> = {
-  upi:  <Smartphone className="w-4 h-4" />,
-  cash: <Banknote className="w-4 h-4" />,
-  card: <CreditCard className="w-4 h-4" />,
+  upi:  <Smartphone className="w-3.5 h-3.5 text-amber-600" />,
+  cash: <Banknote className="w-3.5 h-3.5 text-amber-600" />,
+  card: <CreditCard className="w-3.5 h-3.5 text-amber-600" />,
 };
 
 const StatusBadge: React.FC<{ status: string; size?: 'sm' | 'md' }> = ({ status, size = 'sm' }) => {
@@ -95,14 +95,17 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
             {/* Meta row */}
             <div className={`mt-5 grid ${order.customerName ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'} gap-2.5`}>
               {[
-                ...(order.customerName ? [{ icon: <User className="w-3.5 h-3.5 text-amber-400" />, label: 'Customer', value: order.customerName }] : []),
-                { icon: <Table className="w-3.5 h-3.5" />, label: 'Table', value: order.tableNumber },
-                { icon: <User className="w-3.5 h-3.5" />,  label: 'Waiter', value: order.waiterName },
-                { icon: paymentIcon[paymentKey] || <Banknote className="w-3.5 h-3.5" />, label: 'Payment', value: (order.paymentMethod || 'Cash').toUpperCase() },
+                ...(order.customerName ? [{ icon: <User className="w-3.5 h-3.5 text-amber-600" />, label: 'Customer', value: order.customerName }] : []),
+                { icon: <Table className="w-3.5 h-3.5 text-amber-600" />, label: 'Table', value: order.tableNumber },
+                { icon: <User className="w-3.5 h-3.5 text-amber-600" />,  label: 'Waiter', value: order.waiterName },
+                { icon: paymentIcon[paymentKey] || <Banknote className="w-3.5 h-3.5 text-amber-600" />, label: 'Payment', value: (order.paymentMethod || 'Cash').toUpperCase() },
               ].map(({ icon, label, value }) => (
-                <div key={label} className="bg-white/8 rounded-2xl px-3 py-2.5 border border-white/10">
-                  <div className="flex items-center gap-1.5 text-stone-400 mb-1">{icon}<span className="text-[9px] uppercase tracking-wider">{label}</span></div>
-                  <p className="text-xs font-bold text-white truncate">{value}</p>
+                <div key={label} className="bg-white rounded-2xl px-3 py-2.5 border border-amber-200/90 shadow-2xs">
+                  <div className="flex items-center gap-1.5 text-stone-500 mb-1">
+                    {icon}
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">{label}</span>
+                  </div>
+                  <p className="text-xs font-black text-stone-900 truncate">{value}</p>
                 </div>
               ))}
             </div>
