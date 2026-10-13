@@ -295,10 +295,10 @@ export const AdminRawMaterial: React.FC = () => {
           </p>
         </div>
 
-        {/* Search, Filter Popover, and New Material Button */}
-        <div className="flex items-center space-x-2 flex-wrap sm:flex-nowrap">
+        {/* Search, Filter Popover, View Mode Toggle, and New Material Button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
           {/* Search Input */}
-          <div className="relative min-w-[180px] sm:w-60">
+          <div className="relative w-full sm:w-56 md:w-64">
             <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -311,7 +311,7 @@ export const AdminRawMaterial: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -319,265 +319,292 @@ export const AdminRawMaterial: React.FC = () => {
             )}
           </div>
 
-          {/* Filter Popover Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`btn-interactive px-3 py-2 border rounded-xl text-xs font-bold shadow-2xs flex items-center space-x-1.5 transition-all cursor-pointer ${
-                isFilterOpen || unitFilter !== 'All' || statusFilter !== 'All' || sortBy !== 'name-asc' || (brandFilter !== 'All' && currentRole !== 'admin_kunafa')
-                  ? 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-xs'
-                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-              }`}
-            >
-              <Filter className="w-3.5 h-3.5 text-stone-500" />
-              <span>Filter</span>
-              {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
-                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">
-                  {(unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)}
-                </span>
-              )}
-            </button>
+          {/* Action Buttons Row on Mobile */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {/* Filter Popover Button */}
+            <div className="relative flex-1 sm:flex-initial">
+              <button
+                type="button"
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className={`w-full sm:w-auto justify-center btn-interactive px-3 py-2 border rounded-xl text-xs font-bold shadow-2xs flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  isFilterOpen || unitFilter !== 'All' || statusFilter !== 'All' || sortBy !== 'name-asc' || (brandFilter !== 'All' && currentRole !== 'admin_kunafa')
+                    ? 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-xs'
+                    : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+                }`}
+              >
+                <Filter className="w-3.5 h-3.5 text-stone-500" />
+                <span>Filter</span>
+                {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">
+                    {(unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)}
+                  </span>
+                )}
+              </button>
 
-            {/* Filter Dropdown Popover */}
-            {isFilterOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsFilterOpen(false)}
-                />
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 animate-modal-spring">
-                  <div className="flex items-center justify-between pb-2 border-b border-stone-100">
-                    <div className="flex items-center space-x-1.5">
-                      <Filter className="w-4 h-4 text-indigo-600" />
-                      <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
-                        Filter & View
-                      </h4>
-                    </div>
-                    {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUnitFilter('All');
-                          setStatusFilter('All');
-                          setSortBy('name-asc');
-                          setBrandFilter('All');
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
-                      >
-                        Reset All
-                      </button>
-                    )}
-                  </div>
-
-                  {/* View Mode (Table / Cards) */}
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
-                      Display Mode
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5 p-1 bg-stone-100 rounded-xl">
-                      <button
-                        type="button"
-                        onClick={() => setViewMode('table')}
-                        className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-                          viewMode === 'table'
-                            ? 'bg-white text-stone-900 shadow-2xs'
-                            : 'text-stone-500 hover:text-stone-800'
-                        }`}
-                      >
-                        <List className="w-3.5 h-3.5" />
-                        <span>Table View</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setViewMode('grid')}
-                        className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-                          viewMode === 'grid'
-                            ? 'bg-white text-stone-900 shadow-2xs'
-                            : 'text-stone-500 hover:text-stone-800'
-                        }`}
-                      >
-                        <LayoutGrid className="w-3.5 h-3.5" />
-                        <span>Cards View</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Brand Filter (if not locked to admin_kunafa) */}
-                  {currentRole !== 'admin_kunafa' && (
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
-                        Brand
-                      </label>
-                      <div className="grid grid-cols-3 gap-1 p-1 bg-stone-100 rounded-xl text-xs">
+              {/* Filter Dropdown Popover */}
+              {isFilterOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsFilterOpen(false)}
+                  />
+                  <div className="fixed sm:absolute inset-x-3 sm:inset-x-auto top-28 sm:top-full sm:right-0 sm:mt-2 max-w-sm sm:w-80 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 animate-modal-spring max-h-[80vh] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                      <div className="flex items-center space-x-1.5">
+                        <Filter className="w-4 h-4 text-indigo-600" />
+                        <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
+                          Filter & View
+                        </h4>
+                      </div>
+                      {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
                         <button
                           type="button"
-                          onClick={() => setBrandFilter('All')}
-                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
-                            brandFilter === 'All'
+                          onClick={() => {
+                            setUnitFilter('All');
+                            setStatusFilter('All');
+                            setSortBy('name-asc');
+                            setBrandFilter('All');
+                          }}
+                          className="text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
+                        >
+                          Reset All
+                        </button>
+                      )}
+                    </div>
+
+                    {/* View Mode (Table / Cards) */}
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+                        Display Mode
+                      </label>
+                      <div className="grid grid-cols-2 gap-1.5 p-1 bg-stone-100 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => setViewMode('table')}
+                          className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                            viewMode === 'table'
                               ? 'bg-white text-stone-900 shadow-2xs'
                               : 'text-stone-500 hover:text-stone-800'
                           }`}
                         >
-                          All ({enrichedMaterials.length})
+                          <List className="w-3.5 h-3.5" />
+                          <span>Table View</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => setBrandFilter('JB Cafe')}
-                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
-                            brandFilter === 'JB Cafe'
-                              ? 'bg-amber-100 text-amber-900 shadow-2xs'
+                          onClick={() => setViewMode('grid')}
+                          className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                            viewMode === 'grid'
+                              ? 'bg-white text-stone-900 shadow-2xs'
                               : 'text-stone-500 hover:text-stone-800'
                           }`}
                         >
-                          JB Cafe ({jbCafeCount})
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setBrandFilter('KUNAFA')}
-                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
-                            brandFilter === 'KUNAFA'
-                              ? 'bg-rose-100 text-rose-900 shadow-2xs'
-                              : 'text-stone-500 hover:text-stone-800'
-                          }`}
-                        >
-                          Kunafa ({kunafaCount})
+                          <LayoutGrid className="w-3.5 h-3.5" />
+                          <span>Cards View</span>
                         </button>
                       </div>
                     </div>
-                  )}
 
-                  {/* Unit Filter */}
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
-                      Measurement Unit
-                    </label>
-                    <CustomSelect
-                      value={unitFilter}
-                      onChange={(val) => setUnitFilter(val)}
-                      placeholder="All Units"
-                      options={[
-                        { value: 'All', label: 'All Units' },
-                        ...availableUnits.map((u) => ({ value: u, label: `Unit: ${u}` })),
-                      ]}
-                    />
-                  </div>
+                    {/* Brand Filter (if not locked to admin_kunafa) */}
+                    {currentRole !== 'admin_kunafa' && (
+                      <div>
+                        <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+                          Brand
+                        </label>
+                        <div className="grid grid-cols-3 gap-1 p-1 bg-stone-100 rounded-xl text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setBrandFilter('All')}
+                            className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                              brandFilter === 'All'
+                                ? 'bg-white text-stone-900 shadow-2xs'
+                                : 'text-stone-500 hover:text-stone-800'
+                            }`}
+                          >
+                            All ({enrichedMaterials.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBrandFilter('JB Cafe')}
+                            className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                              brandFilter === 'JB Cafe'
+                                ? 'bg-amber-100 text-amber-900 shadow-2xs'
+                                : 'text-stone-500 hover:text-stone-800'
+                            }`}
+                          >
+                            JB Cafe ({jbCafeCount})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setBrandFilter('KUNAFA')}
+                            className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                              brandFilter === 'KUNAFA'
+                                ? 'bg-rose-100 text-rose-900 shadow-2xs'
+                                : 'text-stone-500 hover:text-stone-800'
+                            }`}
+                          >
+                            Kunafa ({kunafaCount})
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Stock Status Filter */}
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
-                      Stock Status
-                    </label>
-                    <CustomSelect
-                      value={statusFilter}
-                      onChange={(val) => setStatusFilter(val as any)}
-                      placeholder="All Status"
-                      options={[
-                        { value: 'All', label: 'All Status' },
-                        { value: 'good', label: 'In Stock (Good)' },
-                        { value: 'low', label: 'Low Stock' },
-                        { value: 'out', label: 'Out of Stock' },
-                      ]}
-                    />
-                  </div>
+                    {/* Unit Filter */}
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                        Measurement Unit
+                      </label>
+                      <CustomSelect
+                        value={unitFilter}
+                        onChange={(val) => setUnitFilter(val)}
+                        placeholder="All Units"
+                        options={[
+                          { value: 'All', label: 'All Units' },
+                          ...availableUnits.map((u) => ({ value: u, label: `Unit: ${u}` })),
+                        ]}
+                      />
+                    </div>
 
-                  {/* Sort By */}
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
-                      Sort By
-                    </label>
-                    <CustomSelect
-                      value={sortBy}
-                      onChange={(val) => setSortBy(val)}
-                      placeholder="Sort by"
-                      options={[
-                        { value: 'name-asc', label: 'Name (A to Z)' },
-                        { value: 'name-desc', label: 'Name (Z to A)' },
-                        { value: 'cost-desc', label: 'Cost: High to Low' },
-                        { value: 'cost-asc', label: 'Cost: Low to High' },
-                        { value: 'stock-desc', label: 'Stock: High to Low' },
-                        { value: 'stock-asc', label: 'Stock: Low to High' },
-                        { value: 'threshold-desc', label: 'Safe Min: High to Low' },
-                      ]}
-                    />
+                    {/* Stock Status Filter */}
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                        Stock Status
+                      </label>
+                      <CustomSelect
+                        value={statusFilter}
+                        onChange={(val) => setStatusFilter(val as any)}
+                        placeholder="All Status"
+                        options={[
+                          { value: 'All', label: 'All Status' },
+                          { value: 'good', label: 'In Stock (Good)' },
+                          { value: 'low', label: 'Low Stock' },
+                          { value: 'out', label: 'Out of Stock' },
+                        ]}
+                      />
+                    </div>
+
+                    {/* Sort By */}
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                        Sort By
+                      </label>
+                      <CustomSelect
+                        value={sortBy}
+                        onChange={(val) => setSortBy(val)}
+                        placeholder="Sort by"
+                        options={[
+                          { value: 'name-asc', label: 'Name (A to Z)' },
+                          { value: 'name-desc', label: 'Name (Z to A)' },
+                          { value: 'cost-desc', label: 'Cost: High to Low' },
+                          { value: 'cost-asc', label: 'Cost: Low to High' },
+                          { value: 'stock-desc', label: 'Stock: High to Low' },
+                          { value: 'stock-asc', label: 'Stock: Low to High' },
+                          { value: 'threshold-desc', label: 'Safe Min: High to Low' },
+                        ]}
+                      />
+                    </div>
                   </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
+
+            {/* Quick View Mode Switcher */}
+            <div className="flex items-center bg-stone-100 p-0.5 rounded-xl border border-stone-200 shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'table' ? 'bg-white text-indigo-700 shadow-2xs font-bold' : 'text-stone-500 hover:text-stone-800'
+                }`}
+                title="Table View"
+              >
+                <List className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-white text-indigo-700 shadow-2xs font-bold' : 'text-stone-500 hover:text-stone-800'
+                }`}
+                title="Cards View"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* New Material Button */}
+            <button
+              id="create-material-btn"
+              onClick={() => setShowCreateModal(true)}
+              className="flex-1 sm:flex-initial justify-center btn-interactive px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-white" />
+              <span>New Material</span>
+            </button>
           </div>
-
-          {/* New Material Button */}
-          <button
-            id="create-material-btn"
-            onClick={() => setShowCreateModal(true)}
-            className="btn-interactive px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap cursor-pointer"
-          >
-            <Plus className="w-4 h-4 text-white" />
-            <span>New Material</span>
-          </button>
         </div>
       </div>
 
       {/* Overview Stat Cards (Standardized Design) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
         {/* Total Tracked Raw Materials */}
-        <div className="col-span-1 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white p-5 rounded-2xl border border-indigo-200/80 shadow-2xs card-interactive animate-page-enter stagger-1 group">
+        <div className="col-span-1 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white p-3 sm:p-5 rounded-2xl border border-indigo-200/80 shadow-2xs card-interactive animate-page-enter stagger-1 group">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider">Total Materials</p>
-            <div className="w-7 h-7 rounded-lg bg-indigo-100/80 flex items-center justify-center text-indigo-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-              <Boxes className="w-3.5 h-3.5" />
+            <p className="text-[10px] sm:text-xs font-bold text-indigo-800 uppercase tracking-wider truncate">Total Materials</p>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-indigo-100/80 flex items-center justify-center text-indigo-700 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <Boxes className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">{totalItemsCount}</p>
-          <p className="text-xs text-indigo-700/90 font-medium mt-1">Tracked in materials db</p>
+          <p className="text-xl sm:text-2xl lg:text-3xl font-black mt-1.5 sm:mt-2 text-stone-900">{totalItemsCount}</p>
+          <p className="text-[10px] sm:text-xs text-indigo-700/90 font-medium mt-0.5 sm:mt-1 truncate">Tracked in materials db</p>
         </div>
 
         {/* Total Stock Value */}
-        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white p-5 rounded-2xl border border-emerald-200/80 shadow-2xs card-interactive animate-page-enter stagger-2 group">
+        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white p-3 sm:p-5 rounded-2xl border border-emerald-200/80 shadow-2xs card-interactive animate-page-enter stagger-2 group">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Valuation</p>
-            <div className="w-7 h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-              <TrendingUp className="w-3.5 h-3.5" />
+            <p className="text-[10px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider truncate">Total Valuation</p>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-black mt-1.5 sm:mt-2 text-stone-900 truncate">
             ₹{Math.round(totalInventoryValue).toLocaleString()}
           </p>
-          <p className="text-xs text-emerald-700/90 font-medium mt-1">Holding asset value</p>
+          <p className="text-[10px] sm:text-xs text-emerald-700/90 font-medium mt-0.5 sm:mt-1 truncate">Holding asset value</p>
         </div>
 
         {/* Average Unit Cost */}
-        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/30 to-white p-5 rounded-2xl border border-amber-200/80 shadow-2xs card-interactive animate-page-enter stagger-3 group">
+        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/30 to-white p-3 sm:p-5 rounded-2xl border border-amber-200/80 shadow-2xs card-interactive animate-page-enter stagger-3 group">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Avg Cost / Unit</p>
-            <div className="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-              <Tag className="w-3.5 h-3.5" />
+            <p className="text-[10px] sm:text-xs font-bold text-amber-800 uppercase tracking-wider truncate">Avg Cost / Unit</p>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <Tag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-black mt-1.5 sm:mt-2 text-stone-900">
             ₹{Math.round(avgCostPerUnit).toLocaleString()}
           </p>
-          <p className="text-xs text-amber-700/90 font-medium mt-1">Benchmark avg cost</p>
+          <p className="text-[10px] sm:text-xs text-amber-700/90 font-medium mt-0.5 sm:mt-1 truncate">Benchmark avg cost</p>
         </div>
 
         {/* Stock Alerts (Low & Out) */}
-        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white p-5 rounded-2xl border border-rose-200/80 shadow-2xs card-interactive animate-page-enter stagger-4 group">
+        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white p-3 sm:p-5 rounded-2xl border border-rose-200/80 shadow-2xs card-interactive animate-page-enter stagger-4 group">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Stock Warnings</p>
-            <div className="w-7 h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-              <AlertTriangle className="w-3.5 h-3.5" />
+            <p className="text-[10px] sm:text-xs font-bold text-rose-800 uppercase tracking-wider truncate">Stock Warnings</p>
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline space-x-2 mt-2">
-            <span className="text-2xl sm:text-3xl font-black text-amber-600">
-              {lowStockCount} <span className="text-xs text-amber-500 font-bold">Low</span>
+          <div className="flex items-baseline space-x-1 sm:space-x-2 mt-1.5 sm:mt-2 flex-wrap">
+            <span className="text-lg sm:text-2xl lg:text-3xl font-black text-amber-600">
+              {lowStockCount} <span className="text-[10px] sm:text-xs text-amber-500 font-bold">Low</span>
             </span>
-            <span className="text-stone-300">/</span>
-            <span className="text-2xl sm:text-3xl font-black text-rose-600">
-              {outOfStockCount} <span className="text-xs text-rose-500 font-bold">Out</span>
+            <span className="text-stone-300 mx-0.5">/</span>
+            <span className="text-lg sm:text-2xl lg:text-3xl font-black text-rose-600">
+              {outOfStockCount} <span className="text-[10px] sm:text-xs text-rose-500 font-bold">Out</span>
             </span>
           </div>
-          <p className="text-xs text-rose-700/90 font-medium mt-1">Threshold alerts</p>
+          <p className="text-[10px] sm:text-xs text-rose-700/90 font-medium mt-0.5 sm:mt-1 truncate">Threshold alerts</p>
         </div>
       </div>
 
