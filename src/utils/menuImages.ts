@@ -2,29 +2,29 @@ import { MenuItemCategory } from '../types';
 
 export const CATEGORY_IMAGE_MAP: Record<Exclude<MenuItemCategory, 'All'>, string> = {
   'Tea & Coffee': '/images/Tea & Coffee.png',
-  'Snacks': '/images/Snacks.webp',
-  'Sandwich': '/images/Sandwich.jpg',
+  'Snacks': '/images/Snacks.png',
+  'Sandwich': '/images/Sandwich.png',
   'Burger': '/images/Burger.png',
-  'Garlic Bread': '/images/Garlic Bread.jpg',
+  'Garlic Bread': '/images/Garlic Bread.png',
   'Pizza': '/images/Pizza.png',
-  'Hot Dog': '/images/Hot Dog.jpg',
-  'Frankie': '/images/Frankie.avif',
+  'Hot Dog': '/images/Hot Dog.png',
+  'Frankie': '/images/Frankie.png',
   'Maggi': '/images/Maggi.avif',
-  'Pasta': '/images/Pasta.jpg',
-  'French Fries': '/images/French Fries.jpg',
-  'Starter': '/images/Starter.avif',
+  'Pasta': '/images/Pasta.png',
+  'French Fries': '/images/French Fries.png',
+  'Starter': '/images/Starter.png',
   'Noodles': '/images/Noodles.webp',
   'Mocktail': '/images/Mocktail.webp',
   'Soup': '/images/Soup.webp',
   'Rice': '/images/Rice.png',
-  'Shake': '/images/Shake.avif',
+  'Shake': '/images/Shake.png',
   'Cold Coffee': '/images/Cold Coffee.jpg',
   'Soft Drink': '/images/Soft Drink.jpg',
   'Sizzling Brownie': '/images/Sizzling Brownie.jpg',
-  'Cheesecake': '/images/CheeseCake.avif',
+  'Cheesecake': '/images/CheeseCake.png',
   'Cookie Tin': '/images/Cookie Tin.jpg',
-  'Coffee Tiramisu': '/images/Coffee Tiramisu.jpg',
-  'Kunafa': '/images/Kunafa.webp',
+  'Coffee Tiramisu': '/images/Coffee Tiramisu.png',
+  'Kunafa': '/images/Kunafa.png',
   'Dessert Can': '/images/Dessert Can.png',
   'Chocolate Bowl': '/images/Chocolate Bowl.avif',
   'Baklava': '/images/Baklava.png',
@@ -33,7 +33,7 @@ export const CATEGORY_IMAGE_MAP: Record<Exclude<MenuItemCategory, 'All'>, string
   'Chocolate Bar': '/images/Chocolate Bar.png',
 };
 
-export const DEFAULT_MENU_IMAGE = '/images/Snacks.webp';
+export const DEFAULT_MENU_IMAGE = '/images/Snacks.png';
 
 /**
  * Returns the image URL for a given category name.
@@ -53,11 +53,11 @@ export function getCategoryImageUrl(category?: string | null): string {
     }
   }
 
-  if (normalized.includes('cheesecake')) return '/images/CheeseCake.avif';
+  if (normalized.includes('cheesecake')) return '/images/CheeseCake.png';
   if (normalized.includes('cookie')) return '/images/Cookie Tin.jpg';
   if (normalized.includes('coffee')) return '/images/Cold Coffee.jpg';
   if (normalized.includes('tea')) return '/images/Tea & Coffee.png';
-  if (normalized.includes('kunafa')) return '/images/Kunafa.webp';
+  if (normalized.includes('kunafa')) return '/images/Kunafa.png';
   if (normalized.includes('brownie')) return '/images/Sizzling Brownie.jpg';
 
   return DEFAULT_MENU_IMAGE;

@@ -133,7 +133,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 50,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Snacks.webp',
+    image: '/images/Snacks.png',
     ingredients: [],
   },
   {
@@ -143,7 +143,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 70,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Snacks.webp',
+    image: '/images/Snacks.png',
     ingredients: [],
   },
   {
@@ -153,7 +153,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Snacks.webp',
+    image: '/images/Snacks.png',
     ingredients: [],
   },
   {
@@ -163,7 +163,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Snacks.webp',
+    image: '/images/Snacks.png',
     ingredients: [],
   },
   {
@@ -173,7 +173,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Snacks.webp',
+    image: '/images/Snacks.png',
     ingredients: [],
   },
   {
@@ -183,7 +183,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 70,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -193,7 +193,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 70,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -203,7 +203,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -213,7 +213,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -223,7 +223,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 100,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -233,7 +233,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 120,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -243,7 +243,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -253,7 +253,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -263,7 +263,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 170,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -273,7 +273,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -283,7 +283,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 160,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -293,7 +293,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 170,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -303,7 +303,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 180,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -313,7 +313,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 200,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -323,7 +323,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -333,7 +333,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Sandwich.jpg',
+    image: '/images/Sandwich.png',
     ingredients: [],
   },
   {
@@ -383,7 +383,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -393,7 +393,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 110,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -403,7 +403,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 110,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -413,7 +413,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -423,7 +423,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -433,7 +433,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Garlic Bread.jpg',
+    image: '/images/Garlic Bread.png',
     ingredients: [],
   },
   {
@@ -533,7 +533,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 100,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Hot Dog.jpg',
+    image: '/images/Hot Dog.png',
     ingredients: [],
   },
   {
@@ -543,7 +543,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Hot Dog.jpg',
+    image: '/images/Hot Dog.png',
     ingredients: [],
   },
   {
@@ -553,7 +553,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 180,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Hot Dog.jpg',
+    image: '/images/Hot Dog.png',
     ingredients: [],
   },
   {
@@ -563,7 +563,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 110,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -573,7 +573,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 120,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -583,7 +583,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -593,7 +593,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -603,7 +603,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -613,7 +613,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -623,7 +623,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -633,7 +633,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 170,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Frankie.avif',
+    image: '/images/Frankie.png',
     ingredients: [],
   },
   {
@@ -763,7 +763,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Pasta.jpg',
+    image: '/images/Pasta.png',
     ingredients: [],
   },
   {
@@ -773,7 +773,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 170,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Pasta.jpg',
+    image: '/images/Pasta.png',
     ingredients: [],
   },
   {
@@ -783,7 +783,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 180,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Pasta.jpg',
+    image: '/images/Pasta.png',
     ingredients: [],
   },
   {
@@ -793,7 +793,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 190,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Pasta.jpg',
+    image: '/images/Pasta.png',
     ingredients: [],
   },
   {
@@ -803,7 +803,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 210,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Pasta.jpg',
+    image: '/images/Pasta.png',
     ingredients: [],
   },
   {
@@ -813,7 +813,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 90,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -823,7 +823,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 100,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -833,7 +833,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 110,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -843,7 +843,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 130,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -853,7 +853,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -863,7 +863,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 110,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -873,7 +873,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 120,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/French Fries.jpg',
+    image: '/images/French Fries.png',
     ingredients: [],
   },
   {
@@ -883,7 +883,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Starter.avif',
+    image: '/images/Starter.png',
     ingredients: [],
   },
   {
@@ -893,7 +893,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 160,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Starter.avif',
+    image: '/images/Starter.png',
     ingredients: [],
   },
   {
@@ -903,7 +903,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 160,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Starter.avif',
+    image: '/images/Starter.png',
     ingredients: [],
   },
   {
@@ -913,7 +913,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 170,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Starter.avif',
+    image: '/images/Starter.png',
     ingredients: [],
   },
   {
@@ -923,7 +923,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 220,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Starter.avif',
+    image: '/images/Starter.png',
     ingredients: [],
   },
   {
@@ -1173,7 +1173,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 125,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1183,7 +1183,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1193,7 +1193,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1203,7 +1203,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1213,7 +1213,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 140,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1223,7 +1223,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 150,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1233,7 +1233,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 160,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1243,7 +1243,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 160,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1253,7 +1253,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 190,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1263,7 +1263,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 250,
     available: true,
     brand: 'JB Cafe',
-    image: '/images/Shake.avif',
+    image: '/images/Shake.png',
     ingredients: [],
   },
   {
@@ -1543,7 +1543,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 149,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/CheeseCake.avif',
+    image: '/images/CheeseCake.png',
     ingredients: [],
   },
   {
@@ -1553,7 +1553,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 169,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/CheeseCake.avif',
+    image: '/images/CheeseCake.png',
     ingredients: [],
   },
   {
@@ -1563,7 +1563,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 149,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/CheeseCake.avif',
+    image: '/images/CheeseCake.png',
     ingredients: [],
   },
   {
@@ -1573,7 +1573,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 149,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/CheeseCake.avif',
+    image: '/images/CheeseCake.png',
     ingredients: [],
   },
   {
@@ -1593,7 +1593,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 199,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Coffee Tiramisu.jpg',
+    image: '/images/Coffee Tiramisu.png',
     ingredients: [],
   },
   {
@@ -1603,7 +1603,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 299,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1613,7 +1613,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 349,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1623,7 +1623,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 399,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1633,7 +1633,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 399,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1643,7 +1643,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 449,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1653,7 +1653,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 449,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1663,7 +1663,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 449,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
@@ -1673,7 +1673,7 @@ export const INITIAL_MENU: MenuItem[] = [
     price: 499,
     available: true,
     brand: 'KUNAFA',
-    image: '/images/Kunafa.webp',
+    image: '/images/Kunafa.png',
     ingredients: [],
   },
   {
