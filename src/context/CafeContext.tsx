@@ -27,7 +27,7 @@ import { INITIAL_USERS } from '../data/initialData';
 import { db, registerNewUser } from '../firebase';
 import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { getCafeBusinessDate, getCafeOrderPrefix } from '../utils/dateUtils';
-import { getCategoryImageUrl } from '../utils/menuImages';
+import { getCategoryImageUrl, getMenuItemImage, getOrderItemImage } from '../utils/menuImages';
 
 interface CreateOrderParams {
   tableId: string;
@@ -515,7 +515,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         customerName: customerName ? customerName.trim() : undefined,
         waiterId: waiterId || currentUser?.id || 'u-waiter-1',
         waiterName: waiterName || currentUser?.name || 'Rahul Sharma',
-        items: groupItems.map(i => ({ ...i, batch: 1 })),
+        items: groupItems.map(i => ({
+          ...i,
+          batch: 1,
+          image: i.image || getOrderItemImage(i, menuItems),
+        })),
         subtotal,
         tax,
         total,
@@ -561,7 +565,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updatedTableId = existingOrder.tableId;
 
     const nextBatch = Math.max(...existingOrder.items.map(i => i.batch || 1)) + 1;
-    const itemsWithBatch = newItems.map(i => ({ ...i, batch: nextBatch }));
+    const itemsWithBatch = newItems.map(i => ({
+      ...i,
+      batch: nextBatch,
+      image: i.image || getOrderItemImage(i, menuItems),
+    }));
     const updatedItems = [...existingOrder.items, ...itemsWithBatch];
     const subtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 

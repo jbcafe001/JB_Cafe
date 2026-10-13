@@ -87,6 +87,7 @@ export interface OrderItem {
   servedCount?: number;
   prepared?: number;
   batch?: number;
+  image?: string;
 }
 
 export type OrderStatus = 'new' | 'preparing' | 'ready' | 'served' | 'completed' | 'cancelled';

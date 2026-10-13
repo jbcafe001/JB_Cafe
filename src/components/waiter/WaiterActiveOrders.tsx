@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Order, PaymentMethod } from '../../types';
+import { getOrderItemImage } from '../../utils/menuImages';
 import {
   CheckCircle2,
   Clock,
@@ -27,7 +28,7 @@ interface WaiterActiveOrdersProps {
 type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
 
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, servePreparedItems } = useCafe();
+  const { orders, menuItems, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, servePreparedItems } = useCafe();
 
   const [activeTabFilter, setActiveTabFilter] = useState<OrderTabFilter>('all');
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
@@ -286,8 +287,8 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                   {/* Order Items List */}
                   <div className="py-3 space-y-1.5 text-xs sm:text-sm">
                     {order.items.map((item, idx) => (
-                      <div key={idx} className={`flex items-start justify-between group gap-2 text-stone-800 ${item.served ? 'opacity-60' : ''}`}>
-                        <div className="flex items-start sm:items-center gap-x-2.5 gap-y-1.5 flex-1 flex-wrap">
+                      <div key={idx} className={`flex items-center justify-between group gap-2 text-stone-800 ${item.served ? 'opacity-60' : ''}`}>
+                        <div className="flex items-center gap-x-2.5 gap-y-1.5 flex-1 flex-wrap">
                           <button 
                             onClick={(e) => { 
                               e.stopPropagation(); 
@@ -296,7 +297,7 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                               }
                             }}
                             disabled={(item.prepared || 0) < item.quantity && !item.served}
-                            className={`w-5 h-5 shrink-0 rounded flex items-center justify-center transition-colors mt-0.5 sm:mt-0 ${
+                            className={`w-5 h-5 shrink-0 rounded flex items-center justify-center transition-colors ${
                               item.served 
                                 ? 'bg-emerald-500 text-white' 
                                 : ((item.prepared || 0) < item.quantity 
@@ -307,12 +308,20 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                           >
                             {item.served && <Check className="w-3.5 h-3.5" />}
                           </button>
-                          <span className={`w-6 h-6 shrink-0 rounded-md border flex items-center justify-center font-bold text-xs mt-0 sm:mt-0 ${item.served ? 'bg-stone-50 border-stone-200 text-stone-400' : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
+                          <span className={`w-6 h-6 shrink-0 rounded-md border flex items-center justify-center font-bold text-xs ${item.served ? 'bg-stone-50 border-stone-200 text-stone-400' : 'bg-stone-100 border-stone-200 text-stone-700'}`}>
                             {item.quantity}×
                           </span>
-                          <span className={`font-semibold mt-0.5 sm:mt-0 ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-stone-200 p-0.5 shrink-0 flex items-center justify-center shadow-2xs overflow-hidden">
+                            <img
+                              src={getOrderItemImage(item, menuItems)}
+                              alt={item.name}
+                              className="max-h-full max-w-full object-contain"
+                              loading="lazy"
+                            />
+                          </div>
+                          <span className={`font-semibold ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
                           {!item.served && (
-                            <div className="flex gap-1.5 flex-wrap items-center mt-0.5 sm:mt-0">
+                            <div className="flex gap-1.5 flex-wrap items-center">
                               {(item.servedCount || 0) > 0 && (
                                 <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
                                   {item.servedCount}/{item.quantity} Served
@@ -513,10 +522,19 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                     </span>
                     {selectedOrderForPayment.items.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center text-stone-700">
-                        <span>
-                          {item.quantity} × {item.name}
-                        </span>
-                        <span className="font-bold text-stone-900">
+                        <div className="flex items-center space-x-2.5 min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-white border border-stone-200 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+                            <img
+                              src={getOrderItemImage(item, menuItems)}
+                              alt={item.name}
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          </div>
+                          <span className="truncate">
+                            {item.quantity} × {item.name}
+                          </span>
+                        </div>
+                        <span className="font-bold text-stone-900 shrink-0 ml-2">
                           ₹{item.price * item.quantity}
                         </span>
                       </div>

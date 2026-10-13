@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Table, TableStatus, Order, PaymentMethod } from '../../types';
+import { getOrderItemImage } from '../../utils/menuImages';
 import {
   Coffee,
   Users,
@@ -36,7 +37,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   onNavigateToTables,
   onNavigateToProfile,
 }) => {
-  const { tables, orders, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm, settings, logout, servePreparedItems } = useCafe();
+  const { tables, orders, menuItems, currentUser, serveOrder, completeOrder, toggleItemServed, removeItemFromOrder, cancelOrder, showConfirm, settings, logout, servePreparedItems } = useCafe();
 
   // Selected table for quick order status / actions
   const [selectedTableForAction, setSelectedTableForAction] = useState<Table | null>(null);
@@ -462,6 +463,14 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                               <span className={`w-6 h-6 rounded bg-white border border-stone-200 flex items-center justify-center font-bold text-xs ${item.served ? 'text-stone-400' : 'text-stone-700'}`}>
                                 {item.quantity}×
                               </span>
+                              <div className="w-8 h-8 rounded-lg bg-white border border-stone-200 p-0.5 shrink-0 flex items-center justify-center shadow-2xs overflow-hidden">
+                                <img
+                                  src={getOrderItemImage(item, menuItems)}
+                                  alt={item.name}
+                                  className="max-h-full max-w-full object-contain"
+                                  loading="lazy"
+                                />
+                              </div>
                               <span className={`font-semibold text-sm ${item.served ? 'line-through text-stone-500' : 'text-stone-800'}`}>
                                 {item.name}
                               </span>

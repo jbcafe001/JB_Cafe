@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { getCafeBusinessDate } from '../../utils/dateUtils';
+import { getOrderItemImage } from '../../utils/menuImages';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -142,6 +143,13 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
                               <span className="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-[10px] font-black flex items-center justify-center flex-shrink-0">
                                 {item.quantity}
                               </span>
+                              <div className="w-8 h-8 rounded-lg bg-white border border-stone-200 p-0.5 shrink-0 flex items-center justify-center shadow-2xs overflow-hidden">
+                                <img
+                                  src={getOrderItemImage(item, menuItems)}
+                                  alt={item.name}
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              </div>
                               <div>
                                 <div className="flex items-center gap-2">
                                   <p className="text-sm font-semibold text-stone-800">{item.name}</p>

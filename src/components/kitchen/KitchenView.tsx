@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Order, OrderStatus } from '../../types';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getOrderItemImage } from '../../utils/menuImages';
 import {
   ChefHat,
   Clock,
@@ -22,7 +23,7 @@ import {
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
 export const KitchenView: React.FC = () => {
-  const { orders, startPreparingOrder, markOrderReady, incrementItemPrepared, logout, currentUser, settings, showConfirm } = useCafe();
+  const { orders, menuItems, startPreparingOrder, markOrderReady, incrementItemPrepared, logout, currentUser, settings, showConfirm } = useCafe();
   const [activeTab, setActiveTab] = useState<KitchenTab>('new');
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
   useModalClose(() => setIsAvatarMenuOpen(false), isAvatarMenuOpen);
@@ -359,13 +360,21 @@ export const KitchenView: React.FC = () => {
                                 return (
                                   <div
                                     key={originalIdx}
-                                    className="flex items-start justify-between text-sm sm:text-base gap-2 mb-2"
+                                    className="flex items-center justify-between text-sm sm:text-base gap-2 mb-2"
                                   >
-                                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
                                       <span className={`shrink-0 w-8 h-8 rounded-lg border font-bold flex items-center justify-center text-xs ${isItemFullyServedOrPartiallyServedInServedTab ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-stone-100 border-stone-200 text-stone-800'}`}>
                                         {displayCount}×
                                       </span>
-                                      <div className="font-bold flex flex-wrap items-center gap-2 flex-1 pt-1">
+                                      <div className="w-10 h-10 rounded-xl bg-white border border-stone-200 p-1 shrink-0 flex items-center justify-center shadow-xs overflow-hidden">
+                                        <img
+                                          src={getOrderItemImage(item, menuItems)}
+                                          alt={item.name}
+                                          className="max-h-full max-w-full object-contain"
+                                          loading="lazy"
+                                        />
+                                      </div>
+                                      <div className="font-bold flex flex-wrap items-center gap-2 flex-1">
                                         <span className={isItemFullyServedOrPartiallyServedInServedTab ? 'text-stone-400 line-through decoration-stone-300' : 'text-stone-900'}>{item.name}</span>
                                         {isItemFullyServedOrPartiallyServedInServedTab && (
                                           <span className="shrink-0 whitespace-nowrap text-[9px] sm:text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full flex items-center space-x-1 border border-emerald-200">
@@ -474,10 +483,19 @@ export const KitchenView: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
             <div className="p-5 border-b border-stone-100 flex justify-between items-center bg-stone-50">
-              <h2 className="font-bold text-stone-800">Prepare {bulkPrepareModal.itemName}</h2>
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-lg bg-white border border-stone-200 p-0.5 shrink-0 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={getOrderItemImage({ name: bulkPrepareModal.itemName }, menuItems)}
+                    alt={bulkPrepareModal.itemName}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <h2 className="font-bold text-stone-800 truncate">Prepare {bulkPrepareModal.itemName}</h2>
+              </div>
               <button
                 onClick={() => setBulkPrepareModal(null)}
-                className="p-1.5 hover:bg-stone-200 rounded-full text-stone-500 transition-colors"
+                className="p-1.5 hover:bg-stone-200 rounded-full text-stone-500 transition-colors shrink-0"
               >
                 <VolumeX className="w-4 h-4 opacity-0 hidden" />
                 <span className="text-xl leading-none">&times;</span>
