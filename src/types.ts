@@ -73,6 +73,7 @@ export interface MenuItem {
   available: boolean;
   brand?: 'JB Cafe' | 'KUNAFA';
   description?: string;
+  image?: string;
   ingredients: RecipeIngredient[];
 }
 

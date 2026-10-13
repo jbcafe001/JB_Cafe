@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getMenuItemImageUrl } from '../../utils/menuImages';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -345,22 +346,37 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             return (
               <div
                 key={item.id}
-                className={`bg-white border rounded-xl p-3 flex items-center justify-between transition-shadow ${isOutOfStock ? 'border-red-200 bg-red-50/30 opacity-75' : 'border-stone-200/80 shadow-xs hover:shadow-sm'}`}
+                className={`bg-white border rounded-xl p-3 flex items-center justify-between transition-shadow gap-3 ${isOutOfStock ? 'border-red-200 bg-red-50/30 opacity-75' : 'border-stone-200/80 shadow-xs hover:shadow-sm'}`}
               >
-                <div className="pr-2 flex-1">
-                  <h4 className="font-bold text-stone-900 text-sm flex items-center gap-2">
-                    {item.name}
-                  </h4>
-                  <p className="text-xs text-stone-500 line-clamp-1">{item.description}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-bold text-amber-700 text-sm inline-block">
-                      ₹{item.price}
-                    </span>
-                    {additionalAvailable !== null && (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-bold ${additionalAvailable > 0 ? 'bg-amber-100 text-amber-800' : currentQty > 0 ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800'}`}>
-                        {additionalAvailable > 0 ? `${additionalAvailable} more available` : currentQty > 0 ? 'Limit Reached' : 'Out of stock'}
+                <div className="flex items-center gap-3 flex-1 min-w-0 pr-1">
+                  {/* Category Image Thumbnail */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-50 to-stone-100 border border-stone-200/80 p-1 shrink-0 flex items-center justify-center overflow-hidden shadow-2xs">
+                    <img
+                      src={getMenuItemImageUrl(item)}
+                      alt={item.name}
+                      className="w-full h-full object-contain drop-shadow-2xs"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/logo.png';
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-stone-900 text-sm flex items-center gap-2 truncate">
+                      {item.name}
+                    </h4>
+                    <p className="text-xs text-stone-500 line-clamp-1">{item.description}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-bold text-amber-700 text-sm inline-block">
+                        ₹{item.price}
                       </span>
-                    )}
+                      {additionalAvailable !== null && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-bold ${additionalAvailable > 0 ? 'bg-amber-100 text-amber-800' : currentQty > 0 ? 'bg-orange-100 text-orange-800' : 'bg-red-100 text-red-800'}`}>
+                          {additionalAvailable > 0 ? `${additionalAvailable} more available` : currentQty > 0 ? 'Limit Reached' : 'Out of stock'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
