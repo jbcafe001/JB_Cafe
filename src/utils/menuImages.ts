@@ -9,27 +9,27 @@ export const CATEGORY_IMAGE_MAP: Record<Exclude<MenuItemCategory, 'All'>, string
   'Pizza': '/images/Pizza.png',
   'Hot Dog': '/images/Hot Dog.png',
   'Frankie': '/images/Frankie.png',
-  'Maggi': '/images/Maggi.avif',
+  'Maggi': '/images/Maggi.png',
   'Pasta': '/images/Pasta.png',
   'French Fries': '/images/French Fries.png',
   'Starter': '/images/Starter.png',
   'Noodles': '/images/Noodles.webp',
-  'Mocktail': '/images/Mocktail.webp',
+  'Mocktail': '/images/Mocktail.png',
   'Soup': '/images/Soup.webp',
   'Rice': '/images/Rice.png',
   'Shake': '/images/Shake.png',
   'Cold Coffee': '/images/Cold Coffee.jpg',
-  'Soft Drink': '/images/Soft Drink.jpg',
+  'Soft Drink': '/images/Soft Drink.png',
   'Sizzling Brownie': '/images/Sizzling Brownie.jpg',
   'Cheesecake': '/images/CheeseCake.png',
-  'Cookie Tin': '/images/Cookie Tin.jpg',
+  'Cookie Tin': '/images/Cookie Tin.png',
   'Coffee Tiramisu': '/images/Coffee Tiramisu.png',
   'Kunafa': '/images/Kunafa.png',
   'Dessert Can': '/images/Dessert Can.png',
-  'Chocolate Bowl': '/images/Chocolate Bowl.avif',
+  'Chocolate Bowl': '/images/Chocolate Bowl.png',
   'Baklava': '/images/Baklava.png',
   'Kunafa Cheese Bomb': '/images/Kunafa Cheese Bomb.png',
-  'Bombolinis': '/images/Bombolinis.jpg',
+  'Bombolinis': '/images/Bombolinis.png',
   'Chocolate Bar': '/images/Chocolate Bar.png',
 };
 
@@ -54,7 +54,7 @@ export function getCategoryImageUrl(category?: string | null): string {
   }
 
   if (normalized.includes('cheesecake')) return '/images/CheeseCake.png';
-  if (normalized.includes('cookie')) return '/images/Cookie Tin.jpg';
+  if (normalized.includes('cookie')) return '/images/Cookie Tin.png';
   if (normalized.includes('coffee')) return '/images/Cold Coffee.jpg';
   if (normalized.includes('tea')) return '/images/Tea & Coffee.png';
   if (normalized.includes('kunafa')) return '/images/Kunafa.png';
