@@ -105,8 +105,8 @@ export const WaiterView: React.FC = () => {
                     onClick={() => handleBrandSelect('JB Cafe')}
                     className="card-interactive group text-left p-4 rounded-2xl border-2 border-amber-200/90 hover:border-amber-600 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 hover:from-amber-100/70 hover:to-orange-100/50 transition-all shadow-sm flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform">
-                      <Coffee className="w-6 h-6" />
+                    <div className="w-14 h-14 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 group-hover:-rotate-3 transition-transform">
+                      <Coffee className="w-7 h-7" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -127,8 +127,8 @@ export const WaiterView: React.FC = () => {
                     onClick={() => handleBrandSelect('KUNAFA')}
                     className="card-interactive group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all shadow-sm flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform p-1.5">
-                      <img src="/kunafa.png" alt="Kunafa" className="w-7 h-7 object-contain drop-shadow-xs" />
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:rotate-3 transition-transform overflow-hidden shadow-sm">
+                      <img src="/kunafa.png" alt="Kunafa" className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
