@@ -5,7 +5,6 @@ import { MenuItem, MenuItemCategory, RecipeIngredient } from '../../types';
 import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee, Trash2 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
-import { getCategoryImageUrl, getMenuItemImageUrl } from '../../utils/menuImages';
 
 const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Tea & Coffee',
@@ -92,7 +91,6 @@ export const AdminMenu: React.FC = () => {
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
-  const [image, setImage] = useState('');
   const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
 
   const modalCategories = useMemo(() => {
@@ -119,7 +117,6 @@ export const AdminMenu: React.FC = () => {
     setCategory(defaultBrand === 'KUNAFA' ? 'Kunafa' : 'Tea & Coffee');
     setPrice('');
     setDescription('');
-    setImage('');
     setIngredients([]);
     setEditingItem(null);
     setShowAddModal(true);
@@ -132,7 +129,6 @@ export const AdminMenu: React.FC = () => {
     setPrice(item.price.toString());
     setDescription(item.description || '');
     setBrand(item.brand || 'JB Cafe');
-    setImage(item.image || '');
     setIngredients(item.ingredients || []);
     setShowAddModal(true);
   };
@@ -146,8 +142,6 @@ export const AdminMenu: React.FC = () => {
       amount: parseFloat(ing.amount as unknown as string) || 0
     }));
 
-    const finalImage = image.trim() || getCategoryImageUrl(category);
-
     if (editingItem) {
       updateMenuItem(editingItem.id, {
         name: name.trim(),
@@ -155,7 +149,6 @@ export const AdminMenu: React.FC = () => {
         price: parseFloat(price) || 0,
         description: description.trim() || "",
         brand,
-        image: finalImage,
         ingredients: parsedIngredients,
       });
     } else {
@@ -166,7 +159,6 @@ export const AdminMenu: React.FC = () => {
         available: true,
         description: description.trim() || "",
         brand,
-        image: finalImage,
         ingredients: parsedIngredients,
       });
     }
@@ -260,70 +252,47 @@ export const AdminMenu: React.FC = () => {
 
       {/* Menu Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredItems.map((item, idx) => {
-          const itemImage = getMenuItemImageUrl(item);
-
-          return (
-            <div
-              key={item.id}
-              style={{ animationDelay: `${(idx % 12) * 35}ms` }}
-              className={`card-interactive bg-white rounded-2xl border p-4 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between ${
-                item.available ? 'border-stone-200/90' : 'border-stone-200 opacity-60 bg-stone-50/50'
-              }`}
-            >
-              <div>
-                <div className="flex gap-3.5 items-start">
-                  {/* Category Image */}
-                  <div className="relative w-20 h-20 sm:w-22 sm:h-22 shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-amber-50/70 to-stone-100 border border-stone-200/80 flex items-center justify-center p-1.5 shadow-2xs group">
-                    <img
-                      src={itemImage}
-                      alt={item.name}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-xs"
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/logo.png';
-                      }}
-                    />
-                  </div>
-
-                  {/* Item Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-1.5 mb-1">
-                      <div className="flex flex-wrap items-center gap-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                          {item.category}
-                        </span>
-                        {item.brand === 'KUNAFA' && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
-                            KUNAFA
-                          </span>
-                        )}
-                        {(item.brand === 'JB Cafe' || !item.brand) && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                            JB CAFE
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs whitespace-nowrap">
-                        ₹{item.price}
-                      </span>
-                    </div>
-
-                    <h3 className="font-extrabold text-stone-900 text-base leading-snug">{item.name}</h3>
-                    {item.description && (
-                      <p className="text-xs text-stone-500 mt-1 line-clamp-2 leading-relaxed">{item.description}</p>
-                    )}
-                  </div>
+        {filteredItems.map((item, idx) => (
+          <div
+            key={item.id}
+            style={{ animationDelay: `${(idx % 12) * 35}ms` }}
+            className={`card-interactive bg-white rounded-2xl border p-4 shadow-sm flex flex-col justify-between ${
+              item.available ? 'border-stone-200/90' : 'border-stone-200 opacity-60 bg-stone-50/50'
+            }`}
+          >
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                    {item.category}
+                  </span>
+                  {item.brand === 'KUNAFA' && (
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                      KUNAFA
+                    </span>
+                  )}
+                  {(item.brand === 'JB Cafe' || !item.brand) && (
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      JB CAFE
+                    </span>
+                  )}
+                  <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
                 </div>
-
-                {/* Connected Ingredients hint */}
-                {item.ingredients && item.ingredients.length > 0 && (
-                  <div className="mt-3 pt-2 border-t border-stone-100 text-[11px] text-stone-400">
-                    <span className="font-medium">Uses: </span>
-                    {item.ingredients.map((ing) => `${ing.stockItemName}`).join(', ')}
-                  </div>
-                )}
+                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs">
+                  ₹{item.price}
+                </span>
               </div>
+
+              <p className="text-xs text-stone-500 mt-1 line-clamp-2">{item.description}</p>
+
+              {/* Connected Ingredients hint */}
+              {item.ingredients && item.ingredients.length > 0 && (
+                <div className="mt-3 pt-2 border-t border-stone-100 text-[11px] text-stone-400">
+                  <span className="font-medium">Uses: </span>
+                  {item.ingredients.map((ing) => `${ing.stockItemName}`).join(', ')}
+                </div>
+              )}
+            </div>
 
             {/* Actions: Enable/Disable & Edit */}
             <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between">
@@ -347,8 +316,7 @@ export const AdminMenu: React.FC = () => {
               </button>
             </div>
           </div>
-        );
-      })}
+        ))}
       </div>
 
       {/* Add/Edit Modal */}
@@ -439,45 +407,6 @@ export const AdminMenu: React.FC = () => {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Short appetizing description..."
                     className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                  />
-                </div>
-
-                {/* Image Preview & Category Info */}
-                <div className="flex items-center gap-3 p-3 bg-amber-50/60 border border-amber-200/80 rounded-2xl">
-                  <div className="w-14 h-14 rounded-xl bg-white border border-amber-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                    <img
-                      src={image.trim() || getCategoryImageUrl(category)}
-                      alt={category}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/logo.png';
-                      }}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] font-extrabold text-stone-800 flex items-center gap-1.5">
-                      <span>Category Image</span>
-                      <span className="text-[9px] px-1.5 py-0.2 rounded-md bg-amber-200/70 text-amber-900 border border-amber-300 font-bold">Auto</span>
-                    </div>
-                    <div className="text-[10px] text-stone-500 truncate mt-0.5">
-                      {image.trim() ? 'Custom override URL' : getCategoryImageUrl(category)}
-                    </div>
-                    <div className="text-[10px] text-amber-800 font-medium mt-0.5">
-                      Applied to all items in <span className="font-bold">{category}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Custom Image URL <span className="text-[10px] text-stone-400 font-normal">(Optional — defaults to {category} image)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    placeholder="Leave empty to use category default image"
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden text-xs"
                   />
                 </div>
 

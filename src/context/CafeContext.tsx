@@ -27,7 +27,6 @@ import { INITIAL_USERS } from '../data/initialData';
 import { db, registerNewUser } from '../firebase';
 import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { getCafeBusinessDate, getCafeOrderPrefix } from '../utils/dateUtils';
-import { getCategoryImageUrl } from '../utils/menuImages';
 
 interface CreateOrderParams {
   tableId: string;
@@ -298,33 +297,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Shared collections for all roles
     attachListener('users', setUsers);
     attachListener('tables', setTables);
-    
-    // Realtime menu items with category image fallback & backfill
-    const unsubMenu = onSnapshot(collection(db, 'menuItems'), (snap) => {
-      const items = snap.docs.map((d) => {
-        const data = d.data() as MenuItem;
-        return {
-          id: d.id,
-          ...data,
-          image: data.image || getCategoryImageUrl(data.category),
-        };
-      });
-      setMenuItems(items);
-      setIsSyncing(false);
-
-      // Auto-backfill in Firestore for items missing image property
-      snap.docs.forEach((d) => {
-        const data = d.data();
-        if (!data.image && data.category) {
-          const catImg = getCategoryImageUrl(data.category);
-          if (catImg && catImg !== '/logo.png') {
-            updateDoc(doc(db, 'menuItems', d.id), { image: catImg }).catch(() => {});
-          }
-        }
-      });
-    });
-    unsubs.push(unsubMenu);
-
+    attachListener('menuItems', setMenuItems);
     attachListener('materials', setMaterials);
     attachListener('stockBalances', setStockBalances);
 
@@ -1210,7 +1183,6 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addMenuItem = (item: Omit<MenuItem, 'id'>) => {
     const newItem: MenuItem = {
       ...item,
-      image: item.image || getCategoryImageUrl(item.category),
       id: `m-${Date.now()}`,
     };
     setDoc(doc(db, 'menuItems', newItem.id), newItem).catch(console.error);
@@ -1219,11 +1191,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
-    const finalUpdates = { ...updates };
-    if (!finalUpdates.image && finalUpdates.category) {
-      finalUpdates.image = getCategoryImageUrl(finalUpdates.category);
-    }
-    updateDoc(doc(db, 'menuItems', id), finalUpdates).catch(console.error);
+    updateDoc(doc(db, 'menuItems', id), updates).catch(console.error);
     addToast('Menu item updated');
   };
 
