@@ -48,6 +48,7 @@ export const AdminRawMaterial: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'All' | 'good' | 'low' | 'out'>('All');
   const [sortBy, setSortBy] = useState<string>('name-asc');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -276,28 +277,240 @@ export const AdminRawMaterial: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-page-enter">
-      {/* Header & Main Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header & Main Actions */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
             <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">
               RAW MATERIAL MANAGEMENT
             </h2>
-            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-              Collection: materials
-            </span>
+            {currentRole === 'admin_kunafa' && (
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                KUNAFA Only
+              </span>
+            )}
           </div>
           <p className="text-xs text-stone-500 mt-0.5">
             Catalog of raw ingredients, measurement units, purchase cost benchmarks, safety limits, and brand classification
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5">
-          {/* New Material Button (Moved from Stock module) */}
+        {/* Search, Filter Popover, and New Material Button */}
+        <div className="flex items-center space-x-2 flex-wrap sm:flex-nowrap">
+          {/* Search Input */}
+          <div className="relative min-w-[180px] sm:w-60">
+            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search material or unit..."
+              className="w-full pl-9 pr-7 py-2 bg-white border border-stone-200 rounded-xl text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden shadow-2xs"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Popover Button */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`btn-interactive px-3 py-2 border rounded-xl text-xs font-bold shadow-2xs flex items-center space-x-1.5 transition-all cursor-pointer ${
+                isFilterOpen || unitFilter !== 'All' || statusFilter !== 'All' || sortBy !== 'name-asc' || (brandFilter !== 'All' && currentRole !== 'admin_kunafa')
+                  ? 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-xs'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+              }`}
+            >
+              <Filter className="w-3.5 h-3.5 text-stone-500" />
+              <span>Filter</span>
+              {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">
+                  {(unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)}
+                </span>
+              )}
+            </button>
+
+            {/* Filter Dropdown Popover */}
+            {isFilterOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsFilterOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 p-4 space-y-3.5 animate-modal-spring">
+                  <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                    <div className="flex items-center space-x-1.5">
+                      <Filter className="w-4 h-4 text-indigo-600" />
+                      <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider">
+                        Filter & View
+                      </h4>
+                    </div>
+                    {((unitFilter !== 'All' ? 1 : 0) + (statusFilter !== 'All' ? 1 : 0) + (sortBy !== 'name-asc' ? 1 : 0) + (brandFilter !== 'All' && currentRole !== 'admin_kunafa' ? 1 : 0)) > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUnitFilter('All');
+                          setStatusFilter('All');
+                          setSortBy('name-asc');
+                          setBrandFilter('All');
+                        }}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 cursor-pointer"
+                      >
+                        Reset All
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Mode (Table / Cards) */}
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+                      Display Mode
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5 p-1 bg-stone-100 rounded-xl">
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('table')}
+                        className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                          viewMode === 'table'
+                            ? 'bg-white text-stone-900 shadow-2xs'
+                            : 'text-stone-500 hover:text-stone-800'
+                        }`}
+                      >
+                        <List className="w-3.5 h-3.5" />
+                        <span>Table View</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('grid')}
+                        className={`py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                          viewMode === 'grid'
+                            ? 'bg-white text-stone-900 shadow-2xs'
+                            : 'text-stone-500 hover:text-stone-800'
+                        }`}
+                      >
+                        <LayoutGrid className="w-3.5 h-3.5" />
+                        <span>Cards View</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Brand Filter (if not locked to admin_kunafa) */}
+                  {currentRole !== 'admin_kunafa' && (
+                    <div>
+                      <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+                        Brand
+                      </label>
+                      <div className="grid grid-cols-3 gap-1 p-1 bg-stone-100 rounded-xl text-xs">
+                        <button
+                          type="button"
+                          onClick={() => setBrandFilter('All')}
+                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                            brandFilter === 'All'
+                              ? 'bg-white text-stone-900 shadow-2xs'
+                              : 'text-stone-500 hover:text-stone-800'
+                          }`}
+                        >
+                          All ({enrichedMaterials.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBrandFilter('JB Cafe')}
+                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                            brandFilter === 'JB Cafe'
+                              ? 'bg-amber-100 text-amber-900 shadow-2xs'
+                              : 'text-stone-500 hover:text-stone-800'
+                          }`}
+                        >
+                          JB Cafe ({jbCafeCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBrandFilter('KUNAFA')}
+                          className={`py-1 px-2 rounded-lg font-bold transition-all text-center cursor-pointer ${
+                            brandFilter === 'KUNAFA'
+                              ? 'bg-rose-100 text-rose-900 shadow-2xs'
+                              : 'text-stone-500 hover:text-stone-800'
+                          }`}
+                        >
+                          Kunafa ({kunafaCount})
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unit Filter */}
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                      Measurement Unit
+                    </label>
+                    <CustomSelect
+                      value={unitFilter}
+                      onChange={(val) => setUnitFilter(val)}
+                      placeholder="All Units"
+                      options={[
+                        { value: 'All', label: 'All Units' },
+                        ...availableUnits.map((u) => ({ value: u, label: `Unit: ${u}` })),
+                      ]}
+                    />
+                  </div>
+
+                  {/* Stock Status Filter */}
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                      Stock Status
+                    </label>
+                    <CustomSelect
+                      value={statusFilter}
+                      onChange={(val) => setStatusFilter(val as any)}
+                      placeholder="All Status"
+                      options={[
+                        { value: 'All', label: 'All Status' },
+                        { value: 'good', label: 'In Stock (Good)' },
+                        { value: 'low', label: 'Low Stock' },
+                        { value: 'out', label: 'Out of Stock' },
+                      ]}
+                    />
+                  </div>
+
+                  {/* Sort By */}
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
+                      Sort By
+                    </label>
+                    <CustomSelect
+                      value={sortBy}
+                      onChange={(val) => setSortBy(val)}
+                      placeholder="Sort by"
+                      options={[
+                        { value: 'name-asc', label: 'Name (A to Z)' },
+                        { value: 'name-desc', label: 'Name (Z to A)' },
+                        { value: 'cost-desc', label: 'Cost: High to Low' },
+                        { value: 'cost-asc', label: 'Cost: Low to High' },
+                        { value: 'stock-desc', label: 'Stock: High to Low' },
+                        { value: 'stock-asc', label: 'Stock: Low to High' },
+                        { value: 'threshold-desc', label: 'Safe Min: High to Low' },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* New Material Button */}
           <button
             id="create-material-btn"
             onClick={() => setShowCreateModal(true)}
-            className="btn-interactive px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap"
+            className="btn-interactive px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 flex items-center space-x-1.5 transition-all whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>New Material</span>
@@ -305,219 +518,112 @@ export const AdminRawMaterial: React.FC = () => {
         </div>
       </div>
 
-      {/* Overview Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+      {/* Overview Stat Cards (Standardized Design) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Total Tracked Raw Materials */}
-        <div className="card-interactive stagger-1 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white border border-indigo-200/80 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-800">
-              Total Materials
-            </span>
-            <Boxes className="w-4 h-4 text-indigo-600" />
+        <div className="col-span-1 bg-gradient-to-br from-indigo-50/80 via-purple-50/30 to-white p-5 rounded-2xl border border-indigo-200/80 shadow-2xs card-interactive animate-page-enter stagger-1 group">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider">Total Materials</p>
+            <div className="w-7 h-7 rounded-lg bg-indigo-100/80 flex items-center justify-center text-indigo-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <Boxes className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-stone-900">{totalItemsCount}</div>
-          <span className="text-[11px] text-indigo-600/80 mt-1 inline-block">
-            Tracked in materials db
-          </span>
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">{totalItemsCount}</p>
+          <p className="text-xs text-indigo-700/90 font-medium mt-1">Tracked in materials db</p>
         </div>
 
-        {/* Brand Breakdown */}
-        {currentRole !== 'admin_kunafa' && (
-          <div className="card-interactive stagger-2 bg-gradient-to-br from-amber-50/80 via-orange-50/30 to-white border border-amber-200/80 rounded-2xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
-                Brand Catalog
-              </span>
-              <Tag className="w-4 h-4 text-amber-600" />
-            </div>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-lg font-black text-stone-800">{jbCafeCount} <span className="text-[10px] font-semibold text-stone-400">JB</span></span>
-              <span className="text-xs text-stone-300">|</span>
-              <span className="text-lg font-black text-amber-700">{kunafaCount} <span className="text-[10px] font-semibold text-amber-600">KNF</span></span>
-            </div>
-            <span className="text-[11px] text-amber-700/80 mt-1 inline-block">Active brand distribution</span>
-          </div>
-        )}
-
         {/* Total Stock Value */}
-        <div className="card-interactive stagger-3 bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
-              Total Valuation
-            </span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+        <div className="col-span-1 bg-gradient-to-br from-emerald-50/80 via-teal-50/30 to-white p-5 rounded-2xl border border-emerald-200/80 shadow-2xs card-interactive animate-page-enter stagger-2 group">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Valuation</p>
+            <div className="w-7 h-7 rounded-lg bg-emerald-100/80 flex items-center justify-center text-emerald-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-stone-900">
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">
             ₹{Math.round(totalInventoryValue).toLocaleString()}
-          </div>
-          <span className="text-[11px] text-emerald-700 font-semibold mt-1 inline-block">
-            Holding asset value
-          </span>
+          </p>
+          <p className="text-xs text-emerald-700/90 font-medium mt-1">Holding asset value</p>
         </div>
 
         {/* Average Unit Cost */}
-        <div className="card-interactive stagger-4 bg-gradient-to-br from-yellow-50/80 via-amber-50/30 to-white border border-yellow-200/80 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-yellow-800">
-              Avg Cost / Unit
-            </span>
-            <Sparkles className="w-4 h-4 text-amber-600" />
+        <div className="col-span-1 bg-gradient-to-br from-amber-50/80 via-yellow-50/30 to-white p-5 rounded-2xl border border-amber-200/80 shadow-2xs card-interactive animate-page-enter stagger-3 group">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Avg Cost / Unit</p>
+            <div className="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-amber-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <Tag className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-black text-stone-900">
+          <p className="text-2xl sm:text-3xl font-black mt-2 text-stone-900">
             ₹{Math.round(avgCostPerUnit).toLocaleString()}
-          </div>
-          <span className="text-[11px] text-yellow-700/80 mt-1 inline-block">Benchmark avg cost</span>
+          </p>
+          <p className="text-xs text-amber-700/90 font-medium mt-1">Benchmark avg cost</p>
         </div>
 
         {/* Stock Alerts (Low & Out) */}
-        <div className="card-interactive stagger-5 bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white border border-rose-200/80 rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800">
-              Stock Warnings
+        <div className="col-span-1 bg-gradient-to-br from-rose-50/80 via-pink-50/30 to-white p-5 rounded-2xl border border-rose-200/80 shadow-2xs card-interactive animate-page-enter stagger-4 group">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Stock Warnings</p>
+            <div className="w-7 h-7 rounded-lg bg-rose-100/80 flex items-center justify-center text-rose-700 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <div className="flex items-baseline space-x-2 mt-2">
+            <span className="text-2xl sm:text-3xl font-black text-amber-600">
+              {lowStockCount} <span className="text-xs text-amber-500 font-bold">Low</span>
             </span>
-            <AlertTriangle className="w-4 h-4 text-rose-600" />
+            <span className="text-stone-300">/</span>
+            <span className="text-2xl sm:text-3xl font-black text-rose-600">
+              {outOfStockCount} <span className="text-xs text-rose-500 font-bold">Out</span>
+            </span>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-xl font-black text-amber-600">{lowStockCount} <span className="text-[10px] text-amber-500 font-semibold">Low</span></span>
-            <span className="text-xs text-stone-300">/</span>
-            <span className="text-xl font-black text-rose-600">{outOfStockCount} <span className="text-[10px] text-rose-500 font-semibold">Out</span></span>
-          </div>
-          <span className="text-[11px] text-rose-700/80 mt-1 inline-block">Threshold alerts</span>
+          <p className="text-xs text-rose-700/90 font-medium mt-1">Threshold alerts</p>
         </div>
       </div>
 
-      {/* Control & Filter Toolbar */}
-      <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Brand Filter Tabs */}
-          {currentRole !== 'admin_kunafa' ? (
-            <div className="flex items-center space-x-1.5 p-1 bg-[#FAF7F2] border border-[#EFE7DA] rounded-xl">
-              <button
-                onClick={() => setBrandFilter('All')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  brandFilter === 'All'
-                    ? 'bg-white text-stone-900 shadow-2xs'
-                    : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                All Materials ({enrichedMaterials.length})
-              </button>
-              <button
-                onClick={() => setBrandFilter('JB Cafe')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  brandFilter === 'JB Cafe'
-                    ? 'bg-amber-100 text-amber-900 shadow-2xs border border-amber-200'
-                    : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                JB Cafe ({jbCafeCount})
-              </button>
-              <button
-                onClick={() => setBrandFilter('KUNAFA')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  brandFilter === 'KUNAFA'
-                    ? 'bg-rose-100 text-rose-900 shadow-2xs border border-rose-200'
-                    : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                KUNAFA ({kunafaCount})
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-1 text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Showing KUNAFA Materials Only</span>
-            </div>
+      {/* Active Filter Chips (if any applied) */}
+      {(unitFilter !== 'All' || statusFilter !== 'All' || (brandFilter !== 'All' && currentRole !== 'admin_kunafa') || searchQuery) && (
+        <div className="flex items-center flex-wrap gap-2 text-xs">
+          <span className="text-stone-400 text-[11px] font-semibold">Active filters:</span>
+          {searchQuery && (
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700 font-bold border border-stone-200">
+              <span>"{searchQuery}"</span>
+              <button type="button" onClick={() => setSearchQuery('')} className="hover:text-stone-900 ml-1 cursor-pointer">×</button>
+            </span>
           )}
-
-          {/* View Toggle */}
-          <div className="flex items-center space-x-1 border border-stone-200 rounded-xl p-1 bg-stone-50 shrink-0">
-            <button
-              onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all ${
-                viewMode === 'table' ? 'bg-white text-stone-900 shadow-2xs' : 'text-stone-500 hover:text-stone-800'
-              }`}
-              title="Table View"
-            >
-              <List className="w-4 h-4" />
-              <span className="hidden sm:inline">Table</span>
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all ${
-                viewMode === 'grid' ? 'bg-white text-stone-900 shadow-2xs' : 'text-stone-500 hover:text-stone-800'
-              }`}
-              title="Card Grid View"
-            >
-              <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">Cards</span>
-            </button>
-          </div>
+          {brandFilter !== 'All' && currentRole !== 'admin_kunafa' && (
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200">
+              <span>Brand: {brandFilter}</span>
+              <button type="button" onClick={() => setBrandFilter('All')} className="hover:text-amber-950 ml-1 cursor-pointer">×</button>
+            </span>
+          )}
+          {unitFilter !== 'All' && (
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200">
+              <span>Unit: {unitFilter}</span>
+              <button type="button" onClick={() => setUnitFilter('All')} className="hover:text-indigo-900 ml-1 cursor-pointer">×</button>
+            </span>
+          )}
+          {statusFilter !== 'All' && (
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200">
+              <span>Status: {statusFilter}</span>
+              <button type="button" onClick={() => setStatusFilter('All')} className="hover:text-rose-900 ml-1 cursor-pointer">×</button>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('');
+              setBrandFilter('All');
+              setUnitFilter('All');
+              setStatusFilter('All');
+              setSortBy('name-asc');
+            }}
+            className="text-[11px] text-stone-500 hover:text-stone-800 underline font-semibold ml-1 cursor-pointer"
+          >
+            Clear all
+          </button>
         </div>
-
-        {/* Second Row: Search, Unit Filter, Status Filter, Sort By */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, ID, or unit..."
-              className="w-full pl-9 pr-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-hidden"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-
-          {/* Unit Filter */}
-          <CustomSelect
-            value={unitFilter}
-            onChange={(val) => setUnitFilter(val)}
-            placeholder="All Units"
-            options={[
-              { value: 'All', label: 'All Units' },
-              ...availableUnits.map((u) => ({ value: u, label: `Unit: ${u}` })),
-            ]}
-          />
-
-          {/* Stock Status Filter */}
-          <CustomSelect
-            value={statusFilter}
-            onChange={(val) => setStatusFilter(val as any)}
-            placeholder="All Status"
-            options={[
-              { value: 'All', label: 'All Status' },
-              { value: 'good', label: 'In Stock (Good)' },
-              { value: 'low', label: 'Low Stock' },
-              { value: 'out', label: 'Out of Stock' },
-            ]}
-          />
-
-          {/* Sort By */}
-          <CustomSelect
-            value={sortBy}
-            onChange={(val) => setSortBy(val)}
-            placeholder="Sort by"
-            options={[
-              { value: 'name-asc', label: 'Name (A to Z)' },
-              { value: 'name-desc', label: 'Name (Z to A)' },
-              { value: 'cost-desc', label: 'Cost: High to Low' },
-              { value: 'cost-asc', label: 'Cost: Low to High' },
-              { value: 'stock-desc', label: 'Stock: High to Low' },
-              { value: 'stock-asc', label: 'Stock: Low to High' },
-              { value: 'threshold-desc', label: 'Safe Min: High to Low' },
-            ]}
-          />
-        </div>
-      </div>
+      )}
 
       {/* Materials List Section */}
       {filteredMaterials.length === 0 ? (
@@ -551,7 +657,6 @@ export const AdminRawMaterial: React.FC = () => {
               <thead>
                 <tr className="bg-stone-50/80 border-b border-stone-200 text-stone-500 font-bold tracking-wider uppercase text-[10px]">
                   <th className="py-3.5 px-4">Material Details</th>
-                  <th className="py-3.5 px-3">Material ID</th>
                   <th className="py-3.5 px-3">Unit</th>
                   <th className="py-3.5 px-3">Benchmark Cost</th>
                   <th className="py-3.5 px-3">Safe Minimum</th>
@@ -604,24 +709,6 @@ export const AdminRawMaterial: React.FC = () => {
                               </span>
                             </div>
                           </div>
-                        </div>
-                      </td>
-
-                      {/* Material ID with Copy button */}
-                      <td className="py-3 px-3 font-mono text-[11px] text-stone-500 whitespace-nowrap">
-                        <div className="flex items-center space-x-1.5">
-                          <span className="truncate max-w-[130px]">{item.id}</span>
-                          <button
-                            onClick={(e) => handleCopyId(item.id, e)}
-                            className="p-1 rounded-md hover:bg-stone-200/60 text-stone-400 hover:text-stone-700 transition-colors"
-                            title="Copy ID"
-                          >
-                            {copiedId === item.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            ) : (
-                              <Copy className="w-3.5 h-3.5" />
-                            )}
-                          </button>
                         </div>
                       </td>
 

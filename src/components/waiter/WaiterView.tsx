@@ -6,7 +6,7 @@ import { WaiterActiveOrders } from './WaiterActiveOrders';
 import { WaiterTables } from './WaiterTables';
 import { WaiterProfile } from './WaiterProfile';
 import { WaiterOrderTaking } from './WaiterOrderTaking';
-import { Home, ClipboardList, Grid, User, Smartphone, Coffee, Sparkles, X } from 'lucide-react';
+import { Home, ClipboardList, Grid, User, Smartphone, Coffee, X } from 'lucide-react';
 
 type WaiterTab = 'home' | 'orders' | 'tables' | 'profile';
 
@@ -127,8 +127,8 @@ export const WaiterView: React.FC = () => {
                     onClick={() => handleBrandSelect('KUNAFA')}
                     className="card-interactive group text-left p-4 rounded-2xl border-2 border-orange-200/90 hover:border-orange-600 bg-gradient-to-br from-orange-50/60 via-white to-amber-50/40 hover:from-orange-100/70 hover:to-amber-100/50 transition-all shadow-sm flex items-center space-x-3.5 cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform">
-                      <Sparkles className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform p-1.5">
+                      <img src="/kunafa.png" alt="Kunafa" className="w-7 h-7 object-contain drop-shadow-xs" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
