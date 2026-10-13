@@ -677,156 +677,264 @@ export const AdminRawMaterial: React.FC = () => {
           )}
         </div>
       ) : viewMode === 'table' ? (
-        /* TABLE VIEW */
-        <div className="bg-white border border-stone-200/90 rounded-2xl shadow-2xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-stone-50/80 border-b border-stone-200 text-stone-500 font-bold tracking-wider uppercase text-[10px]">
-                  <th className="py-3.5 px-4">Material Details</th>
-                  <th className="py-3.5 px-3">Unit</th>
-                  <th className="py-3.5 px-3">Benchmark Cost</th>
-                  <th className="py-3.5 px-3">Safe Minimum</th>
-                  <th className="py-3.5 px-3">In-Stock Qty</th>
-                  <th className="py-3.5 px-3">Stock Status</th>
-                  <th className="py-3.5 px-3">Total Value</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-100 text-stone-700">
-                {filteredMaterials.map((item) => {
-                  const recipesUsing = getRecipeUsage(item.id);
-                  const isLow = item.status === 'low';
-                  const isOut = item.status === 'out';
-                  const holdingValue = item.available * item.costPerUnit;
+        <>
+          {/* MOBILE CARDS VIEW (< md) - Clean, touch-friendly, no cut-off columns */}
+          <div className="md:hidden space-y-3">
+            {filteredMaterials.map((item) => {
+              const recipesUsing = getRecipeUsage(item.id);
+              const isLow = item.status === 'low';
+              const isOut = item.status === 'out';
+              const holdingValue = item.available * item.costPerUnit;
 
-                  return (
-                    <tr
-                      key={item.id}
-                      onClick={() => handleOpenDetail(item)}
-                      className="hover:bg-stone-50/70 transition-colors cursor-pointer group"
-                    >
-                      {/* Name & Brand */}
-                      <td className="py-3 px-4">
-                        <div className="flex items-center space-x-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center font-black text-stone-600 text-xs shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-colors">
-                            {item.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="font-bold text-stone-900 group-hover:text-indigo-700 transition-colors flex items-center space-x-1.5">
-                              <span>{item.name}</span>
-                              {recipesUsing.length > 0 && (
-                                <span
-                                  className="text-[9px] bg-stone-100 text-stone-500 px-1.5 py-0.2 rounded font-semibold"
-                                  title={`Used in ${recipesUsing.length} menu items`}
-                                >
-                                  {recipesUsing.length} recipes
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-1 mt-0.5">
-                              <span
-                                className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-md ${
-                                  item.brand === 'KUNAFA'
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                    : 'bg-stone-100 text-stone-600 border border-stone-200'
-                                }`}
-                              >
-                                {item.brand || 'JB Cafe'}
-                              </span>
-                            </div>
-                          </div>
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => handleOpenDetail(item)}
+                  className="bg-white border border-stone-200/90 hover:border-indigo-300 rounded-2xl p-3.5 shadow-2xs transition-all cursor-pointer space-y-2.5 active:scale-[0.99]"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center font-black text-stone-600 text-xs shrink-0">
+                        {item.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-stone-900 text-sm truncate">{item.name}</h4>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span
+                            className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                              item.brand === 'KUNAFA'
+                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                : 'bg-stone-100 text-stone-700 border border-stone-200'
+                            }`}
+                          >
+                            {item.brand || 'JB Cafe'}
+                          </span>
+                          <span className="text-[10px] text-stone-400 font-mono">
+                            Unit: {item.unit}
+                          </span>
                         </div>
-                      </td>
+                      </div>
+                    </div>
 
-                      {/* Unit */}
-                      <td className="py-3 px-3">
-                        <span className="inline-block px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-700 rounded-md font-bold text-[11px]">
-                          {item.unit}
-                        </span>
-                      </td>
+                    {isOut ? (
+                      <span className="shrink-0 inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span>Out</span>
+                      </span>
+                    ) : isLow ? (
+                      <span className="shrink-0 inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Low</span>
+                      </span>
+                    ) : (
+                      <span className="shrink-0 inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Good</span>
+                      </span>
+                    )}
+                  </div>
 
-                      {/* Cost per unit */}
-                      <td className="py-3 px-3 font-semibold text-stone-900">
-                        ₹{item.costPerUnit.toLocaleString()}
-                        <span className="text-[10px] text-stone-400 font-normal"> / {item.unit}</span>
-                      </td>
+                  {/* 3-column specs */}
+                  <div className="grid grid-cols-3 gap-1.5 p-2 bg-stone-50 rounded-xl border border-stone-100 text-center text-xs">
+                    <div>
+                      <span className="text-[9px] text-stone-400 font-bold block uppercase">Cost</span>
+                      <span className="font-extrabold text-stone-800 text-xs">₹{item.costPerUnit}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-stone-400 font-bold block uppercase">In Stock</span>
+                      <span className="font-black text-stone-900 text-xs">{item.available} {item.unit}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-stone-400 font-bold block uppercase">Value</span>
+                      <span className="font-black text-emerald-700 text-xs">₹{Math.round(holdingValue).toLocaleString()}</span>
+                    </div>
+                  </div>
 
-                      {/* Min Threshold */}
-                      <td className="py-3 px-3">
-                        <span className="font-semibold text-stone-700">
-                          {item.minThreshold} {item.unit}
-                        </span>
-                      </td>
-
-                      {/* In-Stock Quantity */}
-                      <td className="py-3 px-3">
-                        <span className="font-extrabold text-stone-900">
-                          {item.available} {item.unit}
-                        </span>
-                      </td>
-
-                      {/* Stock Status Badge */}
-                      <td className="py-3 px-3">
-                        {isOut ? (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                            <span>Out of Stock</span>
-                          </span>
-                        ) : isLow ? (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            <span>Low Stock</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span>Good</span>
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Total Holding Value */}
-                      <td className="py-3 px-3 font-bold text-stone-800">
-                        ₹{Math.round(holdingValue).toLocaleString()}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end space-x-1.5">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDetail(item);
-                            }}
-                            className="p-1.5 rounded-lg text-stone-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                            title="View Complete Details"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={(e) => handleOpenEdit(item, e)}
-                            className="p-1.5 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
-                            title="Edit Material"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={(e) => handleDelete(item, e)}
-                            className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                            title="Delete Material"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  {/* Actions & info row */}
+                  <div className="flex items-center justify-between pt-1 border-t border-stone-100">
+                    <span className="text-[10px] text-stone-400 font-medium">
+                      {recipesUsing.length > 0 ? `${recipesUsing.length} recipes using` : 'Direct inventory'}
+                    </span>
+                    <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleOpenDetail(item)}
+                        className="p-1.5 rounded-lg text-stone-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+                        title="View Complete Details"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => handleOpenEdit(item, e)}
+                        className="p-1.5 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                        title="Edit Material"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => handleDelete(item, e)}
+                        className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Delete Material"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
+
+          {/* DESKTOP TABLE VIEW (hidden md:block) */}
+          <div className="hidden md:block bg-white border border-stone-200/90 rounded-2xl shadow-2xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[760px] text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-stone-50/80 border-b border-stone-200 text-stone-500 font-bold tracking-wider uppercase text-[10px]">
+                    <th className="py-3.5 px-4">Material Details</th>
+                    <th className="py-3.5 px-3">Unit</th>
+                    <th className="py-3.5 px-3">Benchmark Cost</th>
+                    <th className="py-3.5 px-3">Safe Minimum</th>
+                    <th className="py-3.5 px-3">In-Stock Qty</th>
+                    <th className="py-3.5 px-3">Stock Status</th>
+                    <th className="py-3.5 px-3">Total Value</th>
+                    <th className="py-3.5 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100 text-stone-700">
+                  {filteredMaterials.map((item) => {
+                    const recipesUsing = getRecipeUsage(item.id);
+                    const isLow = item.status === 'low';
+                    const isOut = item.status === 'out';
+                    const holdingValue = item.available * item.costPerUnit;
+
+                    return (
+                      <tr
+                        key={item.id}
+                        onClick={() => handleOpenDetail(item)}
+                        className="hover:bg-stone-50/70 transition-colors cursor-pointer group"
+                      >
+                        {/* Name & Brand */}
+                        <td className="py-3 px-4">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-8 h-8 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-center font-black text-stone-600 text-xs shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-colors">
+                              {item.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="font-bold text-stone-900 group-hover:text-indigo-700 transition-colors flex items-center space-x-1.5">
+                                <span>{item.name}</span>
+                                {recipesUsing.length > 0 && (
+                                  <span
+                                    className="text-[9px] bg-stone-100 text-stone-500 px-1.5 py-0.2 rounded font-semibold"
+                                    title={`Used in ${recipesUsing.length} menu items`}
+                                  >
+                                    {recipesUsing.length} recipes
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center space-x-1 mt-0.5">
+                                <span
+                                  className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded-md ${
+                                    item.brand === 'KUNAFA'
+                                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                      : 'bg-stone-100 text-stone-600 border border-stone-200'
+                                  }`}
+                                >
+                                  {item.brand || 'JB Cafe'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Unit */}
+                        <td className="py-3 px-3">
+                          <span className="inline-block px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-700 rounded-md font-bold text-[11px]">
+                            {item.unit}
+                          </span>
+                        </td>
+
+                        {/* Cost per unit */}
+                        <td className="py-3 px-3 font-semibold text-stone-900">
+                          ₹{item.costPerUnit.toLocaleString()}
+                          <span className="text-[10px] text-stone-400 font-normal"> / {item.unit}</span>
+                        </td>
+
+                        {/* Min Threshold */}
+                        <td className="py-3 px-3">
+                          <span className="font-semibold text-stone-700">
+                            {item.minThreshold} {item.unit}
+                          </span>
+                        </td>
+
+                        {/* In-Stock Quantity */}
+                        <td className="py-3 px-3">
+                          <span className="font-extrabold text-stone-900">
+                            {item.available} {item.unit}
+                          </span>
+                        </td>
+
+                        {/* Stock Status Badge */}
+                        <td className="py-3 px-3">
+                          {isOut ? (
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                              <span>Out of Stock</span>
+                            </span>
+                          ) : isLow ? (
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                              <span>Low Stock</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              <span>Good</span>
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Total Holding Value */}
+                        <td className="py-3 px-3 font-bold text-stone-800">
+                          ₹{Math.round(holdingValue).toLocaleString()}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenDetail(item);
+                              }}
+                              className="p-1.5 rounded-lg text-stone-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
+                              title="View Complete Details"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => handleOpenEdit(item, e)}
+                              className="p-1.5 rounded-lg text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                              title="Edit Material"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={(e) => handleDelete(item, e)}
+                              className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                              title="Delete Material"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       ) : (
         /* CARD GRID VIEW */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
