@@ -27,6 +27,7 @@ import { INITIAL_USERS } from '../data/initialData';
 import { db, registerNewUser } from '../firebase';
 import { doc, collection, onSnapshot, setDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { getCafeBusinessDate, getCafeOrderPrefix } from '../utils/dateUtils';
+import { getCategoryImageUrl } from '../utils/menuImages';
 
 interface CreateOrderParams {
   tableId: string;
@@ -285,7 +286,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const unsubs: (() => void)[] = [];
 
-    const attachListener = (source: any, setter: React.Dispatch<React.SetStateAction<any[]>>) => {
+    const attachListener = (source: any, setter: ((data: any[]) => void) | React.Dispatch<React.SetStateAction<any[]>>) => {
       // source can be a collection reference or a query
       const unsub = onSnapshot(typeof source === 'string' ? collection(db, source) : source, (snap: any) => {
         setter(snap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
@@ -297,7 +298,16 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Shared collections for all roles
     attachListener('users', setUsers);
     attachListener('tables', setTables);
-    attachListener('menuItems', setMenuItems);
+    attachListener('menuItems', (rawItems: MenuItem[]) => {
+      const enriched = rawItems.map((item) => {
+        const resolvedImage = item.image || getCategoryImageUrl(item.category);
+        return {
+          ...item,
+          image: resolvedImage,
+        };
+      });
+      setMenuItems(enriched);
+    });
     attachListener('materials', setMaterials);
     attachListener('stockBalances', setStockBalances);
 
@@ -1184,6 +1194,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newItem: MenuItem = {
       ...item,
       id: `m-${Date.now()}`,
+      image: item.image || getCategoryImageUrl(item.category),
     };
     setDoc(doc(db, 'menuItems', newItem.id), newItem).catch(console.error);
     addNotification(`Menu item added: ${newItem.name} (₹${newItem.price})`, 'admin');
@@ -1191,7 +1202,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateMenuItem = (id: string, updates: Partial<MenuItem>) => {
-    updateDoc(doc(db, 'menuItems', id), updates).catch(console.error);
+    const enrichedUpdates = { ...updates };
+    if (updates.category && !updates.image) {
+      enrichedUpdates.image = getCategoryImageUrl(updates.category);
+    }
+    updateDoc(doc(db, 'menuItems', id), enrichedUpdates).catch(console.error);
     addToast('Menu item updated');
   };
 

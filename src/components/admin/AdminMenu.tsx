@@ -5,6 +5,7 @@ import { MenuItem, MenuItemCategory, RecipeIngredient } from '../../types';
 import { Plus, Check, X, Edit, ToggleLeft, ToggleRight, Coffee, Trash2 } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getMenuItemImage, getCategoryImageUrl } from '../../utils/menuImages';
 
 const CATEGORIES: Exclude<MenuItemCategory, 'All'>[] = [
   'Tea & Coffee',
@@ -88,6 +89,7 @@ export const AdminMenu: React.FC = () => {
   // Form State
   const [name, setName] = useState('');
   const [category, setCategory] = useState<Exclude<MenuItemCategory, 'All'>>('Tea & Coffee');
+  const [image, setImage] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [brand, setBrand] = useState<'JB Cafe' | 'KUNAFA'>('JB Cafe');
@@ -112,9 +114,11 @@ export const AdminMenu: React.FC = () => {
 
   const handleOpenAdd = () => {
     const defaultBrand = listBrandFilter === 'KUNAFA' || brandFilter === 'KUNAFA' ? 'KUNAFA' : 'JB Cafe';
+    const defaultCat = defaultBrand === 'KUNAFA' ? 'Kunafa' : 'Tea & Coffee';
     setName('');
     setBrand(defaultBrand);
-    setCategory(defaultBrand === 'KUNAFA' ? 'Kunafa' : 'Tea & Coffee');
+    setCategory(defaultCat);
+    setImage(getCategoryImageUrl(defaultCat));
     setPrice('');
     setDescription('');
     setIngredients([]);
@@ -126,6 +130,7 @@ export const AdminMenu: React.FC = () => {
     setEditingItem(item);
     setName(item.name);
     setCategory(item.category);
+    setImage(getMenuItemImage(item));
     setPrice(item.price.toString());
     setDescription(item.description || '');
     setBrand(item.brand || 'JB Cafe');
@@ -142,6 +147,8 @@ export const AdminMenu: React.FC = () => {
       amount: parseFloat(ing.amount as unknown as string) || 0
     }));
 
+    const finalImage = image.trim() || getCategoryImageUrl(category);
+
     if (editingItem) {
       updateMenuItem(editingItem.id, {
         name: name.trim(),
@@ -149,6 +156,7 @@ export const AdminMenu: React.FC = () => {
         price: parseFloat(price) || 0,
         description: description.trim() || "",
         brand,
+        image: finalImage,
         ingredients: parsedIngredients,
       });
     } else {
@@ -159,6 +167,7 @@ export const AdminMenu: React.FC = () => {
         available: true,
         description: description.trim() || "",
         brand,
+        image: finalImage,
         ingredients: parsedIngredients,
       });
     }
@@ -261,29 +270,50 @@ export const AdminMenu: React.FC = () => {
             }`}
           >
             <div>
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                    {item.category}
-                  </span>
-                  {item.brand === 'KUNAFA' && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
-                      KUNAFA
+              {/* Category / Item Image with uniform pure white background */}
+              <div className="w-full h-36 bg-white rounded-xl border border-stone-200/70 p-2 mb-3.5 flex items-center justify-center overflow-hidden shadow-2xs group relative">
+                <img
+                  src={getMenuItemImage(item)}
+                  alt={item.name}
+                  className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const fallback = getCategoryImageUrl(item.category);
+                    if (target.src !== fallback) {
+                      target.src = fallback;
+                    }
+                  }}
+                />
+              </div>
+
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      {item.category}
                     </span>
-                  )}
-                  {(item.brand === 'JB Cafe' || !item.brand) && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                      JB CAFE
-                    </span>
-                  )}
-                  <h3 className="font-extrabold text-stone-900 text-base mt-1">{item.name}</h3>
+                    {item.brand === 'KUNAFA' && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                        KUNAFA
+                      </span>
+                    )}
+                    {(item.brand === 'JB Cafe' || !item.brand) && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                        JB CAFE
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-extrabold text-stone-900 text-base mt-1.5 leading-snug">{item.name}</h3>
                 </div>
-                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs">
+                <span className="text-sm font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 shadow-2xs shrink-0">
                   ₹{item.price}
                 </span>
               </div>
 
-              <p className="text-xs text-stone-500 mt-1 line-clamp-2">{item.description}</p>
+              {item.description && (
+                <p className="text-xs text-stone-500 mt-1.5 line-clamp-2">{item.description}</p>
+              )}
 
               {/* Connected Ingredients hint */}
               {item.ingredients && item.ingredients.length > 0 && (
@@ -365,6 +395,7 @@ export const AdminMenu: React.FC = () => {
                         const targetCats = newBrand === 'KUNAFA' ? KUNAFA_CATEGORIES : JB_CAFE_CATEGORIES;
                         if (!targetCats.includes(category)) {
                           setCategory(targetCats[0]);
+                          setImage(getCategoryImageUrl(targetCats[0]));
                         }
                       }}
                       options={[
@@ -380,7 +411,11 @@ export const AdminMenu: React.FC = () => {
                     <label className="block font-semibold text-stone-700 mb-1">Category</label>
                     <CustomSelect
                       value={category}
-                      onChange={(val) => setCategory(val as Exclude<MenuItemCategory, 'All'>)}
+                      onChange={(val) => {
+                        const newCat = val as Exclude<MenuItemCategory, 'All'>;
+                        setCategory(newCat);
+                        setImage(getCategoryImageUrl(newCat));
+                      }}
                       options={modalCategories.map((cat) => ({ value: cat, label: cat }))}
                     />
                   </div>
@@ -396,6 +431,26 @@ export const AdminMenu: React.FC = () => {
                       placeholder="140"
                       className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                     />
+                  </div>
+                </div>
+
+                {/* Category Image Preview with Pure White Background */}
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Category Image</label>
+                  <div className="flex items-center gap-3.5 p-2.5 bg-stone-50 rounded-xl border border-stone-200">
+                    <div className="w-16 h-16 rounded-xl bg-white border border-stone-200 p-1 flex items-center justify-center shadow-2xs shrink-0 overflow-hidden">
+                      <img
+                        src={image || getCategoryImageUrl(category)}
+                        alt="Category preview"
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-stone-800">{category} Image</div>
+                      <div className="text-[11px] text-stone-500 truncate">
+                        Applied across all items in {category} with uniform white background
+                      </div>
+                    </div>
                   </div>
                 </div>
 

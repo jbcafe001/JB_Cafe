@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
+import { getMenuItemImage } from '../../utils/menuImages';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -345,9 +346,19 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             return (
               <div
                 key={item.id}
-                className={`bg-white border rounded-xl p-3 flex items-center justify-between transition-shadow ${isOutOfStock ? 'border-red-200 bg-red-50/30 opacity-75' : 'border-stone-200/80 shadow-xs hover:shadow-sm'}`}
+                className={`bg-white border rounded-xl p-3 flex items-center justify-between transition-shadow gap-3 ${isOutOfStock ? 'border-red-200 bg-red-50/30 opacity-75' : 'border-stone-200/80 shadow-xs hover:shadow-sm'}`}
               >
-                <div className="pr-2 flex-1">
+                {/* Item category image with uniform pure white background */}
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white border border-stone-200/80 p-1 shrink-0 flex items-center justify-center shadow-2xs overflow-hidden">
+                  <img
+                    src={getMenuItemImage(item)}
+                    alt={item.name}
+                    className="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="pr-2 flex-1 min-w-0">
                   <h4 className="font-bold text-stone-900 text-sm flex items-center gap-2">
                     {item.name}
                   </h4>
