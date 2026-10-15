@@ -14,9 +14,12 @@ import {
   Flame,
   Check,
   Sparkles,
+  Grid,
+  Map,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
+import { SeatMap } from '../common/SeatMap';
 
 interface WaiterTablesProps {
   onSelectTable: (table: Table) => void;
@@ -25,6 +28,7 @@ interface WaiterTablesProps {
 export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => {
   const { tables, orders, menuItems, serveOrder, completeOrder, servePreparedItems, toggleItemServed } = useCafe();
   const [filter, setFilter] = useState<'all' | TableStatus>('all');
+  const [view, setView] = useState<'grid' | 'map'>('grid');
 
   // Modal states for Table View
   const [activeTableModal, setActiveTableModal] = useState<Table | null>(null);
@@ -148,10 +152,32 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">Café Floor Tables</h2>
           <p className="text-xs text-stone-500">Tap table to start order, serve, or collect payment</p>
         </div>
+        {/* View toggle */}
+        <div className="flex rounded-xl border border-stone-200 overflow-hidden shadow-sm">
+          <button
+            onClick={() => setView('grid')}
+            className={`px-3 py-1.5 flex items-center gap-1 text-[10px] font-bold transition-colors ${
+              view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500'
+            }`}
+          >
+            <Grid className="w-3 h-3" />
+            Grid
+          </button>
+          <button
+            onClick={() => setView('map')}
+            className={`px-3 py-1.5 flex items-center gap-1 text-[10px] font-bold transition-colors ${
+              view === 'map' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500'
+            }`}
+          >
+            <Map className="w-3 h-3" />
+            Map
+          </button>
+        </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
+      {/* Filter Tabs — only in grid view */}
+      {view === 'grid' && (
+        <div className="flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
         {(['all', 'available', 'occupied', 'preparing', 'ready', 'served'] as const).map((st) => {
           const getActiveFilterStyle = (status: string) => {
             switch (status) {
@@ -187,9 +213,17 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           );
         })}
       </div>
+      )}
+
+      {/* Seat Map View */}
+      {view === 'map' && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm">
+          <SeatMap tables={tables} onTableClick={handleCardClick} interactive />
+        </div>
+      )}
 
       {/* Table Cards Grid */}
-      {filteredTables.length === 0 ? (
+      {view === 'grid' && filteredTables.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[350px] text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-stone-200/50 flex items-center justify-center text-stone-400">
             <Utensils className="w-8 h-8 opacity-50" />

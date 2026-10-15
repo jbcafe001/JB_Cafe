@@ -236,7 +236,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-page-enter">
           {tables.map((table, idx) => {
             const activeOrders = getActiveOrdersForTable(table.id);
-            
+
             const isAllItemsServed = (o: Order) => o.items.length > 0 && o.items.every(i => i.served);
             const isPartiallyReady = (o: Order) => o.status === 'preparing' && o.items.some(i => ((i.prepared || 0) > (i.servedCount || 0)));
             const readyCount = activeOrders.filter(o => (o.status === 'ready' || isPartiallyReady(o)) && !isAllItemsServed(o)).length;
@@ -448,13 +448,12 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                                 }
                               }}
                               disabled={(item.prepared || 0) < item.quantity && !item.served}
-                              className={`w-5 h-5 rounded-md border shadow-sm flex items-center justify-center transition-all ${
-                                item.served 
-                                  ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20' 
-                                  : ((item.prepared || 0) < item.quantity 
-                                      ? 'bg-stone-100 border-stone-200 cursor-not-allowed opacity-50' 
-                                      : 'bg-white border-stone-300 text-transparent hover:border-emerald-400')
-                              }`}
+                              className={`w-5 h-5 rounded-md border shadow-sm flex items-center justify-center transition-all ${item.served
+                                  ? 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20'
+                                  : ((item.prepared || 0) < item.quantity
+                                    ? 'bg-stone-100 border-stone-200 cursor-not-allowed opacity-50'
+                                    : 'bg-white border-stone-300 text-transparent hover:border-emerald-400')
+                                }`}
                               title={(item.prepared || 0) < item.quantity && !item.served ? "Item not fully prepared yet" : "Mark as Served"}
                             >
                               <Check className="w-3 h-3" />
@@ -563,8 +562,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                       onClick={() => {
                         servePreparedItems(order.id);
                         if (activeModalOrders.length === 1 && unservedReadyCount === order.items.reduce((s, i) => s + (i.quantity - (i.servedCount || 0)), 0)) {
-                           // if all remaining items are being served, close modal
-                           setSelectedTableForAction(null);
+                          // if all remaining items are being served, close modal
+                          setSelectedTableForAction(null);
                         }
                       }}
                       className="w-full py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-extrabold text-sm rounded-xl border border-emerald-300 shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"

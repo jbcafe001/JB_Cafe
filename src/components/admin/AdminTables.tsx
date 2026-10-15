@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
 import { Table, TableStatus } from '../../types';
-import { Plus, Users, Edit, X, Grid, CheckCircle2 } from 'lucide-react';
+import { Plus, Users, Edit, X, Grid, Map } from 'lucide-react';
 import { CustomSelect } from '../common/CustomSelect';
 import { useModalClose } from '../../hooks/useModalClose';
+import { SeatMap } from '../common/SeatMap';
 
 export const AdminTables: React.FC = () => {
   const { tables, addTable, updateTable } = useCafe();
 
+  const [view, setView] = useState<'grid' | 'map'>('grid');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingTable, setEditingTable] = useState<Table | null>(null);
   const [number, setNumber] = useState('');
@@ -111,18 +113,49 @@ export const AdminTables: React.FC = () => {
           <p className="text-xs text-stone-500">Floor arrangement, seating capacity, and occupancy status</p>
         </div>
 
-        <button
-          id="add-table-btn"
-          onClick={handleOpenAdd}
-          className="btn-interactive w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-black text-xs rounded-xl shadow-md shadow-teal-700/15 flex items-center justify-center space-x-1.5 transition-all whitespace-nowrap"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Table</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex rounded-xl border border-stone-200 overflow-hidden">
+            <button
+              onClick={() => setView('grid')}
+              className={`px-3 py-2 flex items-center gap-1.5 text-xs font-bold transition-colors ${
+                view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+              }`}
+            >
+              <Grid className="w-3.5 h-3.5" />
+              Grid
+            </button>
+            <button
+              onClick={() => setView('map')}
+              className={`px-3 py-2 flex items-center gap-1.5 text-xs font-bold transition-colors ${
+                view === 'map' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+              }`}
+            >
+              <Map className="w-3.5 h-3.5" />
+              Seat Map
+            </button>
+          </div>
+
+          <button
+            id="add-table-btn"
+            onClick={handleOpenAdd}
+            className="btn-interactive px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-black text-xs rounded-xl shadow-md shadow-teal-700/15 flex items-center space-x-1.5 transition-all whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Table</span>
+          </button>
+        </div>
       </div>
 
+      {/* Seat Map View */}
+      {view === 'map' && (
+        <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+          <SeatMap tables={tables} interactive={false} />
+        </div>
+      )}
+
       {/* Tables Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      {view === 'grid' && <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {tables.map((table, idx) => (
           <div
             key={table.id}
@@ -176,7 +209,7 @@ export const AdminTables: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Add / Edit Table Modal */}
       {showAddModal && (
