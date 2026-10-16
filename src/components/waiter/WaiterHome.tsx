@@ -178,7 +178,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
     .toUpperCase();
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-28 bg-[#F9F8F6]">
+    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-5 pb-28 bg-[#F9F8F6]">
       <WaiterHeader />
 
       {/* Ready Orders Alert Strip */}
@@ -255,7 +255,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
         {/* Seat Map View (Default) */}
         {view === 'map' && (
-          <div className="bg-white rounded-3xl border border-stone-200/90 p-4 sm:p-5 shadow-sm">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 p-2 sm:p-4 md:p-5 shadow-sm">
             <SeatMap tables={tables} onTableClick={handleTableCardClick} interactive={true} />
           </div>
         )}

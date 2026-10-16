@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { User, UserRole } from '../../types';
 import { Plus, UserCheck, Shield, ChefHat, Smartphone, X, Edit, ToggleLeft, ToggleRight, User as UserIcon, Trash2 } from 'lucide-react';
@@ -268,122 +269,137 @@ export const AdminUsers: React.FC = () => {
       </div>
 
       {/* Add User Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4" onClick={handleCloseModal}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150 border border-stone-200" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 rounded-t-2xl">
-              <h3 className="font-extrabold text-stone-900 text-base">{editingUserId ? 'Edit Team Member' : 'Add Team Member'}</h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm min-h-[400px] flex flex-col">
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Maya Rao"
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Email / Login ID *</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="maya@cafe.demo"
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
-              </div>
-
-              {!editingUserId && (
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Temporary Password *</label>
-                  <input
-                    type="text"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="e.g. password123"
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Assigned Role *</label>
-                <CustomSelect
-                  value={role}
-                  onChange={(val) => setRole(val as UserRole)}
-                  options={[
-                    { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
-                    { value: 'cook', label: 'Cook (KDS Display)' },
-                    { value: 'others', label: 'Others (Limited Access)' },
-                    ...(currentRole !== 'admin_kunafa' ? [
-                      { value: 'admin', label: 'Admin (Full Management)' },
-                      { value: 'admin_kunafa', label: 'Admin (KUNAFA)' },
-                    ] : [])
-                  ]}
-                />
-              </div>
-
-              {['waiter', 'cook', 'others'].includes(role) && currentRole !== 'admin_kunafa' && (
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Associated Brand *</label>
-                  <CustomSelect
-                    value={brand}
-                    onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
-                    options={[
-                      { value: 'JB Cafe', label: 'JB Cafe' },
-                      { value: 'KUNAFA', label: 'KUNAFA' },
-                    ]}
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Phone Number (Optional)</label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 98765 00000"
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end space-x-2 mt-auto">
+      {showAddModal &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-xs overflow-y-auto flex items-center justify-center p-4"
+            onClick={handleCloseModal}
+          >
+            <div
+              className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-150 border border-stone-200 my-auto max-h-[92vh] flex flex-col overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 shrink-0">
+                <h3 className="font-extrabold text-stone-900 text-base">
+                  {editingUserId ? 'Edit Team Member' : 'Add Team Member'}
+                </h3>
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
+                  className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  id="save-user-btn"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs disabled:opacity-70 flex items-center space-x-2"
-                >
-                  {isSubmitting && <span className="animate-spin h-3 w-3 border-2 border-white/40 border-t-white rounded-full" />}
-                  <span>{editingUserId ? 'Update User' : 'Create User'}</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+              <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm overflow-y-auto flex-1 flex flex-col">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Maya Rao"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Email / Login ID *</label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="maya@cafe.demo"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+
+                {!editingUserId && (
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">Temporary Password *</label>
+                    <input
+                      type="text"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="e.g. password123"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Assigned Role *</label>
+                  <CustomSelect
+                    value={role}
+                    onChange={(val) => setRole(val as UserRole)}
+                    options={[
+                      { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
+                      { value: 'cook', label: 'Cook (KDS Display)' },
+                      { value: 'others', label: 'Others (Limited Access)' },
+                      ...(currentRole !== 'admin_kunafa'
+                        ? [
+                            { value: 'admin', label: 'Admin (Full Management)' },
+                            { value: 'admin_kunafa', label: 'Admin (KUNAFA)' },
+                          ]
+                        : []),
+                    ]}
+                  />
+                </div>
+
+                {['waiter', 'cook', 'others'].includes(role) && currentRole !== 'admin_kunafa' && (
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">Associated Brand *</label>
+                    <CustomSelect
+                      value={brand}
+                      onChange={(val) => setBrand(val as 'JB Cafe' | 'KUNAFA')}
+                      options={[
+                        { value: 'JB Cafe', label: 'JB Cafe' },
+                        { value: 'KUNAFA', label: 'KUNAFA' },
+                      ]}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Phone Number (Optional)</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 00000"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end space-x-2 mt-auto">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    id="save-user-btn"
+                    disabled={isSubmitting}
+                    className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs disabled:opacity-70 flex items-center space-x-2 cursor-pointer"
+                  >
+                    {isSubmitting && (
+                      <span className="animate-spin h-3 w-3 border-2 border-white/40 border-t-white rounded-full" />
+                    )}
+                    <span>{editingUserId ? 'Update User' : 'Create User'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };

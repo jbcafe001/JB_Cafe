@@ -19,7 +19,7 @@ export const WaiterHeader: React.FC = () => {
     .toUpperCase();
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80 text-stone-900 border-b border-amber-200/80 px-4 py-3.5 sm:py-4 -mx-4 -mt-4 mb-4 flex items-center justify-between shadow-2xs">
+    <div className="bg-gradient-to-r from-amber-50 via-[#FAF7F2] to-orange-50/80 text-stone-900 border-b border-amber-200/80 px-3 sm:px-4 py-3 sm:py-4 -mx-2.5 sm:-mx-4 -mt-2.5 sm:-mt-4 mb-3 sm:mb-4 flex items-center justify-between shadow-2xs">
       {/* Left: Cafe Name & Logo */}
       <div className="flex items-center space-x-2.5">
         <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center text-amber-600 shadow-sm overflow-hidden shrink-0 border-2 border-amber-200/80">

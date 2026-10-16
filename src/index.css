@@ -220,10 +220,20 @@
    GLOBAL BORDER REMOVAL — Cards, Tables, Sidebar Active Tabs
    ============================================================ */
 
-/* Remove borders from all rounded card containers */
-[class*="rounded-2xl"],
-[class*="rounded-xl"] {
+/* Remove borders from all rounded card containers except seat map cells */
+[class*="rounded-2xl"]:not(.seat-cell),
+[class*="rounded-xl"]:not(.seat-cell) {
   border: none !important;
+}
+
+.seat-cell {
+  border-width: 1.5px !important;
+  border-style: solid !important;
+}
+@media (min-width: 640px) {
+  .seat-cell {
+    border-width: 2px !important;
+  }
 }
 
 /* Remove ALL borders from every table element including row dividers */

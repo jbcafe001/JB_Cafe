@@ -145,7 +145,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
   const changeToReturn = paymentModalOrder ? currentCash - paymentModalOrder.total : 0;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28 bg-[#F8F6F0]">
+    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-4 pb-28 bg-[#F8F6F0]">
       <WaiterHeader />
       <div className="flex items-center justify-between">
         <div>
@@ -217,7 +217,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
       {/* Seat Map View */}
       {view === 'map' && (
-        <div className="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 p-2 sm:p-4 md:p-5 shadow-sm">
           <SeatMap tables={tables} onTableClick={handleCardClick} interactive />
         </div>
       )}

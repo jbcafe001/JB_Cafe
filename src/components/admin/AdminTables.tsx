@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { Table, TableStatus } from '../../types';
 import { Plus, Users, Edit, X, Grid, Map } from 'lucide-react';
@@ -110,7 +111,7 @@ export const AdminTables: React.FC = () => {
 
       {/* Seat Map View */}
       {view === 'map' && (
-        <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white border border-stone-200/90 rounded-2xl sm:rounded-3xl p-2 sm:p-4 md:p-5 shadow-sm">
           <SeatMap tables={tables} onTableClick={handleOpenEdit} interactive={true} />
         </div>
       )}
@@ -172,95 +173,104 @@ export const AdminTables: React.FC = () => {
         ))}
       </div>}
 
-      {/* Edit Table Details Modal */}
-      {showAddModal && editingTable && (
-        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={handleCloseModal}>
-          <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
-              <div>
-                <h3 className="font-extrabold text-stone-900 text-base">
-                  {editingTable.name || `Table ${editingTable.number}`}
-                </h3>
-                <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Fixed Floor Layout</span>
-              </div>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-semibold text-stone-700">Table Number</label>
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(editingTable.status)}`}>
-                    {editingTable.status === 'occupied' ? 'Order Taken' : editingTable.status}
-                  </span>
+      {/* Edit Table Details Modal — Rendered via Portal directly to body for true centering and responsive visibility */}
+      {showAddModal && editingTable &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] bg-stone-900/40 backdrop-blur-md overflow-y-auto animate-fade-in flex items-center justify-center p-4"
+            onClick={handleCloseModal}
+          >
+            <div
+              className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden my-auto max-h-[92vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div>
+                  <h3 className="font-extrabold text-stone-900 text-base">
+                    {editingTable.name || `Table ${editingTable.number}`}
+                  </h3>
+                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Fixed Floor Layout</span>
                 </div>
-                <input
-                  type="text"
-                  disabled
-                  value={editingTable.number}
-                  className="w-full px-3 py-2 bg-stone-100 border border-stone-200 rounded-xl font-bold text-stone-700 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Seating Capacity (Guests)</label>
-                <CustomSelect
-                  value={seats}
-                  onChange={(val) => setSeats(val)}
-                  options={[
-                    { value: '2', label: '2 Guests' },
-                    { value: '4', label: '4 Guests' },
-                    { value: '6', label: '6 Guests' },
-                    { value: '8', label: '8 Guests' },
-                    { value: '10', label: '10 Guests' },
-                  ]}
-                />
-              </div>
-
-              {editingTable.activeWaiterName && (
-                <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-600">
-                  Assigned Waiter: <strong className="text-stone-900">{editingTable.activeWaiterName}</strong>
-                </div>
-              )}
-
-              {editingTable.status !== 'available' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    updateTable(editingTable.id, { status: 'available', currentOrderId: undefined });
-                    setShowAddModal(false);
-                  }}
-                  className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center space-x-1"
-                >
-                  <span>Free Table / Set to Available</span>
-                </button>
-              )}
-
-              <div className="pt-2 flex items-center justify-end space-x-2">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="btn-interactive px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
+                  className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  id="save-table-btn"
-                  className="btn-interactive px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md shadow-amber-600/20"
-                >
-                  Save Changes
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+              <form onSubmit={handleSaveSubmit} className="p-5 space-y-4 text-xs sm:text-sm overflow-y-auto flex-1">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-stone-700">Table Number</label>
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(editingTable.status)}`}>
+                      {editingTable.status === 'occupied' ? 'Order Taken' : editingTable.status}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    disabled
+                    value={editingTable.number}
+                    className="w-full px-3 py-2 bg-stone-100 border border-stone-200 rounded-xl font-bold text-stone-700 cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Seating Capacity (Guests)</label>
+                  <CustomSelect
+                    value={seats}
+                    onChange={(val) => setSeats(val)}
+                    options={[
+                      { value: '2', label: '2 Guests' },
+                      { value: '4', label: '4 Guests' },
+                      { value: '6', label: '6 Guests' },
+                      { value: '8', label: '8 Guests' },
+                      { value: '10', label: '10 Guests' },
+                    ]}
+                  />
+                </div>
+
+                {editingTable.activeWaiterName && (
+                  <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-600">
+                    Assigned Waiter: <strong className="text-stone-900">{editingTable.activeWaiterName}</strong>
+                  </div>
+                )}
+
+                {editingTable.status !== 'available' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateTable(editingTable.id, { status: 'available', currentOrderId: undefined });
+                      setShowAddModal(false);
+                    }}
+                    className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center space-x-1 cursor-pointer"
+                  >
+                    <span>Free Table / Set to Available</span>
+                  </button>
+                )}
+
+                <div className="pt-2 flex items-center justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="btn-interactive px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    id="save-table-btn"
+                    className="btn-interactive px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md shadow-amber-600/20 cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
