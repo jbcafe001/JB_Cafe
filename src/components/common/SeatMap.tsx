@@ -239,23 +239,31 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `3-${i}` }))}
         />
 
-        {/* Col 6: Col 2: 2-5 → 2-1 */}
+        {/* Col 6: Col 2: starts 1 row down to match Col 3, 2-5 → 2-1 */}
         <Col
           label="Col 2"
+          topSpacer={1}
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `2-${i}` }))}
         />
 
-        {/* Col 7: Col 1: 1-5 → 1-1 */}
+        {/* Col 7: Col 1: starts 1 row down to match Col 3, 1-5 → 1-1 */}
         <Col
           label="Col 1"
+          topSpacer={1}
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `1-${i}` }))}
         />
 
-        {/* Col 8: Entry Jhula: J-4 → J-1 */}
+        {/* Col 8: Entry Jhula: J-4 (aligned with 1-5), walkway gap (aligned with 1-4), J-3, J-2, J-1 (aligned with 1-3, 1-2, 1-1) */}
         <Col
-          label="↑ Entry"
+          label="← Entry"
           labelColor="text-yellow-600"
-          items={[4, 3, 2, 1].map((i) => ({ number: `J-${i}`, zone: 'J' as const }))}
+          topSpacer={1}
+          items={[
+            { number: 'J-4', zone: 'J', spacerAfter: true },
+            { number: 'J-3', zone: 'J' },
+            { number: 'J-2', zone: 'J' },
+            { number: 'J-1', zone: 'J' },
+          ]}
         />
       </div>
 
