@@ -9,7 +9,7 @@ import { SeatMap } from '../common/SeatMap';
 export const AdminTables: React.FC = () => {
   const { tables, addTable, updateTable } = useCafe();
 
-  const [view, setView] = useState<'grid' | 'map'>('grid');
+  const [view, setView] = useState<'grid' | 'map'>('map');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingTable, setEditingTable] = useState<Table | null>(null);
   const [number, setNumber] = useState('');
@@ -18,15 +18,6 @@ export const AdminTables: React.FC = () => {
 
   const handleCloseModal = () => setShowAddModal(false);
   useModalClose(handleCloseModal, showAddModal);
-
-  const handleOpenAdd = () => {
-    const nextNum = (tables.length + 1).toString().padStart(2, '0');
-    setNumber(nextNum);
-    setSeats('4');
-    setEditingTable(null);
-    setNumberError('');
-    setShowAddModal(true);
-  };
 
   const handleOpenEdit = (tbl: Table) => {
     setEditingTable(tbl);
@@ -40,30 +31,9 @@ export const AdminTables: React.FC = () => {
     e.preventDefault();
     if (!number.trim() || !seats) return;
 
-    // Check for duplicate table number (exclude the current table when editing)
-    const trimmed = number.trim();
-    const isDuplicate = tables.some(
-      (t) => t.number === trimmed && t.id !== editingTable?.id
-    );
-    if (isDuplicate) {
-      setNumberError(`Table ${trimmed} already exists. Please choose a different number.`);
-      return;
-    }
-
-    setNumberError('');
-
     if (editingTable) {
       updateTable(editingTable.id, {
-        number: trimmed,
-        name: `Table ${trimmed}`,
         seats: parseInt(seats, 10) || 4,
-      });
-    } else {
-      addTable({
-        number: trimmed,
-        name: `Table ${trimmed}`,
-        seats: parseInt(seats, 10) || 4,
-        status: 'available',
       });
     }
 
@@ -94,11 +64,11 @@ export const AdminTables: React.FC = () => {
       case 'occupied':
         return 'bg-gradient-to-br from-amber-50/50 via-white to-white border-amber-200/90';
       case 'preparing':
-        return 'bg-gradient-to-br from-orange-50/50 via-white to-white border-orange-200/90';
+        return 'bg-orange-50/50 via-white to-white border-orange-200/90';
       case 'ready':
-        return 'bg-gradient-to-br from-teal-50/50 via-white to-white border-teal-200/90';
+        return 'bg-teal-50/50 via-white to-white border-teal-200/90';
       case 'served':
-        return 'bg-gradient-to-br from-purple-50/50 via-white to-white border-purple-200/90';
+        return 'bg-purple-50/50 via-white to-white border-purple-200/90';
       default:
         return 'bg-white border-stone-200/90';
     }
@@ -106,7 +76,7 @@ export const AdminTables: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-page-enter">
-      {/* Header & Add Button */}
+      {/* Header & View Toggle (Add Table removed as layout is fixed) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">TABLE MANAGEMENT</h2>
@@ -115,16 +85,7 @@ export const AdminTables: React.FC = () => {
 
         <div className="flex items-center gap-2">
           {/* View toggle */}
-          <div className="flex rounded-xl border border-stone-200 overflow-hidden">
-            <button
-              onClick={() => setView('grid')}
-              className={`px-3 py-2 flex items-center gap-1.5 text-xs font-bold transition-colors ${
-                view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
-              }`}
-            >
-              <Grid className="w-3.5 h-3.5" />
-              Grid
-            </button>
+          <div className="flex rounded-xl border border-stone-200 overflow-hidden shadow-xs">
             <button
               onClick={() => setView('map')}
               className={`px-3 py-2 flex items-center gap-1.5 text-xs font-bold transition-colors ${
@@ -134,23 +95,23 @@ export const AdminTables: React.FC = () => {
               <Map className="w-3.5 h-3.5" />
               Seat Map
             </button>
+            <button
+              onClick={() => setView('grid')}
+              className={`px-3 py-2 flex items-center gap-1.5 text-xs font-bold transition-colors ${
+                view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+              }`}
+            >
+              <Grid className="w-3.5 h-3.5" />
+              Grid
+            </button>
           </div>
-
-          <button
-            id="add-table-btn"
-            onClick={handleOpenAdd}
-            className="btn-interactive px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-black text-xs rounded-xl shadow-md shadow-teal-700/15 flex items-center space-x-1.5 transition-all whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Table</span>
-          </button>
         </div>
       </div>
 
       {/* Seat Map View */}
       {view === 'map' && (
         <div className="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
-          <SeatMap tables={tables} interactive={false} />
+          <SeatMap tables={tables} onTableClick={handleOpenEdit} interactive={true} />
         </div>
       )}
 
@@ -211,14 +172,17 @@ export const AdminTables: React.FC = () => {
         ))}
       </div>}
 
-      {/* Add / Edit Table Modal */}
-      {showAddModal && (
+      {/* Edit Table Details Modal */}
+      {showAddModal && editingTable && (
         <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={handleCloseModal}>
           <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b border-stone-200/80 flex items-center justify-between bg-stone-50/80">
-              <h3 className="font-extrabold text-stone-900 text-base">
-                {editingTable ? 'Edit Table' : '+ Add Café Table'}
-              </h3>
+              <div>
+                <h3 className="font-extrabold text-stone-900 text-base">
+                  {editingTable.name || `Table ${editingTable.number}`}
+                </h3>
+                <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Fixed Floor Layout</span>
+              </div>
               <button
                 onClick={() => setShowAddModal(false)}
                 className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
@@ -229,28 +193,22 @@ export const AdminTables: React.FC = () => {
 
             <form onSubmit={handleSaveSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Table Number (e.g. 11) *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-semibold text-stone-700">Table Number</label>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full capitalize border ${getStatusBadge(editingTable.status)}`}>
+                    {editingTable.status === 'occupied' ? 'Order Taken' : editingTable.status}
+                  </span>
+                </div>
                 <input
                   type="text"
-                  required
-                  value={number}
-                  onChange={(e) => { setNumber(e.target.value); setNumberError(''); }}
-                  placeholder="11"
-                  className={`w-full px-3 py-2 bg-stone-50 border rounded-xl focus:ring-1 focus:outline-hidden transition-all ${
-                    numberError
-                      ? 'border-red-400 focus:ring-red-400'
-                      : 'border-stone-200 focus:ring-amber-500'
-                  }`}
+                  disabled
+                  value={editingTable.number}
+                  className="w-full px-3 py-2 bg-stone-100 border border-stone-200 rounded-xl font-bold text-stone-700 cursor-not-allowed"
                 />
-                {numberError && (
-                  <p className="mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1 animate-slide-in-right">
-                    <span>⚠</span> {numberError}
-                  </p>
-                )}
               </div>
 
               <div>
-                <label className="block font-semibold text-stone-700 mb-1">Seating Capacity (Guests) *</label>
+                <label className="block font-semibold text-stone-700 mb-1">Seating Capacity (Guests)</label>
                 <CustomSelect
                   value={seats}
                   onChange={(val) => setSeats(val)}
@@ -263,6 +221,25 @@ export const AdminTables: React.FC = () => {
                   ]}
                 />
               </div>
+
+              {editingTable.activeWaiterName && (
+                <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-600">
+                  Assigned Waiter: <strong className="text-stone-900">{editingTable.activeWaiterName}</strong>
+                </div>
+              )}
+
+              {editingTable.status !== 'available' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateTable(editingTable.id, { status: 'available', currentOrderId: undefined });
+                    setShowAddModal(false);
+                  }}
+                  className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center space-x-1"
+                >
+                  <span>Free Table / Set to Available</span>
+                </button>
+              )}
 
               <div className="pt-2 flex items-center justify-end space-x-2">
                 <button
@@ -277,7 +254,7 @@ export const AdminTables: React.FC = () => {
                   id="save-table-btn"
                   className="btn-interactive px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md shadow-amber-600/20"
                 >
-                  {editingTable ? 'Save Table' : 'Add Table'}
+                  Save Changes
                 </button>
               </div>
             </form>

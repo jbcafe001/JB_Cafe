@@ -28,7 +28,7 @@ interface WaiterTablesProps {
 export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => {
   const { tables, orders, menuItems, serveOrder, completeOrder, servePreparedItems, toggleItemServed } = useCafe();
   const [filter, setFilter] = useState<'all' | TableStatus>('all');
-  const [view, setView] = useState<'grid' | 'map'>('grid');
+  const [view, setView] = useState<'grid' | 'map'>('map');
 
   // Modal states for Table View
   const [activeTableModal, setActiveTableModal] = useState<Table | null>(null);
@@ -153,24 +153,24 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           <p className="text-xs text-stone-500">Tap table to start order, serve, or collect payment</p>
         </div>
         {/* View toggle */}
-        <div className="flex rounded-xl border border-stone-200 overflow-hidden shadow-sm">
-          <button
-            onClick={() => setView('grid')}
-            className={`px-3 py-1.5 flex items-center gap-1 text-[10px] font-bold transition-colors ${
-              view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500'
-            }`}
-          >
-            <Grid className="w-3 h-3" />
-            Grid
-          </button>
+        <div className="flex rounded-xl border border-stone-200 overflow-hidden shadow-xs">
           <button
             onClick={() => setView('map')}
-            className={`px-3 py-1.5 flex items-center gap-1 text-[10px] font-bold transition-colors ${
-              view === 'map' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500'
+            className={`px-3 py-1.5 flex items-center gap-1 text-[11px] font-bold transition-colors ${
+              view === 'map' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
             }`}
           >
-            <Map className="w-3 h-3" />
-            Map
+            <Map className="w-3.5 h-3.5" />
+            Seat Map
+          </button>
+          <button
+            onClick={() => setView('grid')}
+            className={`px-3 py-1.5 flex items-center gap-1 text-[11px] font-bold transition-colors ${
+              view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+            }`}
+          >
+            <Grid className="w-3.5 h-3.5" />
+            Grid
           </button>
         </div>
       </div>

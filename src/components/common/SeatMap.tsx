@@ -20,12 +20,24 @@ const GAP    = 8;  // px — vertical gap between boxes (gap-2)
 
 export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interactive = true }) => {
   const tableMap = new Map<string, Table>();
-  tables.forEach((t) => tableMap.set(t.number, t));
+  tables.forEach((t) => {
+    tableMap.set(t.number, t);
+    tableMap.set(t.number.toLowerCase(), t);
+    tableMap.set(t.number.replace(/\s+/g, ''), t);
+  });
 
   /* ── Table Cell ─────────────────────────────────────────── */
   const TableCell: React.FC<{ number: string; zone?: 'G' | 'J' | 'Sm' | 'C' }> = ({ number, zone }) => {
-    const table  = tableMap.get(number);
-    const status = table?.status ?? 'available';
+    const table = tableMap.get(number) || tableMap.get(number.toLowerCase()) || tableMap.get(number.replace(/\s+/g, ''));
+    const fallbackTable: Table = {
+      id: `tbl-${number.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      number,
+      name: `Table ${number}`,
+      seats: 4,
+      status: 'available',
+    };
+    const effectiveTable = table || fallbackTable;
+    const status = effectiveTable.status ?? 'available';
     const c      = statusColor[status] ?? statusColor.available;
 
     const ring =
@@ -42,15 +54,15 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
     return (
       <div
-        onClick={() => interactive && table && onTableClick?.(table)}
-        title={table ? `${table.name} — ${status}` : `${number} (not configured)`}
+        onClick={() => interactive && onTableClick?.(effectiveTable)}
+        title={effectiveTable ? `${effectiveTable.name} — ${status}` : `${number}`}
         className={[
           'relative flex flex-col items-center justify-center rounded-xl border-2 select-none transition-all shadow-xs',
           'w-full max-w-[150px]',
           c.bg, c.border, ring,
-          interactive && table
+          interactive
             ? 'cursor-pointer hover:brightness-95 hover:shadow-md hover:scale-[1.02] active:scale-95'
-            : 'cursor-default opacity-60',
+            : 'cursor-default',
         ].join(' ')}
         style={{ height: CELL_H, minHeight: CELL_H }}
       >
@@ -100,7 +112,8 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
   );
 
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-auto pb-2">
+      <div className="min-w-[680px] w-full">
 
       {/* ════════════════════════════════════════════════════════
           KUNAFA SECTION
@@ -265,6 +278,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
         <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
           <span className="w-3 h-3 rounded-full ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
         </span>
+      </div>
       </div>
     </div>
   );

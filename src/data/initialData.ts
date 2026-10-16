@@ -1810,85 +1810,72 @@ export const INITIAL_MENU: MenuItem[] = [
 
 
 export const INITIAL_TABLES: Table[] = [
-  {
-    id: 'tbl-01',
-    number: '01',
-    name: 'Table 01',
-    seats: 2,
-    status: 'available',
-  },
-  {
-    id: 'tbl-02',
-    number: '02',
-    name: 'Table 02',
-    seats: 4,
-    status: 'ready',
-    currentOrderId: 'ord-live-1043',
-    activeWaiterId: 'u-waiter-1',
-    activeWaiterName: 'Rahul Sharma',
-  },
-  {
-    id: 'tbl-03',
-    number: '03',
-    name: 'Table 03',
-    seats: 2,
-    status: 'preparing',
-    currentOrderId: 'ord-live-1041',
-    activeWaiterId: 'u-waiter-2',
-    activeWaiterName: 'Priya Patel',
-  },
-  {
-    id: 'tbl-04',
-    number: '04',
-    name: 'Table 04',
-    seats: 4,
-    status: 'available', // Ready for demo step!
-  },
-  {
-    id: 'tbl-05',
-    number: '05',
-    name: 'Table 05',
-    seats: 6,
-    status: 'occupied',
-    currentOrderId: 'ord-live-1040',
-    activeWaiterId: 'u-waiter-1',
-    activeWaiterName: 'Rahul Sharma',
-  },
-  {
-    id: 'tbl-06',
-    number: '06',
-    name: 'Table 06',
-    seats: 2,
-    status: 'available',
-  },
-  {
-    id: 'tbl-07',
-    number: '07',
-    name: 'Table 07',
-    seats: 4,
-    status: 'available',
-  },
-  {
-    id: 'tbl-08',
-    number: '08',
-    name: 'Table 08',
-    seats: 4,
-    status: 'available',
-  },
-  {
-    id: 'tbl-09',
-    number: '09',
-    name: 'Table 09',
-    seats: 6,
-    status: 'available',
-  },
-  {
-    id: 'tbl-10',
-    number: '10',
-    name: 'Table 10',
-    seats: 2,
-    status: 'available',
-  },
+  // Kunafa Section
+  { id: 'tbl-sm-2', number: 'Sm-2', name: 'Table Sm-2', seats: 2, status: 'available' },
+  { id: 'tbl-sm-1', number: 'Sm-1', name: 'Table Sm-1', seats: 2, status: 'available' },
+  { id: 'tbl-j-9',  number: 'J-9',  name: 'Table J-9',  seats: 4, status: 'available' },
+  { id: 'tbl-c-3',  number: 'C-3',  name: 'Table C-3',  seats: 4, status: 'available' },
+  { id: 'tbl-c-4',  number: 'C-4',  name: 'Table C-4',  seats: 4, status: 'available' },
+  { id: 'tbl-p-6',  number: 'P-6',  name: 'Table P-6',  seats: 4, status: 'available' },
+  { id: 'tbl-p-5',  number: 'P-5',  name: 'Table P-5',  seats: 4, status: 'available' },
+  { id: 'tbl-p-4',  number: 'P-4',  name: 'Table P-4',  seats: 4, status: 'available' },
+  { id: 'tbl-p-3',  number: 'P-3',  name: 'Table P-3',  seats: 4, status: 'available' },
+  { id: 'tbl-p-2',  number: 'P-2',  name: 'Table P-2',  seats: 4, status: 'available' },
+  { id: 'tbl-p-1',  number: 'P-1',  name: 'Table P-1',  seats: 4, status: 'available' },
+  { id: 'tbl-c-2',  number: 'C-2',  name: 'Table C-2',  seats: 4, status: 'available' },
+  { id: 'tbl-c-1',  number: 'C-1',  name: 'Table C-1',  seats: 4, status: 'available' },
+  { id: 'tbl-j-6',  number: 'J-6',  name: 'Table J-6',  seats: 4, status: 'available' },
+  { id: 'tbl-j-5',  number: 'J-5',  name: 'Table J-5',  seats: 4, status: 'available' },
+
+  // JB Cafe Floor - Garden: G-7 to G-1
+  { id: 'tbl-g-7',  number: 'G-7',  name: 'Table G-7',  seats: 4, status: 'available' },
+  { id: 'tbl-g-6',  number: 'G-6',  name: 'Table G-6',  seats: 4, status: 'available' },
+  { id: 'tbl-g-5',  number: 'G-5',  name: 'Table G-5',  seats: 4, status: 'available' },
+  { id: 'tbl-g-4',  number: 'G-4',  name: 'Table G-4',  seats: 4, status: 'available' },
+  { id: 'tbl-g-3',  number: 'G-3',  name: 'Table G-3',  seats: 4, status: 'available' },
+  { id: 'tbl-g-2',  number: 'G-2',  name: 'Table G-2',  seats: 4, status: 'available' },
+  { id: 'tbl-g-1',  number: 'G-1',  name: 'Table G-1',  seats: 4, status: 'available' },
+
+  // Jhula (Left): J-10, J-8, J-7
+  { id: 'tbl-j-10', number: 'J-10', name: 'Table J-10', seats: 4, status: 'available' },
+  { id: 'tbl-j-8',  number: 'J-8',  name: 'Table J-8',  seats: 4, status: 'available' },
+  { id: 'tbl-j-7',  number: 'J-7',  name: 'Table J-7',  seats: 4, status: 'available' },
+
+  // Col 4: 4-7 to 4-1
+  { id: 'tbl-4-7',  number: '4-7',  name: 'Table 4-7',  seats: 4, status: 'available' },
+  { id: 'tbl-4-6',  number: '4-6',  name: 'Table 4-6',  seats: 4, status: 'available' },
+  { id: 'tbl-4-5',  number: '4-5',  name: 'Table 4-5',  seats: 4, status: 'available' },
+  { id: 'tbl-4-4',  number: '4-4',  name: 'Table 4-4',  seats: 4, status: 'available' },
+  { id: 'tbl-4-3',  number: '4-3',  name: 'Table 4-3',  seats: 4, status: 'available' },
+  { id: 'tbl-4-2',  number: '4-2',  name: 'Table 4-2',  seats: 4, status: 'available' },
+  { id: 'tbl-4-1',  number: '4-1',  name: 'Table 4-1',  seats: 4, status: 'available' },
+
+  // Col 3: 3-5 to 3-1
+  { id: 'tbl-3-5',  number: '3-5',  name: 'Table 3-5',  seats: 4, status: 'available' },
+  { id: 'tbl-3-4',  number: '3-4',  name: 'Table 3-4',  seats: 4, status: 'available' },
+  { id: 'tbl-3-3',  number: '3-3',  name: 'Table 3-3',  seats: 4, status: 'available' },
+  { id: 'tbl-3-2',  number: '3-2',  name: 'Table 3-2',  seats: 4, status: 'available' },
+  { id: 'tbl-3-1',  number: '3-1',  name: 'Table 3-1',  seats: 4, status: 'available' },
+
+  // Col 2: 2-5 to 2-1
+  { id: 'tbl-2-5',  number: '2-5',  name: 'Table 2-5',  seats: 4, status: 'available' },
+  { id: 'tbl-2-4',  number: '2-4',  name: 'Table 2-4',  seats: 4, status: 'available' },
+  { id: 'tbl-2-3',  number: '2-3',  name: 'Table 2-3',  seats: 4, status: 'available' },
+  { id: 'tbl-2-2',  number: '2-2',  name: 'Table 2-2',  seats: 4, status: 'available' },
+  { id: 'tbl-2-1',  number: '2-1',  name: 'Table 2-1',  seats: 4, status: 'available' },
+
+  // Col 1: 1-5 to 1-1
+  { id: 'tbl-1-5',  number: '1-5',  name: 'Table 1-5',  seats: 4, status: 'available' },
+  { id: 'tbl-1-4',  number: '1-4',  name: 'Table 1-4',  seats: 4, status: 'available' },
+  { id: 'tbl-1-3',  number: '1-3',  name: 'Table 1-3',  seats: 4, status: 'available' },
+  { id: 'tbl-1-2',  number: '1-2',  name: 'Table 1-2',  seats: 4, status: 'available' },
+  { id: 'tbl-1-1',  number: '1-1',  name: 'Table 1-1',  seats: 4, status: 'available' },
+
+  // Entry Jhula: J-4 to J-1
+  { id: 'tbl-j-4',  number: 'J-4',  name: 'Table J-4',  seats: 4, status: 'available' },
+  { id: 'tbl-j-3',  number: 'J-3',  name: 'Table J-3',  seats: 4, status: 'available' },
+  { id: 'tbl-j-2',  number: 'J-2',  name: 'Table J-2',  seats: 4, status: 'available' },
+  { id: 'tbl-j-1',  number: 'J-1',  name: 'Table J-1',  seats: 4, status: 'available' },
 ];
 
 // Generate sample orders so the dashboard reflects the exact prompt stats:

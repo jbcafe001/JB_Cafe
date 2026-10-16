@@ -20,9 +20,12 @@ import {
   LogOut,
   User as UserIcon,
   Sparkles,
+  Grid,
+  Map,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
+import { SeatMap } from '../common/SeatMap';
 
 interface WaiterHomeProps {
   onSelectTable: (table: Table) => void;
@@ -47,6 +50,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const [view, setView] = useState<'map' | 'grid'>('map');
 
   useModalClose(() => setSelectedTableForAction(null), !!selectedTableForAction);
   useModalClose(() => setSelectedTableForAction(null), !!selectedTableForAction);
@@ -216,24 +220,49 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
       {/* Tables Section */}
       <div>
-        <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500">
               Café Tables
             </h3>
             <p className="text-[11px] text-stone-400">Tap table to take order, serve, or settle payment</p>
           </div>
-          <button
-            onClick={onNavigateToTables}
-            className="text-xs text-amber-700 font-semibold hover:underline flex items-center space-x-1"
-          >
-            <span>Floor View</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {/* View toggle */}
+            <div className="flex rounded-xl border border-stone-200 overflow-hidden shadow-xs">
+              <button
+                onClick={() => setView('map')}
+                className={`px-3 py-1.5 flex items-center gap-1 text-[11px] font-bold transition-colors ${
+                  view === 'map' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+                }`}
+              >
+                <Map className="w-3.5 h-3.5" />
+                Seat Map
+              </button>
+              <button
+                onClick={() => setView('grid')}
+                className={`px-3 py-1.5 flex items-center gap-1 text-[11px] font-bold transition-colors ${
+                  view === 'grid' ? 'bg-stone-900 text-white' : 'bg-white text-stone-500 hover:bg-stone-50'
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" />
+                Grid
+              </button>
+            </div>
+          </div>
         </div>
 
+        {/* Seat Map View (Default) */}
+        {view === 'map' && (
+          <div className="bg-white rounded-3xl border border-stone-200/90 p-4 sm:p-5 shadow-sm">
+            <SeatMap tables={tables} onTableClick={handleTableCardClick} interactive={true} />
+          </div>
+        )}
+
         {/* Tables Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-page-enter">
+        {view === 'grid' && (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-page-enter">
           {tables.map((table, idx) => {
             const activeOrders = getActiveOrdersForTable(table.id);
 
@@ -397,7 +426,8 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
             );
           })}
         </div>
-      </div>
+      )}
+    </div>
 
       {/* Table Detail & Action Modal (When clicking active table) */}
       {selectedTableForAction && activeModalOrders.length > 0 && (
