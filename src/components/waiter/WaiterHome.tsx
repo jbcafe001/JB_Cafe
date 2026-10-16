@@ -178,7 +178,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
     .toUpperCase();
 
   return (
-    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-5 pb-36 sm:pb-48 bg-[#F9F8F6] min-h-0">
+    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-5 pb-16 sm:pb-20 bg-[#F9F8F6] min-h-0">
       <WaiterHeader />
 
       {/* Ready Orders Alert Strip */}
@@ -256,7 +256,13 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         {/* Seat Map View (Default) */}
         {view === 'map' && (
           <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 p-2 sm:p-4 md:p-5 shadow-sm">
-            <SeatMap tables={tables} onTableClick={handleTableCardClick} interactive={true} />
+            <SeatMap
+              tables={tables}
+              onTableClick={handleTableCardClick}
+              interactive={true}
+              showControls={false}
+              showLegend={false}
+            />
           </div>
         )}
 
@@ -820,9 +826,6 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
           </div>
         </div>
       )}
-
-      {/* Extra scroll clearance spacer so Counter, Legend and Table content completely clear bottom nav */}
-      <div className="h-28 sm:h-40 w-full shrink-0 pointer-events-none select-none" aria-hidden="true" />
     </div>
   );
 };

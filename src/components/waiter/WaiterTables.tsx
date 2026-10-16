@@ -145,7 +145,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
   const changeToReturn = paymentModalOrder ? currentCash - paymentModalOrder.total : 0;
 
   return (
-    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-4 pb-36 sm:pb-48 bg-[#F8F6F0] min-h-0">
+    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-4 pb-16 sm:pb-20 bg-[#F8F6F0] min-h-0">
       <WaiterHeader />
       <div className="flex items-center justify-between">
         <div>
@@ -218,7 +218,13 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       {/* Seat Map View */}
       {view === 'map' && (
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/90 p-2 sm:p-4 md:p-5 shadow-sm">
-          <SeatMap tables={tables} onTableClick={handleCardClick} interactive />
+          <SeatMap
+            tables={tables}
+            onTableClick={handleCardClick}
+            interactive
+            showControls={false}
+            showLegend={false}
+          />
         </div>
       )}
 
@@ -729,9 +735,6 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           </div>
         </div>
       )}
-
-      {/* Extra scroll clearance spacer so Counter, Legend and Table content completely clear bottom nav */}
-      <div className="h-28 sm:h-40 w-full shrink-0 pointer-events-none select-none" aria-hidden="true" />
     </div>
   );
 };

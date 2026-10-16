@@ -6,6 +6,8 @@ interface SeatMapProps {
   tables: Table[];
   onTableClick?: (table: Table) => void;
   interactive?: boolean;
+  showControls?: boolean;
+  showLegend?: boolean;
 }
 
 const statusColor: Record<TableStatus, { bg: string; border: string; text: string; dot: string }> = {
@@ -16,7 +18,13 @@ const statusColor: Record<TableStatus, { bg: string; border: string; text: strin
   served:     { bg: 'bg-purple-50 hover:bg-purple-100/70',    border: 'border-purple-500',  text: 'text-purple-900',  dot: 'bg-purple-500' },
 };
 
-export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interactive = true }) => {
+export const SeatMap: React.FC<SeatMapProps> = ({
+  tables,
+  onTableClick,
+  interactive = true,
+  showControls = true,
+  showLegend = true,
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeZone, setActiveZone] = useState<'all' | 'garden' | 'kunafa' | 'columns' | 'entry'>('all');
 
@@ -152,103 +160,105 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
   return (
     <div className="w-full">
-      {/* Top Header: Floor Map Info + Quick Jump Tabs + Scroll Arrows */}
-      <div className="flex flex-col gap-2.5 mb-4 pb-3 border-b border-stone-200/90">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs sm:text-sm font-black text-stone-900 tracking-tight uppercase">
-              Floor Map
-            </span>
-            <span className="text-[10px] font-extrabold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
-              {tables.length} Tables
-            </span>
+      {/* Top Header: Floor Map Info + Quick Jump Tabs + Scroll Arrows (only shown if showControls is true) */}
+      {showControls && (
+        <div className="flex flex-col gap-2.5 mb-4 pb-3 border-b border-stone-200/90">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm font-black text-stone-900 tracking-tight uppercase">
+                Floor Map
+              </span>
+              <span className="text-[10px] font-extrabold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
+                {tables.length} Tables
+              </span>
+            </div>
+
+            {/* Quick Scroll Left/Right Arrow Buttons */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => scrollByAmount(-280)}
+                className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                title="Scroll Left"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span className="text-[11px]">Left</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByAmount(280)}
+                className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                title="Scroll Right"
+              >
+                <span className="text-[11px]">Right</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Quick Scroll Left/Right Arrow Buttons */}
-          <div className="flex items-center gap-1.5">
+          {/* Zone Navigation Pills for Instant 1-Tap Access on Mobile */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <span className="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider shrink-0 mr-0.5">
+              Zone:
+            </span>
             <button
               type="button"
-              onClick={() => scrollByAmount(-280)}
-              className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-              title="Scroll Left"
+              onClick={() => scrollToZone('all')}
+              className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+                activeZone === 'all'
+                  ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                  : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+              }`}
             >
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-[11px]">Left</span>
+              All Tables
             </button>
             <button
               type="button"
-              onClick={() => scrollByAmount(280)}
-              className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-              title="Scroll Right"
+              onClick={() => scrollToZone('garden')}
+              className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+                activeZone === 'garden'
+                  ? 'bg-green-600 text-white border-green-700 shadow-xs'
+                  : 'bg-green-50 text-green-800 border-green-200 hover:bg-green-100'
+              }`}
             >
-              <span className="text-[11px]">Right</span>
-              <ChevronRight className="w-4 h-4" />
+              🌿 Garden (G-1..G-7)
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToZone('kunafa')}
+              className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+                activeZone === 'kunafa'
+                  ? 'bg-rose-600 text-white border-rose-700 shadow-xs'
+                  : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100'
+              }`}
+            >
+              🧁 Kunafa & Smoking
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToZone('columns')}
+              className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+                activeZone === 'columns'
+                  ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                  : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+              }`}
+            >
+              🪑 Columns 1–4
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToZone('entry')}
+              className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+                activeZone === 'entry'
+                  ? 'bg-amber-600 text-white border-amber-700 shadow-xs'
+                  : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+              }`}
+            >
+              🎪 Jhula & Entry
             </button>
           </div>
         </div>
-
-        {/* Zone Navigation Pills for Instant 1-Tap Access on Mobile */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
-          <span className="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider shrink-0 mr-0.5">
-            Zone:
-          </span>
-          <button
-            type="button"
-            onClick={() => scrollToZone('all')}
-            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
-              activeZone === 'all'
-                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-                : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
-            }`}
-          >
-            All Tables
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToZone('garden')}
-            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
-              activeZone === 'garden'
-                ? 'bg-green-600 text-white border-green-700 shadow-xs'
-                : 'bg-green-50 text-green-800 border-green-200 hover:bg-green-100'
-            }`}
-          >
-            🌿 Garden (G-1..G-7)
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToZone('kunafa')}
-            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
-              activeZone === 'kunafa'
-                ? 'bg-rose-600 text-white border-rose-700 shadow-xs'
-                : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100'
-            }`}
-          >
-            🧁 Kunafa & Smoking
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToZone('columns')}
-            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
-              activeZone === 'columns'
-                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-                : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
-            }`}
-          >
-            🪑 Columns 1–4
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollToZone('entry')}
-            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
-              activeZone === 'entry'
-                ? 'bg-amber-600 text-white border-amber-700 shadow-xs'
-                : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
-            }`}
-          >
-            🎪 Jhula & Entry
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Main Floor Map Container — Wide Horizontal Cards View on All Screens */}
       <div
@@ -256,7 +266,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
         onScroll={handleScroll}
         className="w-full overflow-x-auto pb-3 scroll-smooth"
       >
-        <div className="min-w-[780px] sm:min-w-[820px] w-full px-2 sm:px-0 pb-8 sm:pb-12">
+        <div className="min-w-[780px] sm:min-w-[820px] w-full px-2 sm:px-0">
 
           {/* ════════════════════════════════════════════════════════
               KUNAFA SECTION (Tables & Counter)
@@ -418,36 +428,35 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           </div>
 
           {/* JB Counter — centered like in the image */}
-          <div className="flex justify-center my-6">
+          <div className="flex justify-center mt-5 mb-2">
             <div className="inline-flex items-center gap-2 px-8 py-2.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 text-xs sm:text-sm font-black select-none cursor-default tracking-widest shadow-xs">
               🍽️  C O U N T E R  ( J B )
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="pt-4 pb-4 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2.5 justify-center mb-4">
-            {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
-              <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
-                <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
-                {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
+          {/* Legend (only shown if showLegend is true) */}
+          {showLegend && (
+            <div className="pt-4 pb-2 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2.5 justify-center mt-4">
+              {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
+                <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
+                  <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
+                  {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
+                </span>
+              ))}
+              <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+                <span className="w-3 h-3 rounded-full ring-2 ring-green-500 inline-block bg-white" /> Garden
               </span>
-            ))}
-            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
-              <span className="w-3 h-3 rounded-full ring-2 ring-green-500 inline-block bg-white" /> Garden
-            </span>
-            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
-              <span className="w-3 h-3 rounded-full ring-2 ring-yellow-500 inline-block bg-white" /> Jhula
-            </span>
-            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
-              <span className="w-3 h-3 rounded-full ring-2 ring-rose-500 inline-block bg-white" /> Smoking
-            </span>
-            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
-              <span className="w-3 h-3 rounded-full ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
-            </span>
-          </div>
-
-          {/* Bottom extra space for comfortable scrolling */}
-          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
+              <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+                <span className="w-3 h-3 rounded-full ring-2 ring-yellow-500 inline-block bg-white" /> Jhula
+              </span>
+              <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+                <span className="w-3 h-3 rounded-full ring-2 ring-rose-500 inline-block bg-white" /> Smoking
+              </span>
+              <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+                <span className="w-3 h-3 rounded-full ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
