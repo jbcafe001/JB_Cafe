@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useCafe } from '../../context/CafeContext';
 import { Expense, ExpenseCategory } from '../../types';
 import {
@@ -212,108 +213,117 @@ export const AdminExpenses: React.FC = () => {
       </div>
 
       {/* + Add Expense Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-stone-900/35 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={handleCloseModal}>
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80">
-              <h3 className="font-extrabold text-stone-900 text-base">Record New Expense</h3>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm">
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Expense Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Milk Purchase, Commercial Gas, Paper Cups..."
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
+      {showAddModal &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] bg-stone-900/40 backdrop-blur-md overflow-y-auto flex items-center justify-center p-4 animate-fade-in"
+            onClick={handleCloseModal}
+          >
+            <div
+              className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-stone-200/80 animate-modal-spring overflow-hidden my-auto max-h-[92vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 border-b border-amber-200/60 flex items-center justify-between bg-gradient-to-r from-amber-50/80 via-[#FAF7F2] to-orange-50/80 shrink-0">
+                <h3 className="font-extrabold text-stone-900 text-base">Record New Expense</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="btn-interactive p-1.5 rounded-xl text-stone-400 hover:text-stone-700 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <form onSubmit={handleAddSubmit} className="p-5 space-y-4 text-xs sm:text-sm overflow-y-auto flex-1">
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Amount (₹) *</label>
+                  <label className="block font-semibold text-stone-700 mb-1">Expense Name *</label>
                   <input
-                    type="number"
+                    type="text"
                     required
-                    min="1"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="2500"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Milk Purchase, Commercial Gas, Paper Cups..."
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">Amount (₹) *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="2500"
+                      className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">Category</label>
+                    <CustomSelect
+                      value={category}
+                      onChange={(val) => setCategory(val as ExpenseCategory)}
+                      options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Category</label>
-                  <CustomSelect
-                    value={category}
-                    onChange={(val) => setCategory(val as ExpenseCategory)}
-                    options={CATEGORIES.map((cat) => ({ value: cat, label: cat }))}
+                  <label className="block font-semibold text-stone-700 mb-1">Note (Optional)</label>
+                  <input
+                    type="text"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="e.g. Invoice #204 from Dairy supplier"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Date</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
-              </div>
+                {!isKunafaAdmin && (
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">Brand</label>
+                    <CustomSelect
+                      value={expenseBrand}
+                      onChange={(val) => setExpenseBrand(val as 'JB Cafe' | 'KUNAFA')}
+                      options={[{ value: 'JB Cafe', label: 'JB Cafe' }, { value: 'KUNAFA', label: 'KUNAFA' }]}
+                    />
+                  </div>
+                )}
 
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Note (Optional)</label>
-                <input
-                  type="text"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="e.g. Invoice #204 from Dairy supplier"
-                  className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl focus:ring-1 focus:ring-amber-500 focus:outline-hidden"
-                />
-              </div>
-
-              {!isKunafaAdmin && (
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">Brand</label>
-                  <CustomSelect
-                    value={expenseBrand}
-                    onChange={(val) => setExpenseBrand(val as 'JB Cafe' | 'KUNAFA')}
-                    options={[{value: 'JB Cafe', label: 'JB Cafe'}, {value: 'KUNAFA', label: 'KUNAFA'}]}
-                  />
+                <div className="pt-2 flex items-center justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    id="save-expense-btn"
+                    className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs cursor-pointer"
+                  >
+                    Save Expense
+                  </button>
                 </div>
-              )}
-
-              <div className="pt-2 flex items-center justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  id="save-expense-btn"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-xs"
-                >
-                  Save Expense
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
