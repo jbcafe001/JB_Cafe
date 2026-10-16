@@ -178,7 +178,7 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
     .toUpperCase();
 
   return (
-    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-5 pb-28 bg-[#F9F8F6]">
+    <div className="flex-1 overflow-y-auto p-2.5 sm:p-4 space-y-3 sm:space-y-5 pb-36 sm:pb-48 bg-[#F9F8F6] min-h-0">
       <WaiterHeader />
 
       {/* Ready Orders Alert Strip */}
@@ -820,6 +820,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
           </div>
         </div>
       )}
+
+      {/* Extra scroll clearance spacer so Counter, Legend and Table content completely clear bottom nav */}
+      <div className="h-28 sm:h-40 w-full shrink-0 pointer-events-none select-none" aria-hidden="true" />
     </div>
   );
 };

@@ -41,7 +41,7 @@ export const WaiterView: React.FC = () => {
 
   // The actual waiter UI content
   const waiterContent = (
-    <div className="flex flex-col h-full bg-[#F9F8F6] relative select-none">
+    <div className="flex-1 flex flex-col h-full bg-[#F9F8F6] relative select-none overflow-hidden min-h-0">
       {/* If currently taking order on a table */}
       {activeTableForOrder ? (
         <WaiterOrderTaking
@@ -215,7 +215,7 @@ export const WaiterView: React.FC = () => {
 
   // Full-width (default responsive mobile-first container)
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#F9F8F6] relative">
+    <div className="h-screen h-[100dvh] w-full flex flex-col bg-[#F9F8F6] relative overflow-hidden">
       {waiterContent}
     </div>
   );

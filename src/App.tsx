@@ -57,7 +57,7 @@ const MainAppContent: React.FC = () => {
       ) : requiresPasswordChange ? (
         <ForcePasswordChangeView />
       ) : (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           {currentRole === 'waiter' && <WaiterView />}
           {currentRole === 'cook' && <KitchenView />}
           {(currentRole === 'admin' || currentRole === 'admin_kunafa') && <AdminView />}

@@ -99,7 +99,7 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
   const changeToReturn = selectedOrderForPayment ? currentCash - selectedOrderForPayment.total : 0;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28 bg-[#F8F6F0]">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-36 sm:pb-48 bg-[#F8F6F0] min-h-0">
       <WaiterHeader />
       {/* Ready Orders Alert Banner if any */}
       {readyOrders.length > 0 && (
@@ -724,6 +724,9 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
           </div>
         </div>
       )}
+
+      {/* Extra scroll clearance spacer so active orders completely clear bottom nav */}
+      <div className="h-28 sm:h-40 w-full shrink-0 pointer-events-none select-none" aria-hidden="true" />
     </div>
   );
 };

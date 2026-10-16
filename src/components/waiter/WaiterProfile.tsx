@@ -6,7 +6,7 @@ export const WaiterProfile: React.FC = () => {
   const { currentUser, logout, switchRole, showConfirm } = useCafe();
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 bg-[#F8F6F0]">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-36 bg-[#F8F6F0] min-h-0">
       <div className="bg-white border border-stone-200/80 rounded-2xl p-5 shadow-xs text-center">
         <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center mx-auto mb-3 font-extrabold text-xl border-2 border-amber-300">
           {currentUser?.name.charAt(0) || 'R'}
@@ -18,8 +18,6 @@ export const WaiterProfile: React.FC = () => {
         <p className="text-xs text-stone-400 mt-2">{currentUser?.email}</p>
         <p className="text-xs text-stone-400">{currentUser?.phone}</p>
       </div>
-
-
 
       <div className="bg-white border border-stone-200/80 rounded-2xl p-4 shadow-xs">
         <div className="flex items-center space-x-3 text-xs text-stone-600">
@@ -42,6 +40,9 @@ export const WaiterProfile: React.FC = () => {
         <LogOut className="w-4 h-4" />
         <span>Log Out of Shift</span>
       </button>
+
+      {/* Extra scroll clearance spacer so profile completely clears bottom nav */}
+      <div className="h-24 sm:h-32 w-full shrink-0 pointer-events-none select-none" aria-hidden="true" />
     </div>
   );
 };

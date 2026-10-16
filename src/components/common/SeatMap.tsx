@@ -256,7 +256,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
         onScroll={handleScroll}
         className="w-full overflow-x-auto pb-3 scroll-smooth"
       >
-        <div className="min-w-[780px] sm:min-w-[820px] w-full px-2 sm:px-0">
+        <div className="min-w-[780px] sm:min-w-[820px] w-full px-2 sm:px-0 pb-8 sm:pb-12">
 
           {/* ════════════════════════════════════════════════════════
               KUNAFA SECTION (Tables & Counter)
@@ -425,7 +425,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           </div>
 
           {/* Legend */}
-          <div className="pt-4 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2 justify-center">
+          <div className="pt-4 pb-4 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2.5 justify-center mb-4">
             {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
               <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
                 <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
@@ -446,6 +446,8 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
             </span>
           </div>
 
+          {/* Bottom extra space for comfortable scrolling */}
+          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
         </div>
       </div>
     </div>
