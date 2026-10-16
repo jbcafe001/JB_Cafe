@@ -106,36 +106,35 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
   return (
     <div className="w-full overflow-x-auto pb-2">
-      <div className="min-w-[680px] w-full">
+      <div className="min-w-[780px] w-full">
 
       {/* ════════════════════════════════════════════════════════
           KUNAFA SECTION (Tables & Counter)
-          7-column layout (matching floor plan):
-            Col 1: Smoking (Sm-2, Sm-1)
-            Col 2: Jhula (J-9)
-            Col 3: C (C-3, C-4)
-            Cols 4-7: Kunafa Counter & Tables (P-6..P-1, C-2, C-1, J-6, J-5)
+          8-column layout (matching floor plan):
+            Cols 1-2: Smoking (Sm-2, Sm-1)
+            Col 3: Jhula (J-9)
+            Col 4: C (C-3, C-4)
+            Cols 5-8: Kunafa Counter & Tables (P-6..P-1, C-2, C-1, J-6, J-5)
       ════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
+      <div className="grid grid-cols-8 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
-        {/* Col 1: Smoking */}
-        <Col
-          label="Smoking"
-          labelColor="text-rose-600"
-          items={[
-            { number: 'Sm-2', zone: 'Sm' },
-            { number: 'Sm-1', zone: 'Sm' },
-          ]}
-        />
+        {/* Col 1-2: Smoking (wide box spanning above garden columns) */}
+        <div className="col-span-2 flex flex-col items-center gap-2 w-full">
+          <span className="text-[11px] font-extrabold uppercase tracking-wider min-h-[16px] text-center text-rose-600">
+            Smoking
+          </span>
+          <TableCell number="Sm-2" zone="Sm" />
+          <TableCell number="Sm-1" zone="Sm" />
+        </div>
 
-        {/* Col 2: J-9 */}
+        {/* Col 3: Jhula (J-9) */}
         <Col
           label="Jhula"
           labelColor="text-yellow-600"
           items={[{ number: 'J-9', zone: 'J' }]}
         />
 
-        {/* Col 3: C-3 & C-4 */}
+        {/* Col 4: C-3 & C-4 */}
         <Col
           label="C"
           labelColor="text-sky-600"
@@ -145,7 +144,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           ]}
         />
 
-        {/* Col 4-7: Kunafa Counter badge + P / C / J tables */}
+        {/* Col 5-8: Kunafa Counter badge + P / C / J tables */}
         <div className="col-span-4 flex flex-col items-center w-full">
           {/* Kunafa counter badge */}
           <div className="inline-flex items-center justify-center gap-1.5 px-4 py-1 rounded-lg border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs font-black select-none cursor-default mb-1 w-full max-w-sm text-center shadow-xs">
@@ -177,63 +176,82 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
       {/* ════════════════════════════════════════════════════════
           JB CAFE FLOOR
-          7-column layout:
-            Col 1: Garden (G-7 → G-1)
-            Col 2: Left Jhula (J-10, J-8, J-7)
-            Col 3: Col 4 (4-7 → 4-1)
-            Col 4: Col 3 (3-5 → 3-1)
-            Col 5: Col 2 (2-5 → 2-1)
-            Col 6: Col 1 (1-5 → 1-1)
-            Col 7: Entry Jhula (J-4 → J-1)
+          8-column layout (matching floor plan):
+            Col 1: Garden Left (G-6, G-5)
+            Col 2: Garden Main (G-7, J-10 above G-4, G-4 → G-1)
+            Col 3: Jhula (J-8, J-7 aligned with 4-2 & 4-1)
+            Col 4: Col 4 (4-7 → 4-1)
+            Col 5: Col 3 (3-5 → 3-1)
+            Col 6: Col 2 (2-5 → 2-1)
+            Col 7: Col 1 (1-5 → 1-1)
+            Col 8: Entry Jhula (J-4 → J-1)
       ════════════════════════════════════════════════════════ */}
       <div className="border-t-2 border-dashed border-stone-300 my-6" />
 
-      <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
+      <div className="grid grid-cols-8 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
-        {/* Col 1: Garden: G-7 → G-1 */}
+        {/* Col 1: Garden Left: G-6, G-5 */}
         <Col
           label="Garden"
           labelColor="text-green-700"
-          items={[7, 6, 5, 4, 3, 2, 1].map((i) => ({ number: `G-${i}`, zone: 'G' as const }))}
-        />
-
-        {/* Col 2: Left Jhula: J-10, J-8, J-7 */}
-        <Col
-          label="Jhula"
-          labelColor="text-yellow-600"
+          topSpacer={1}
           items={[
-            { number: 'J-10', zone: 'J' },
-            { number: 'J-8',  zone: 'J' },
-            { number: 'J-7',  zone: 'J' },
+            { number: 'G-6', zone: 'G' },
+            { number: 'G-5', zone: 'G' },
           ]}
         />
 
-        {/* Col 3: Col 4: 4-7 → 4-1 */}
+        {/* Col 2: Garden Main: G-7, J-10, G-4 → G-1 */}
+        <Col
+          label="Garden"
+          labelColor="text-green-700"
+          items={[
+            { number: 'G-7', zone: 'G' },
+            { number: 'J-10', zone: 'J' },
+            { number: 'G-4', zone: 'G' },
+            { number: 'G-3', zone: 'G' },
+            { number: 'G-2', zone: 'G' },
+            { number: 'G-1', zone: 'G' },
+          ]}
+        />
+
+        {/* Col 3: Jhula: J-8, J-7 aligned at bottom near Counter */}
+        <Col
+          label="Jhula"
+          labelColor="text-yellow-600"
+          topSpacer={4}
+          items={[
+            { number: 'J-8', zone: 'J' },
+            { number: 'J-7', zone: 'J' },
+          ]}
+        />
+
+        {/* Col 4: Col 4: 4-7 → 4-1 */}
         <Col
           label="Col 4"
           items={[7, 6, 5, 4, 3, 2, 1].map((i) => ({ number: `4-${i}` }))}
         />
 
-        {/* Col 4: Col 3: starts 1 row down, 3-5 → 3-1 */}
+        {/* Col 5: Col 3: starts 1 row down, 3-5 → 3-1 */}
         <Col
           label="Col 3"
           topSpacer={1}
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `3-${i}` }))}
         />
 
-        {/* Col 5: Col 2: 2-5 → 2-1 */}
+        {/* Col 6: Col 2: 2-5 → 2-1 */}
         <Col
           label="Col 2"
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `2-${i}` }))}
         />
 
-        {/* Col 6: Col 1: 1-5 → 1-1 */}
+        {/* Col 7: Col 1: 1-5 → 1-1 */}
         <Col
           label="Col 1"
           items={[5, 4, 3, 2, 1].map((i) => ({ number: `1-${i}` }))}
         />
 
-        {/* Col 7: Entry Jhula: J-4 → J-1 */}
+        {/* Col 8: Entry Jhula: J-4 → J-1 */}
         <Col
           label="↑ Entry"
           labelColor="text-yellow-600"
