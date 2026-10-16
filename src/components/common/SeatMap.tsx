@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Table, TableStatus } from '../../types';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SeatMapProps {
   tables: Table[];
@@ -17,7 +17,8 @@ const statusColor: Record<TableStatus, { bg: string; border: string; text: strin
 };
 
 export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interactive = true }) => {
-  const [mode, setMode] = useState<'fit' | 'scroll'>('fit');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeZone, setActiveZone] = useState<'all' | 'garden' | 'kunafa' | 'columns' | 'entry'>('all');
 
   const tableMap = new Map<string, Table>();
   tables.forEach((t) => {
@@ -26,7 +27,41 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     tableMap.set(t.number.replace(/\s+/g, ''), t);
   });
 
-  /* ── Table Cell ─────────────────────────────────────────── */
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const el = scrollRef.current;
+    const max = el.scrollWidth - el.clientWidth;
+    if (max <= 0) return;
+    const ratio = el.scrollLeft / max;
+    if (ratio < 0.2) setActiveZone('garden');
+    else if (ratio < 0.5) setActiveZone('kunafa');
+    else if (ratio < 0.8) setActiveZone('columns');
+    else setActiveZone('entry');
+  };
+
+  const scrollByAmount = (amount: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToZone = (zone: 'all' | 'garden' | 'kunafa' | 'columns' | 'entry') => {
+    if (!scrollRef.current) return;
+    const el = scrollRef.current;
+    const max = el.scrollWidth - el.clientWidth;
+    if (zone === 'all' || zone === 'garden') {
+      el.scrollTo({ left: 0, behavior: 'smooth' });
+    } else if (zone === 'kunafa') {
+      el.scrollTo({ left: max * 0.35, behavior: 'smooth' });
+    } else if (zone === 'columns') {
+      el.scrollTo({ left: max * 0.65, behavior: 'smooth' });
+    } else if (zone === 'entry') {
+      el.scrollTo({ left: max, behavior: 'smooth' });
+    }
+    setActiveZone(zone);
+  };
+
+  /* ── Table Cell (Identical Wide Horizontal Card View) ─── */
   const TableCell: React.FC<{ number: string; zone?: 'G' | 'J' | 'Sm' | 'C' }> = ({ number, zone }) => {
     const table = tableMap.get(number) || tableMap.get(number.toLowerCase()) || tableMap.get(number.replace(/\s+/g, ''));
     const fallbackTable: Table = {
@@ -41,10 +76,10 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     const c      = statusColor[status] ?? statusColor.available;
 
     const ring =
-      zone === 'G'  ? 'ring-1 sm:ring-2 ring-green-400/80'  :
-      zone === 'J'  ? 'ring-1 sm:ring-2 ring-yellow-400/80' :
-      zone === 'Sm' ? 'ring-1 sm:ring-2 ring-rose-400/80'   :
-      zone === 'C'  ? 'ring-1 sm:ring-2 ring-sky-400/80'    : '';
+      zone === 'G'  ? 'ring-2 ring-green-400/80'  :
+      zone === 'J'  ? 'ring-2 ring-yellow-400/80' :
+      zone === 'Sm' ? 'ring-2 ring-rose-400/80'   :
+      zone === 'C'  ? 'ring-2 ring-sky-400/80'    : '';
 
     const zoneTextColor =
       zone === 'G'  ? 'text-green-700'  :
@@ -57,29 +92,21 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
         onClick={() => interactive && onTableClick?.(effectiveTable)}
         title={effectiveTable ? `${effectiveTable.name} — ${status}` : `${number}`}
         className={[
-          'seat-cell relative flex flex-col items-center justify-center rounded-lg sm:rounded-xl select-none transition-all shadow-2xs',
-          'w-full',
-          mode === 'fit' ? 'h-10 sm:h-14 md:h-16' : 'h-14 sm:h-16',
+          'seat-cell relative flex flex-col items-center justify-center rounded-xl select-none transition-all shadow-xs',
+          'w-full max-w-[150px]',
+          'h-14 sm:h-16',
           c.bg, c.border, ring,
           interactive
-            ? 'cursor-pointer hover:brightness-95 hover:shadow-md hover:scale-[1.03] active:scale-95'
+            ? 'cursor-pointer hover:brightness-95 hover:shadow-md hover:scale-[1.02] active:scale-95'
             : 'cursor-default',
         ].join(' ')}
       >
-        <span className={`absolute top-0.5 right-0.5 sm:top-1.5 sm:right-1.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${c.dot} shadow-xs`} />
-        <span
-          className={`font-black leading-none text-center tracking-tight ${
-            mode === 'fit' ? 'text-[9.5px] sm:text-xs md:text-sm' : 'text-xs sm:text-sm'
-          } ${c.text}`}
-        >
+        <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${c.dot} shadow-xs`} />
+        <span className={`font-black text-sm sm:text-base leading-tight text-center tracking-tight ${c.text}`}>
           {number}
         </span>
         {zone && (
-          <span
-            className={`font-extrabold leading-none mt-0.5 sm:mt-1 tracking-wider uppercase ${
-              mode === 'fit' ? 'text-[7px] sm:text-[9px]' : 'text-[8px] sm:text-[10px]'
-            } ${zoneTextColor}`}
-          >
+          <span className={`text-[10px] font-extrabold leading-none mt-1 tracking-wider uppercase ${zoneTextColor}`}>
             {zone}
           </span>
         )}
@@ -94,11 +121,9 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     topSpacer?: number;
     items: { number: string; zone?: 'G' | 'J' | 'Sm' | 'C'; spacerAfter?: boolean }[];
   }> = ({ label, labelColor = 'text-stone-400', topSpacer = 0, items }) => (
-    <div className="flex flex-col items-center gap-1 sm:gap-2 w-full">
+    <div className="flex flex-col items-center gap-2 w-full">
       {/* label row */}
-      <span
-        className={`text-[8px] sm:text-[10px] md:text-[11px] font-extrabold uppercase tracking-tight min-h-[14px] sm:min-h-[16px] text-center truncate w-full ${labelColor}`}
-      >
+      <span className={`text-[11px] font-extrabold uppercase tracking-wider min-h-[16px] text-center ${labelColor}`}>
         {label ?? ''}
       </span>
       {/* top spacer */}
@@ -106,7 +131,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
         Array.from({ length: topSpacer }).map((_, i) => (
           <div
             key={`top-spacer-${i}`}
-            className={`w-full ${mode === 'fit' ? 'h-10 sm:h-14 md:h-16' : 'h-14 sm:h-16'} invisible pointer-events-none select-none`}
+            className="w-full h-14 sm:h-16 invisible pointer-events-none select-none"
             aria-hidden="true"
           />
         ))}
@@ -116,7 +141,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           <TableCell number={item.number} zone={item.zone} />
           {item.spacerAfter && (
             <div
-              className={`w-full ${mode === 'fit' ? 'h-10 sm:h-14 md:h-16' : 'h-14 sm:h-16'} invisible pointer-events-none select-none`}
+              className="w-full h-14 sm:h-16 invisible pointer-events-none select-none"
               aria-hidden="true"
             />
           )}
@@ -127,50 +152,111 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
   return (
     <div className="w-full">
-      {/* Header controls: Floor Plan Info + View Mode Toggle */}
-      <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-4 pb-2 border-b border-stone-200/80">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[11px] sm:text-xs font-black text-stone-800 tracking-tight uppercase">
-            Floor Map
-          </span>
-          <span className="text-[9px] sm:text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
-            {tables.length} Tables
-          </span>
+      {/* Top Header: Floor Map Info + Quick Jump Tabs + Scroll Arrows */}
+      <div className="flex flex-col gap-2.5 mb-4 pb-3 border-b border-stone-200/90">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm font-black text-stone-900 tracking-tight uppercase">
+              Floor Map
+            </span>
+            <span className="text-[10px] font-extrabold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200">
+              {tables.length} Tables
+            </span>
+          </div>
+
+          {/* Quick Scroll Left/Right Arrow Buttons */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => scrollByAmount(-280)}
+              className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+              title="Scroll Left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-[11px]">Left</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByAmount(280)}
+              className="btn-interactive px-2.5 py-1 bg-stone-100 hover:bg-stone-200 active:bg-stone-300 text-stone-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+              title="Scroll Right"
+            >
+              <span className="text-[11px]">Right</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center bg-stone-100 p-0.5 rounded-lg border border-stone-200">
+        {/* Zone Navigation Pills for Instant 1-Tap Access on Mobile */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+          <span className="text-[10px] font-extrabold text-stone-400 uppercase tracking-wider shrink-0 mr-0.5">
+            Zone:
+          </span>
           <button
             type="button"
-            onClick={() => setMode('fit')}
-            className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-              mode === 'fit'
-                ? 'bg-stone-900 text-white shadow-xs font-extrabold'
-                : 'text-stone-600 hover:text-stone-900'
+            onClick={() => scrollToZone('all')}
+            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+              activeZone === 'all'
+                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
             }`}
-            title="Fit whole layout onto screen without cut-offs"
           >
-            <Minimize2 className="w-3 h-3" />
-            <span>Fit Screen</span>
+            All Tables
           </button>
           <button
             type="button"
-            onClick={() => setMode('scroll')}
-            className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-              mode === 'scroll'
-                ? 'bg-stone-900 text-white shadow-xs font-extrabold'
-                : 'text-stone-600 hover:text-stone-900'
+            onClick={() => scrollToZone('garden')}
+            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+              activeZone === 'garden'
+                ? 'bg-green-600 text-white border-green-700 shadow-xs'
+                : 'bg-green-50 text-green-800 border-green-200 hover:bg-green-100'
             }`}
-            title="Zoom in with horizontal scrolling"
           >
-            <Maximize2 className="w-3 h-3" />
-            <span>Wide View</span>
+            🌿 Garden (G-1..G-7)
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToZone('kunafa')}
+            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+              activeZone === 'kunafa'
+                ? 'bg-rose-600 text-white border-rose-700 shadow-xs'
+                : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100'
+            }`}
+          >
+            🧁 Kunafa & Smoking
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToZone('columns')}
+            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+              activeZone === 'columns'
+                ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
+                : 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
+            }`}
+          >
+            🪑 Columns 1–4
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollToZone('entry')}
+            className={`btn-interactive px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer border ${
+              activeZone === 'entry'
+                ? 'bg-amber-600 text-white border-amber-700 shadow-xs'
+                : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+            }`}
+          >
+            🎪 Jhula & Entry
           </button>
         </div>
       </div>
 
-      {/* Main Floor Map Container */}
-      <div className={`w-full ${mode === 'scroll' ? 'overflow-x-auto pb-2' : ''}`}>
-        <div className={mode === 'scroll' ? 'min-w-[680px] sm:min-w-[760px] w-full' : 'w-full'}>
+      {/* Main Floor Map Container — Wide Horizontal Cards View on All Screens */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="w-full overflow-x-auto pb-3 scroll-smooth"
+      >
+        <div className="min-w-[780px] sm:min-w-[820px] w-full px-2 sm:px-0">
 
           {/* ════════════════════════════════════════════════════════
               KUNAFA SECTION (Tables & Counter)
@@ -180,11 +266,11 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
                 Col 4: C (C-3, C-4)
                 Cols 5-8: Kunafa Counter & Tables (P-6..P-1, C-2, C-1, J-6, J-5)
           ════════════════════════════════════════════════════════ */}
-          <div className={`grid grid-cols-8 ${mode === 'fit' ? 'gap-1 sm:gap-2.5 md:gap-3.5' : 'gap-2.5 sm:gap-3.5 md:gap-4'} w-full mb-3 sm:mb-5`}>
+          <div className="grid grid-cols-8 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
             {/* Col 1-2: Smoking (wide box spanning above garden columns) */}
-            <div className="col-span-2 flex flex-col items-center gap-1 sm:gap-2 w-full">
-              <span className="text-[8px] sm:text-[10px] md:text-[11px] font-extrabold uppercase tracking-tight min-h-[14px] sm:min-h-[16px] text-center text-rose-600">
+            <div className="col-span-2 flex flex-col items-center gap-2 w-full">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider min-h-[16px] text-center text-rose-600">
                 Smoking
               </span>
               <TableCell number="Sm-2" zone="Sm" />
@@ -211,11 +297,11 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
             {/* Col 5-8: Kunafa Counter badge + P / C / J tables */}
             <div className="col-span-4 flex flex-col items-center w-full">
               {/* Kunafa counter badge */}
-              <div className="inline-flex items-center justify-center gap-1 px-2 sm:px-4 py-0.5 sm:py-1 rounded-md sm:rounded-lg border border-rose-300 sm:border-2 sm:border-rose-400 bg-rose-50 text-rose-900 text-[8.5px] sm:text-xs font-black select-none cursor-default mb-1 w-full max-w-sm text-center shadow-2xs truncate">
+              <div className="inline-flex items-center justify-center gap-1.5 px-4 py-1 rounded-lg border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs font-black select-none cursor-default mb-1 w-full max-w-sm text-center shadow-xs">
                 🧁 Kunafa Counter
               </div>
 
-              <div className={`grid grid-cols-4 ${mode === 'fit' ? 'gap-1 sm:gap-2 md:gap-3' : 'gap-2 sm:gap-3 md:gap-4'} w-full`}>
+              <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-5 w-full">
                 {/* P-6, P-5, P-4 */}
                 <Col items={[{ number: 'P-6' }, { number: 'P-5' }, { number: 'P-4' }]} />
                 {/* P-3, P-2, P-1 */}
@@ -250,9 +336,9 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
                 Col 7: Col 1 (1-5 → 1-1)
                 Col 8: Entry Jhula (J-4 → J-1)
           ════════════════════════════════════════════════════════ */}
-          <div className="border-t sm:border-t-2 border-dashed border-stone-300 my-2.5 sm:my-5" />
+          <div className="border-t-2 border-dashed border-stone-300 my-6" />
 
-          <div className={`grid grid-cols-8 ${mode === 'fit' ? 'gap-1 sm:gap-2.5 md:gap-3.5' : 'gap-2.5 sm:gap-3.5 md:gap-4'} w-full mb-3 sm:mb-5`}>
+          <div className="grid grid-cols-8 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
             {/* Col 1: Garden Left: G-6, G-5 */}
             <Col
@@ -319,7 +405,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
 
             {/* Col 8: Entry Jhula: J-4 (aligned with 1-5), walkway gap (aligned with 1-4), J-3, J-2, J-1 (aligned with 1-3, 1-2, 1-1) */}
             <Col
-              label="Entry"
+              label="← Entry"
               labelColor="text-yellow-600"
               topSpacer={1}
               items={[
@@ -332,31 +418,31 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
           </div>
 
           {/* JB Counter — centered like in the image */}
-          <div className="flex justify-center my-2.5 sm:my-5">
-            <div className="inline-flex items-center gap-1.5 px-3 sm:px-8 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl border border-amber-300 sm:border-2 sm:border-amber-400 bg-amber-50 text-amber-900 text-[9px] sm:text-xs md:text-sm font-black select-none cursor-default tracking-widest shadow-2xs">
+          <div className="flex justify-center my-6">
+            <div className="inline-flex items-center gap-2 px-8 py-2.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 text-xs sm:text-sm font-black select-none cursor-default tracking-widest shadow-xs">
               🍽️  C O U N T E R  ( J B )
             </div>
           </div>
 
           {/* Legend */}
-          <div className="pt-2.5 sm:pt-4 border-t border-stone-200 flex flex-wrap gap-x-2.5 sm:gap-x-6 gap-y-1 sm:gap-y-2 justify-center">
+          <div className="pt-4 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2 justify-center">
             {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
-              <span key={st} className="flex items-center gap-1 sm:gap-1.5 text-[8.5px] sm:text-xs font-semibold text-stone-600">
-                <span className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
+              <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
+                <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
                 {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
               </span>
             ))}
-            <span className="flex items-center gap-1 sm:gap-1.5 text-[8.5px] sm:text-xs font-semibold text-stone-500">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ring-1 sm:ring-2 ring-green-500 inline-block bg-white" /> Garden
+            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+              <span className="w-3 h-3 rounded-full ring-2 ring-green-500 inline-block bg-white" /> Garden
             </span>
-            <span className="flex items-center gap-1 sm:gap-1.5 text-[8.5px] sm:text-xs font-semibold text-stone-500">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ring-1 sm:ring-2 ring-yellow-500 inline-block bg-white" /> Jhula
+            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+              <span className="w-3 h-3 rounded-full ring-2 ring-yellow-500 inline-block bg-white" /> Jhula
             </span>
-            <span className="flex items-center gap-1 sm:gap-1.5 text-[8.5px] sm:text-xs font-semibold text-stone-500">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ring-1 sm:ring-2 ring-rose-500 inline-block bg-white" /> Smoking
+            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+              <span className="w-3 h-3 rounded-full ring-2 ring-rose-500 inline-block bg-white" /> Smoking
             </span>
-            <span className="flex items-center gap-1 sm:gap-1.5 text-[8.5px] sm:text-xs font-semibold text-stone-500">
-              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ring-1 sm:ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
+            <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+              <span className="w-3 h-3 rounded-full ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
             </span>
           </div>
 
@@ -365,4 +451,5 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     </div>
   );
 };
+
 
