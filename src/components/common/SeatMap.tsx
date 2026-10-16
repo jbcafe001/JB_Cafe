@@ -79,13 +79,6 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     );
   };
 
-  /* ── Section Header ─────────────────────────────────────── */
-  const SectionHeader: React.FC<{ label: string; color: string; lineColor: string }> = ({ label, color, lineColor }) => (
-    <div className="flex items-center gap-2 mb-4">
-      <span className={`text-xs font-black uppercase tracking-widest ${color}`}>{label}</span>
-      <div className={`flex-1 h-px ${lineColor}`} />
-    </div>
-  );
 
   /* ── Column of cells ────────────────────────────────────── */
   const Col: React.FC<{
@@ -116,15 +109,13 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
       <div className="min-w-[680px] w-full">
 
       {/* ════════════════════════════════════════════════════════
-          KUNAFA SECTION
+          KUNAFA SECTION (Tables & Counter)
           7-column layout (matching floor plan):
             Col 1: Smoking (Sm-2, Sm-1)
             Col 2: Jhula (J-9)
             Col 3: C (C-3, C-4)
             Cols 4-7: Kunafa Counter & Tables (P-6..P-1, C-2, C-1, J-6, J-5)
       ════════════════════════════════════════════════════════ */}
-      <SectionHeader label="Kunafa Section" color="text-rose-800" lineColor="bg-rose-200" />
-
       <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
         {/* Col 1: Smoking */}
@@ -196,7 +187,6 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
             Col 7: Entry Jhula (J-4 → J-1)
       ════════════════════════════════════════════════════════ */}
       <div className="border-t-2 border-dashed border-stone-300 my-6" />
-      <SectionHeader label="JB Cafe Floor" color="text-amber-800" lineColor="bg-amber-200" />
 
       <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
