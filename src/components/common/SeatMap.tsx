@@ -7,82 +7,59 @@ interface SeatMapProps {
   interactive?: boolean;
 }
 
-// Status colours
 const statusColor: Record<TableStatus, { bg: string; border: string; text: string; dot: string }> = {
-  available: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-400',
-    text: 'text-emerald-800',
-    dot: 'bg-emerald-500',
-  },
-  occupied: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-400',
-    text: 'text-amber-900',
-    dot: 'bg-amber-500',
-  },
-  preparing: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-400',
-    text: 'text-blue-900',
-    dot: 'bg-blue-500 animate-pulse',
-  },
-  ready: {
-    bg: 'bg-teal-100',
-    border: 'border-teal-500',
-    text: 'text-teal-900',
-    dot: 'bg-teal-500',
-  },
-  served: {
-    bg: 'bg-purple-50',
-    border: 'border-purple-400',
-    text: 'text-purple-900',
-    dot: 'bg-purple-500',
-  },
+  available:  { bg: 'bg-emerald-50 hover:bg-emerald-100/70',  border: 'border-emerald-400', text: 'text-emerald-800', dot: 'bg-emerald-500' },
+  occupied:   { bg: 'bg-amber-50 hover:bg-amber-100/70',      border: 'border-amber-400',   text: 'text-amber-900',   dot: 'bg-amber-500' },
+  preparing:  { bg: 'bg-blue-50 hover:bg-blue-100/70',        border: 'border-blue-400',    text: 'text-blue-900',    dot: 'bg-blue-500 animate-pulse' },
+  ready:      { bg: 'bg-teal-100 hover:bg-teal-200/70',       border: 'border-teal-500',    text: 'text-teal-900',    dot: 'bg-teal-500' },
+  served:     { bg: 'bg-purple-50 hover:bg-purple-100/70',    border: 'border-purple-400',  text: 'text-purple-900',  dot: 'bg-purple-500' },
 };
+
+const CELL_H = 70; // px — table box height
+const GAP    = 8;  // px — vertical gap between boxes (gap-2)
 
 export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interactive = true }) => {
   const tableMap = new Map<string, Table>();
   tables.forEach((t) => tableMap.set(t.number, t));
 
-  const getStatusColors = (status: TableStatus) => statusColor[status] ?? statusColor.available;
-
-  const TableCell: React.FC<{ number: string; zone?: 'G' | 'J' | 'Sm' | undefined }> = ({ number, zone }) => {
-    const table = tableMap.get(number);
+  /* ── Table Cell ─────────────────────────────────────────── */
+  const TableCell: React.FC<{ number: string; zone?: 'G' | 'J' | 'Sm' | 'C' }> = ({ number, zone }) => {
+    const table  = tableMap.get(number);
     const status = table?.status ?? 'available';
-    const colors = getStatusColors(status);
+    const c      = statusColor[status] ?? statusColor.available;
 
-    const zoneAccent =
-      zone === 'G'
-        ? 'ring-1 ring-green-400/60'
-        : zone === 'J'
-        ? 'ring-1 ring-yellow-400/60'
-        : zone === 'Sm'
-        ? 'ring-1 ring-rose-400/60'
-        : '';
+    const ring =
+      zone === 'G'  ? 'ring-2 ring-green-400/80'  :
+      zone === 'J'  ? 'ring-2 ring-yellow-400/80' :
+      zone === 'Sm' ? 'ring-2 ring-rose-400/80'   :
+      zone === 'C'  ? 'ring-2 ring-sky-400/80'    : '';
+
+    const zoneTextColor =
+      zone === 'G'  ? 'text-green-700'  :
+      zone === 'J'  ? 'text-yellow-700' :
+      zone === 'Sm' ? 'text-rose-700'   :
+      zone === 'C'  ? 'text-sky-700'    : '';
 
     return (
       <div
         onClick={() => interactive && table && onTableClick?.(table)}
         title={table ? `${table.name} — ${status}` : `${number} (not configured)`}
         className={[
-          'relative flex flex-col items-center justify-center rounded-lg border-2',
-          colors.bg, colors.border, zoneAccent,
-          interactive && table ? 'cursor-pointer hover:brightness-95 active:scale-95 transition-all' : 'cursor-default opacity-60',
-          'p-0.5 select-none',
+          'relative flex flex-col items-center justify-center rounded-xl border-2 select-none transition-all shadow-xs',
+          'w-full max-w-[150px]',
+          c.bg, c.border, ring,
+          interactive && table
+            ? 'cursor-pointer hover:brightness-95 hover:shadow-md hover:scale-[1.02] active:scale-95'
+            : 'cursor-default opacity-60',
         ].join(' ')}
-        style={{ minHeight: 44, minWidth: 44, width: 44 }}
+        style={{ height: CELL_H, minHeight: CELL_H }}
       >
-        <span className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${colors.dot}`} />
-        <span className={`font-extrabold text-[9px] leading-tight text-center ${colors.text}`}>
+        <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${c.dot} shadow-xs`} />
+        <span className={`font-black text-sm sm:text-base leading-tight text-center tracking-tight ${c.text}`}>
           {number}
         </span>
         {zone && (
-          <span
-            className={`text-[7px] font-bold leading-none mt-0.5 ${
-              zone === 'G' ? 'text-green-700' : zone === 'J' ? 'text-yellow-700' : 'text-rose-700'
-            }`}
-          >
+          <span className={`text-[10px] font-extrabold leading-none mt-1 tracking-wider uppercase ${zoneTextColor}`}>
             {zone}
           </span>
         )}
@@ -90,132 +67,204 @@ export const SeatMap: React.FC<SeatMapProps> = ({ tables, onTableClick, interact
     );
   };
 
+  /* ── Section Header ─────────────────────────────────────── */
   const SectionHeader: React.FC<{ label: string; color: string; lineColor: string }> = ({ label, color, lineColor }) => (
-    <div className="flex items-center gap-2 mb-2">
-      <span className={`text-[10px] font-black uppercase tracking-widest ${color}`}>{label}</span>
+    <div className="flex items-center gap-2 mb-4">
+      <span className={`text-xs font-black uppercase tracking-widest ${color}`}>{label}</span>
       <div className={`flex-1 h-px ${lineColor}`} />
     </div>
   );
 
-  const ZoneLabel: React.FC<{ label: string; color: string }> = ({ label, color }) => (
-    <div className={`text-[8px] font-bold mb-0.5 pl-0.5 ${color}`}>{label}</div>
+  /* ── Column of cells ────────────────────────────────────── */
+  const Col: React.FC<{
+    label?: string;
+    labelColor?: string;
+    topSpacer?: number;
+    items: { number: string; zone?: 'G' | 'J' | 'Sm' | 'C'; spacerAfter?: boolean }[];
+  }> = ({ label, labelColor = 'text-stone-400', topSpacer = 0, items }) => (
+    <div className="flex flex-col items-center gap-2 w-full">
+      {/* label row */}
+      <span className={`text-[11px] font-extrabold uppercase tracking-wider min-h-[16px] text-center ${labelColor}`}>
+        {label ?? ''}
+      </span>
+      {/* top spacer */}
+      {topSpacer > 0 && <div style={{ height: topSpacer * (CELL_H + GAP) }} />}
+      {/* cells */}
+      {items.map((item, idx) => (
+        <React.Fragment key={`${item.number}-${idx}`}>
+          <TableCell number={item.number} zone={item.zone} />
+          {item.spacerAfter && <div style={{ height: CELL_H + GAP }} />}
+        </React.Fragment>
+      ))}
+    </div>
   );
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div style={{ minWidth: 560 }}>
+    <div className="w-full">
 
-        {/* ── JB CAFE ───────────────────────────── */}
-        <SectionHeader label="JB Cafe Floor" color="text-amber-800" lineColor="bg-amber-200" />
+      {/* ════════════════════════════════════════════════════════
+          KUNAFA SECTION
+          7-column layout (matching floor plan):
+            Col 1: Smoking (Sm-2, Sm-1)
+            Col 2: Jhula (J-9)
+            Col 3: C (C-3, C-4)
+            Cols 4-7: Kunafa Counter & Tables (P-6..P-1, C-2, C-1, J-6, J-5)
+      ════════════════════════════════════════════════════════ */}
+      <SectionHeader label="Kunafa Section" color="text-rose-800" lineColor="bg-rose-200" />
 
-        {/* Row 1: 1-1 … 1-10 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="Row 1" color="text-stone-400" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5,6,7,8,9,10].map(i => <TableCell key={`1-${i}`} number={`1-${i}`} />)}
-          </div>
-        </div>
+      <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
 
-        {/* Row 2: 2-1 … 2-5 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="Row 2" color="text-stone-400" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5].map(i => <TableCell key={`2-${i}`} number={`2-${i}`} />)}
-          </div>
-        </div>
+        {/* Col 1: Smoking */}
+        <Col
+          label="Smoking"
+          labelColor="text-rose-600"
+          items={[
+            { number: 'Sm-2', zone: 'Sm' },
+            { number: 'Sm-1', zone: 'Sm' },
+          ]}
+        />
 
-        {/* Row 3: 3-1 … 3-5 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="Row 3" color="text-stone-400" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5].map(i => <TableCell key={`3-${i}`} number={`3-${i}`} />)}
-          </div>
-        </div>
+        {/* Col 2: J-9 */}
+        <Col
+          label="Jhula"
+          labelColor="text-yellow-600"
+          items={[{ number: 'J-9', zone: 'J' }]}
+        />
 
-        {/* Row 4: 4-1 … 4-7 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="Row 4" color="text-stone-400" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5,6,7].map(i => <TableCell key={`4-${i}`} number={`4-${i}`} />)}
-          </div>
-        </div>
+        {/* Col 3: C-3 & C-4 */}
+        <Col
+          label="C"
+          labelColor="text-sky-600"
+          items={[
+            { number: 'C-3', zone: 'C' },
+            { number: 'C-4', zone: 'C' },
+          ]}
+        />
 
-        {/* Jhula: J-1 … J-10 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="Jhula (J)" color="text-yellow-600" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5,6,7,8,9,10].map(i => <TableCell key={`J-${i}`} number={`J-${i}`} zone="J" />)}
-          </div>
-        </div>
-
-        {/* Garden + Smoking */}
-        <div className="flex flex-wrap gap-6 mb-2">
-          <div>
-            <ZoneLabel label="Garden (G)" color="text-green-700" />
-            <div className="flex gap-1">
-              {[9,10].map(i => <TableCell key={`G-${i}`} number={`G-${i}`} zone="G" />)}
-            </div>
-          </div>
-          <div>
-            <ZoneLabel label="Smoking (Sm)" color="text-rose-700" />
-            <div className="flex gap-1">
-              {[1,2].map(i => <TableCell key={`Sm-${i}`} number={`Sm-${i}`} zone="Sm" />)}
-            </div>
-          </div>
-        </div>
-
-        {/* JB Counter — display only */}
-        <div className="mb-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-amber-400 bg-amber-50 text-amber-900 text-[10px] font-black select-none cursor-default">
-            🍽️ Counter (JB)
-          </div>
-        </div>
-
-        {/* ── KUNAFA ────────────────────────────── */}
-        <div className="border-t-2 border-dashed border-stone-300 my-3" />
-        <SectionHeader label="Kunafa Section" color="text-rose-800" lineColor="bg-rose-200" />
-
-        {/* P tables: P-1 … P-6 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="P Tables" color="text-stone-400" />
-          <div className="flex flex-wrap gap-1">
-            {[1,2,3,4,5,6].map(i => <TableCell key={`P-${i}`} number={`P-${i}`} />)}
-          </div>
-        </div>
-
-        {/* C tables: C-1, C-2, C-3 */}
-        <div className="mb-1.5">
-          <ZoneLabel label="C Tables" color="text-stone-400" />
-          <div className="flex gap-1">
-            {[1,2,3].map(i => <TableCell key={`C-${i}`} number={`C-${i}`} />)}
-          </div>
-        </div>
-
-        {/* Kunafa Counter — display only */}
-        <div className="mb-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-rose-400 bg-rose-50 text-rose-900 text-[10px] font-black select-none cursor-default">
+        {/* Col 4-7: Kunafa Counter badge + P / C / J tables */}
+        <div className="col-span-4 flex flex-col items-center w-full">
+          {/* Kunafa counter badge */}
+          <div className="inline-flex items-center justify-center gap-1.5 px-4 py-1 rounded-lg border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs font-black select-none cursor-default mb-1 w-full max-w-sm text-center shadow-xs">
             🧁 Kunafa Counter
           </div>
-        </div>
 
-        {/* Legend */}
-        <div className="mt-3 pt-2 border-t border-stone-200 flex flex-wrap gap-x-3 gap-y-1">
-          {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
-            <span key={st} className="flex items-center gap-1 text-[9px] font-semibold text-stone-600">
-              <span className={`w-2 h-2 rounded-full ${c.dot.replace(' animate-pulse','')}`} />
-              {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
-            </span>
-          ))}
-          <span className="flex items-center gap-1 text-[9px] font-semibold text-stone-400">
-            <span className="w-2 h-2 rounded-full ring-1 ring-green-500 inline-block" /> Garden
-          </span>
-          <span className="flex items-center gap-1 text-[9px] font-semibold text-stone-400">
-            <span className="w-2 h-2 rounded-full ring-1 ring-yellow-500 inline-block" /> Jhula
-          </span>
-          <span className="flex items-center gap-1 text-[9px] font-semibold text-stone-400">
-            <span className="w-2 h-2 rounded-full ring-1 ring-rose-500 inline-block" /> Smoking
-          </span>
+          <div className="grid grid-cols-4 gap-3 sm:gap-4 md:gap-5 w-full">
+            {/* P-6, P-5, P-4 */}
+            <Col items={[{ number: 'P-6' }, { number: 'P-5' }, { number: 'P-4' }]} />
+            {/* P-3, P-2, P-1 */}
+            <Col items={[{ number: 'P-3' }, { number: 'P-2' }, { number: 'P-1' }]} />
+            {/* C-2 (row 1), spacer, C-1 (row 3) */}
+            <Col
+              items={[
+                { number: 'C-2', zone: 'C', spacerAfter: true },
+                { number: 'C-1', zone: 'C' },
+              ]}
+            />
+            {/* J-6 (row 1), spacer, J-5 (row 3) */}
+            <Col
+              items={[
+                { number: 'J-6', zone: 'J', spacerAfter: true },
+                { number: 'J-5', zone: 'J' },
+              ]}
+            />
+          </div>
         </div>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════
+          JB CAFE FLOOR
+          7-column layout:
+            Col 1: Garden (G-7 → G-1)
+            Col 2: Left Jhula (J-10, J-8, J-7)
+            Col 3: Col 4 (4-7 → 4-1)
+            Col 4: Col 3 (3-5 → 3-1)
+            Col 5: Col 2 (2-5 → 2-1)
+            Col 6: Col 1 (1-5 → 1-1)
+            Col 7: Entry Jhula (J-4 → J-1)
+      ════════════════════════════════════════════════════════ */}
+      <div className="border-t-2 border-dashed border-stone-300 my-6" />
+      <SectionHeader label="JB Cafe Floor" color="text-amber-800" lineColor="bg-amber-200" />
+
+      <div className="grid grid-cols-7 gap-3 sm:gap-4 md:gap-5 w-full mb-6">
+
+        {/* Col 1: Garden: G-7 → G-1 */}
+        <Col
+          label="Garden"
+          labelColor="text-green-700"
+          items={[7, 6, 5, 4, 3, 2, 1].map((i) => ({ number: `G-${i}`, zone: 'G' as const }))}
+        />
+
+        {/* Col 2: Left Jhula: J-10, J-8, J-7 */}
+        <Col
+          label="Jhula"
+          labelColor="text-yellow-600"
+          items={[
+            { number: 'J-10', zone: 'J' },
+            { number: 'J-8',  zone: 'J' },
+            { number: 'J-7',  zone: 'J' },
+          ]}
+        />
+
+        {/* Col 3: Col 4: 4-7 → 4-1 */}
+        <Col
+          label="Col 4"
+          items={[7, 6, 5, 4, 3, 2, 1].map((i) => ({ number: `4-${i}` }))}
+        />
+
+        {/* Col 4: Col 3: starts 1 row down, 3-5 → 3-1 */}
+        <Col
+          label="Col 3"
+          topSpacer={1}
+          items={[5, 4, 3, 2, 1].map((i) => ({ number: `3-${i}` }))}
+        />
+
+        {/* Col 5: Col 2: 2-5 → 2-1 */}
+        <Col
+          label="Col 2"
+          items={[5, 4, 3, 2, 1].map((i) => ({ number: `2-${i}` }))}
+        />
+
+        {/* Col 6: Col 1: 1-5 → 1-1 */}
+        <Col
+          label="Col 1"
+          items={[5, 4, 3, 2, 1].map((i) => ({ number: `1-${i}` }))}
+        />
+
+        {/* Col 7: Entry Jhula: J-4 → J-1 */}
+        <Col
+          label="↑ Entry"
+          labelColor="text-yellow-600"
+          items={[4, 3, 2, 1].map((i) => ({ number: `J-${i}`, zone: 'J' as const }))}
+        />
+      </div>
+
+      {/* JB Counter — centered like in the image */}
+      <div className="flex justify-center my-6">
+        <div className="inline-flex items-center gap-2 px-8 py-2.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 text-xs sm:text-sm font-black select-none cursor-default tracking-widest shadow-xs">
+          🍽️  C O U N T E R  ( J B )
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="pt-4 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
+          <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
+            <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
+            {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
+          </span>
+        ))}
+        <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+          <span className="w-3 h-3 rounded-full ring-2 ring-green-500 inline-block bg-white" /> Garden
+        </span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+          <span className="w-3 h-3 rounded-full ring-2 ring-yellow-500 inline-block bg-white" /> Jhula
+        </span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+          <span className="w-3 h-3 rounded-full ring-2 ring-rose-500 inline-block bg-white" /> Smoking
+        </span>
+        <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
+          <span className="w-3 h-3 rounded-full ring-2 ring-sky-500 inline-block bg-white" /> C-Zone
+        </span>
       </div>
     </div>
   );
