@@ -88,9 +88,10 @@ interface CafeContextType {
   incrementItemPrepared: (orderId: string, itemIndex: number, amount?: number) => void;
   servePreparedItems: (orderId: string) => void;
   toggleItemServed: (orderId: string, itemIndex: number | number[]) => void;
-  removeItemFromOrder: (orderId: string, itemIndex: number | number[]) => void;
+  removeItemFromOrder: (orderId: string, itemIndex: number | number[], quantityToRemove?: number) => void;
   completeOrder: (orderId: string, paymentMethod: PaymentMethod) => void;
   cancelOrder: (orderId: string) => void;
+  deleteOrder: (orderId: string) => void;
 
   // Stock & Materials
   createStockItem: (item: Omit<StockItem, 'id'>) => void;
@@ -841,13 +842,47 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const removeItemFromOrder = (orderId: string, itemIndex: number | number[]) => {
+  const removeItemFromOrder = (orderId: string, itemIndex: number | number[], quantityToRemove?: number) => {
+    const existingOrder = orders.find(o => o.id === orderId);
+    if (!existingOrder) return;
+
+    // Check if partial quantity reduction for a single item
+    if (!Array.isArray(itemIndex) && typeof quantityToRemove === 'number' && quantityToRemove > 0) {
+      const idx = itemIndex;
+      const targetItem = existingOrder.items[idx];
+      if (targetItem && quantityToRemove < targetItem.quantity) {
+        const updatedItems = existingOrder.items.map((item, i) => {
+          if (i === idx) {
+            const newQty = item.quantity - quantityToRemove;
+            const newPrepared = Math.min(item.prepared || 0, newQty);
+            const newServed = Math.min(item.servedCount || 0, newQty);
+            return {
+              ...item,
+              quantity: newQty,
+              prepared: newPrepared,
+              servedCount: newServed,
+              served: newServed >= newQty,
+            };
+          }
+          return item;
+        });
+
+        const newSubtotal = updatedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+        updateDoc(doc(db, 'orders', orderId), {
+          items: updatedItems,
+          subtotal: newSubtotal,
+          total: newSubtotal + (existingOrder.tax || 0),
+        }).catch(console.error);
+
+        addToast(`Removed ${quantityToRemove} × ${targetItem.name}`, 'info');
+        return;
+      }
+    }
+
     const indices = Array.isArray(itemIndex) ? itemIndex : [itemIndex];
     // Sort descending so splicing doesn't shift remaining indices
     const sortedIndices = [...indices].sort((a, b) => b - a);
-
-    const existingOrder = orders.find(o => o.id === orderId);
-    if (!existingOrder) return;
 
     const updatedItems = [...existingOrder.items];
     sortedIndices.forEach(idx => {
@@ -855,8 +890,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (updatedItems.length === 0) {
-      cancelOrder(orderId);
-      addToast('Order auto-cancelled as all items were removed', 'info');
+      deleteOrder(orderId);
+      addToast('Order deleted as all items were removed', 'info');
       return;
     }
 
@@ -978,6 +1013,40 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     addNotification(`Order ${ord.orderNumber} was cancelled`, 'all');
     addToast('Order cancelled successfully', 'error');
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    const ord = orders.find((o) => o.id === orderId);
+    if (!ord) return;
+
+    await deleteDoc(doc(db, 'orders', orderId)).catch(console.error);
+
+    if (ord.tableId) {
+      getDocs(query(
+        collection(db, 'orders'),
+        where('tableId', '==', ord.tableId),
+        where('status', 'in', ['new', 'preparing', 'ready', 'served'])
+      )).then(snap => {
+        const activeDocs = snap.docs.filter(d => d.id !== orderId);
+        if (activeDocs.length === 0) {
+          updateDoc(doc(db, 'tables', ord.tableId), {
+            status: 'available',
+            currentOrderId: null,
+            activeWaiterId: null,
+            activeWaiterName: null
+          }).catch(console.error);
+        } else {
+          const nextActive = activeDocs[0].data();
+          updateDoc(doc(db, 'tables', ord.tableId), {
+            currentOrderId: activeDocs[0].id,
+            activeWaiterId: nextActive.waiterId,
+            activeWaiterName: nextActive.waiterName,
+          }).catch(console.error);
+        }
+      }).catch(console.error);
+    }
+    addNotification(`Order ${ord.orderNumber} was deleted`, 'all');
+    addToast(`Order ${ord.orderNumber} deleted successfully`, 'info');
   };
 
   // Stock & Material Management
@@ -1576,6 +1645,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeItemFromOrder,
         completeOrder,
         cancelOrder,
+        deleteOrder,
         createStockItem,
         updateMaterial,
         deleteMaterial,

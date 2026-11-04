@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
-import { Order, PaymentMethod } from '../../types';
+import { Order, OrderItem, PaymentMethod } from '../../types';
 import { getOrderItemImage } from '../../utils/menuImages';
 import {
   CheckCircle2,
@@ -18,6 +18,8 @@ import {
   Sparkles,
   Trash2,
   Printer,
+  Minus,
+  Plus,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
@@ -29,8 +31,15 @@ interface WaiterActiveOrdersProps {
 
 type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
 
+interface ItemRemovalTarget {
+  orderId: string;
+  itemIndex: number;
+  item: OrderItem;
+  removeQty: number;
+}
+
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, menuItems, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, servePreparedItems } = useCafe();
+  const { orders, menuItems, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, servePreparedItems, deleteOrder } = useCafe();
 
   const [activeTabFilter, setActiveTabFilter] = useState<OrderTabFilter>('all');
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
@@ -43,8 +52,14 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
   // Serve confirmation state
   const [justServedOrder, setJustServedOrder] = useState<Order | null>(null);
 
+  // Item quantity removal & Order deletion state
+  const [itemRemovalTarget, setItemRemovalTarget] = useState<ItemRemovalTarget | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+
   useModalClose(() => setJustServedOrder(null), !!justServedOrder);
   useModalClose(() => setIsCompletedModalOpen(false), isCompletedModalOpen);
+  useModalClose(() => setItemRemovalTarget(null), !!itemRemovalTarget);
+  useModalClose(() => setOrderToDelete(null), !!orderToDelete);
 
   // Active orders (new, preparing, ready, served)
   const activeOrders = orders.filter(
@@ -275,8 +290,8 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                       </span>
                     </div>
 
-                    {/* Status Badge */}
-                    <div>
+                    {/* Status Badge & Delete Entire Order */}
+                    <div className="flex items-center space-x-1.5">
                       {isReady && (
                         <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500 text-white shadow-xs animate-pulse whitespace-nowrap">
                           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -304,6 +319,18 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                           <span>NEW</span>
                         </span>
                       )}
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOrderToDelete(order);
+                        }}
+                        className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        title="Delete Entire Order"
+                      >
+                        <Trash2 className="w-4 h-4 text-stone-400 hover:text-red-500" />
+                      </button>
                     </div>
                   </div>
 
@@ -368,9 +395,21 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                             ₹{item.price * item.quantity}
                           </span>
                           <button 
-                            onClick={(e) => { e.stopPropagation(); removeItemFromOrder(order.id, idx); }}
-                            className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors shrink-0"
-                            title="Remove Item"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              if (item.quantity > 1) {
+                                setItemRemovalTarget({
+                                  orderId: order.id,
+                                  itemIndex: idx,
+                                  item,
+                                  removeQty: 1,
+                                });
+                              } else {
+                                removeItemFromOrder(order.id, idx);
+                              }
+                            }}
+                            className="p-1 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors shrink-0 cursor-pointer"
+                            title={item.quantity > 1 ? `Reduce quantity for ${item.name}` : `Remove ${item.name}`}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -447,9 +486,19 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                       ) : null}
 
                       {isNew && (
-                        <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
-                          Ticket Sent to Kitchen
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setOrderToDelete(order)}
+                            className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Delete Order</span>
+                          </button>
+                          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
+                            Ticket Sent to Kitchen
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -744,6 +793,210 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Item Quantity Removal Modal */}
+      {itemRemovalTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setItemRemovalTarget(null)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-sm p-5 sm:p-6 shadow-2xl flex flex-col space-y-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-stone-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                  Reduce Quantity
+                </span>
+                <h3 className="text-base sm:text-lg font-black text-stone-900 mt-1.5">
+                  {itemRemovalTarget.item.name}
+                </h3>
+                <p className="text-xs text-stone-500 mt-0.5">
+                  Current in order: <strong className="text-stone-900">{itemRemovalTarget.item.quantity}</strong> (₹{itemRemovalTarget.item.price} each)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setItemRemovalTarget(null)}
+                className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-stone-50 rounded-2xl p-4 flex flex-col items-center">
+              <span className="text-xs font-bold text-stone-700 mb-2.5">
+                How many quantities do you want to remove?
+              </span>
+              <div className="flex items-center space-x-4">
+                <button
+                  type="button"
+                  disabled={itemRemovalTarget.removeQty <= 1}
+                  onClick={() =>
+                    setItemRemovalTarget((prev) =>
+                      prev ? { ...prev, removeQty: Math.max(1, prev.removeQty - 1) } : null
+                    )
+                  }
+                  className="w-10 h-10 rounded-xl bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xs font-bold cursor-pointer"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <div className="w-16 text-center">
+                  <span className="text-3xl font-black text-stone-900 font-mono">
+                    {itemRemovalTarget.removeQty}
+                  </span>
+                  <span className="block text-[10px] text-stone-400 font-bold uppercase">
+                    To Remove
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  disabled={itemRemovalTarget.removeQty >= itemRemovalTarget.item.quantity}
+                  onClick={() =>
+                    setItemRemovalTarget((prev) =>
+                      prev
+                        ? { ...prev, removeQty: Math.min(prev.item.quantity, prev.removeQty + 1) }
+                        : null
+                    )
+                  }
+                  className="w-10 h-10 rounded-xl bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-2xs font-bold cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 mt-3 w-full justify-center">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setItemRemovalTarget((prev) => (prev ? { ...prev, removeQty: 1 } : null))
+                  }
+                  className={`px-3 py-1 text-xs rounded-lg font-bold border transition-all cursor-pointer ${
+                    itemRemovalTarget.removeQty === 1
+                      ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-2xs'
+                      : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-100'
+                  }`}
+                >
+                  Remove 1
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setItemRemovalTarget((prev) =>
+                      prev ? { ...prev, removeQty: prev.item.quantity } : null
+                    )
+                  }
+                  className={`px-3 py-1 text-xs rounded-lg font-bold border transition-all cursor-pointer ${
+                    itemRemovalTarget.removeQty === itemRemovalTarget.item.quantity
+                      ? 'bg-red-100 text-red-900 border-red-300 shadow-2xs'
+                      : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-100'
+                  }`}
+                >
+                  Remove All ({itemRemovalTarget.item.quantity})
+                </button>
+              </div>
+            </div>
+
+            <div className="text-xs text-stone-600 px-1 text-center">
+              {itemRemovalTarget.removeQty >= itemRemovalTarget.item.quantity ? (
+                <span className="text-red-600 font-bold">
+                  ⚠️ This item will be completely removed from the order.
+                </span>
+              ) : (
+                <span>
+                  Remaining in order:{' '}
+                  <strong className="text-stone-900 font-mono">
+                    {itemRemovalTarget.item.quantity - itemRemovalTarget.removeQty} × {itemRemovalTarget.item.name}
+                  </strong>{' '}
+                  (₹{(itemRemovalTarget.item.quantity - itemRemovalTarget.removeQty) * itemRemovalTarget.item.price})
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setItemRemovalTarget(null)}
+                className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  removeItemFromOrder(
+                    itemRemovalTarget.orderId,
+                    itemRemovalTarget.itemIndex,
+                    itemRemovalTarget.removeQty
+                  );
+                  setItemRemovalTarget(null);
+                }}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                Remove {itemRemovalTarget.removeQty} {itemRemovalTarget.removeQty === 1 ? 'Item' : 'Items'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Entire Order Confirmation Modal */}
+      {orderToDelete && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setOrderToDelete(null)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl flex flex-col items-center text-center space-y-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-inner">
+              <Trash2 className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-black text-stone-900">
+                Delete Entire Order?
+              </h3>
+              <p className="text-xs text-stone-500 mt-1">
+                {orderToDelete.tableNumber} • Order #{orderToDelete.orderNumber}
+              </p>
+              <div className="text-xs text-stone-600 mt-3 p-3 bg-red-50/60 rounded-xl border border-red-200/80 text-left space-y-1">
+                <p>
+                  <strong>Customer:</strong> {orderToDelete.customerName || 'Guest'}
+                </p>
+                <p>
+                  <strong>Total Items:</strong> {orderToDelete.items.reduce((s, i) => s + i.quantity, 0)} items (₹{orderToDelete.total})
+                </p>
+                <p className="text-red-700 font-semibold pt-1">
+                  ⚠️ This will permanently delete the entire order and free up {orderToDelete.tableNumber}.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 w-full pt-1">
+              <button
+                type="button"
+                onClick={() => setOrderToDelete(null)}
+                className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+              >
+                Keep Order
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteOrder(orderToDelete.id);
+                  setOrderToDelete(null);
+                }}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs shadow-md shadow-red-600/30 transition-all active:scale-95 cursor-pointer"
+              >
+                Yes, Delete Order
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -22,21 +22,38 @@ export interface KotData {
 }
 
 /**
+ * Formats dates like "2026-11-05" into readable "05 Nov 2026".
+ */
+function formatKotDate(dateStr?: string): string {
+  if (!dateStr) {
+    return new Date().toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [y, m, d] = dateStr.split('-');
+    const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
+    return dateObj.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+  return dateStr;
+}
+
+/**
  * Builds a styled 80mm Kitchen Order Ticket (KOT) PDF document.
+ * Excludes Order #, Waiter, and Payment as requested.
+ * Sizes height dynamically to prevent blank space at the bottom.
  */
 export function buildKotPdfDoc(data: KotData): jsPDF {
   const brandName = data.brand === 'KUNAFA' ? 'KUNAFA DESSERTS' : 'JB PAVILION & CAFE';
   const tableName = data.tableName || 'Takeaway';
   const customerName = data.customerName?.trim() || 'Guest';
-  const waiterName = data.waiterName || 'Staff';
-  const orderNumber = data.orderNumber || `${Date.now().toString().slice(-5)}`;
-  const dateStr =
-    data.date ||
-    new Date().toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+  const formattedDate = formatKotDate(data.date);
   const timeStr =
     data.time ||
     new Date().toLocaleTimeString('en-IN', {
@@ -44,33 +61,51 @@ export function buildKotPdfDoc(data: KotData): jsPDF {
       minute: '2-digit',
       hour12: true,
     });
-  const paymentMode = data.paymentMethod ? data.paymentMethod.toUpperCase() : 'PAID';
   const notes = data.notes?.trim() || '';
 
-  // 1. Measure dynamic content to calculate exact height (no awkward whitespace or page breaks)
-  const tempDoc = new jsPDF({ unit: 'mm', format: [80, 600] });
-  tempDoc.setFont('helvetica', 'normal');
-  tempDoc.setFontSize(9.5);
+  // 1. Pre-measure height using a temporary doc to achieve exact fit
+  const measureDoc = new jsPDF({ unit: 'mm', format: [80, 1000] });
+  measureDoc.setFont('helvetica', 'normal');
+  measureDoc.setFontSize(9.5);
 
-  let itemsHeight = 0;
+  let calcY = 8;
+  calcY += 5;   // Brand
+  calcY += 6.5; // Badge
+  calcY += 4.5; // Solid line gap
+  calcY += 5.5; // Table name
+  calcY += 4.5; // Date & Time
+  calcY += 4.5; // Name
+  calcY += 4;   // Dashed line
+  calcY += 2.5; // ITEM & QTY header
+  calcY += 4;   // Solid line gap
+
   data.items.forEach((item) => {
-    const wrappedLines = tempDoc.splitTextToSize(item.name, 50);
-    itemsHeight += wrappedLines.length * 4.2;
+    const nameLines = measureDoc.splitTextToSize(item.name, 50);
+    calcY += nameLines.length * 4.2;
     if (item.notes) {
-      const noteLines = tempDoc.splitTextToSize(`* ${item.notes}`, 48);
-      itemsHeight += noteLines.length * 3.5;
+      const noteLines = measureDoc.splitTextToSize(`* ${item.notes}`, 50);
+      calcY += noteLines.length * 3.5;
     }
-    itemsHeight += 1.8;
+    calcY += 1.5;
   });
 
-  let notesHeight = 0;
+  calcY += 1;   // Pre-divider gap
+  calcY += 4;   // Dashed divider gap
+  calcY += 3.5; // Totals summary
+  calcY += 4;   // Solid divider gap
+
   if (notes) {
-    const wrappedNotes = tempDoc.splitTextToSize(notes, 62);
-    notesHeight = 8 + wrappedNotes.length * 4 + 4;
+    const wrappedNotes = measureDoc.splitTextToSize(notes, 62);
+    const boxHeight = 6 + wrappedNotes.length * 4;
+    calcY += boxHeight + 4;
+    calcY += 3.5;
   }
 
-  // Base overhead: Top (8) + Brand Header (16) + Table/Meta Info (32) + Items Header (9) + Totals (8) + Footer (16) = ~89mm
-  const totalHeight = Math.max(120, Math.ceil(88 + itemsHeight + notesHeight + 14));
+  calcY += 4;   // SEND TO KITCHEN
+  calcY += 4.5; // Printed timestamp
+  calcY += 7;   // Clean bottom padding
+
+  const totalHeight = Math.ceil(calcY);
 
   const doc = new jsPDF({
     unit: 'mm',
@@ -118,40 +153,28 @@ export function buildKotPdfDoc(data: KotData): jsPDF {
   drawSolidDivider(y);
   y += 4.5;
 
-  // 2. ORDER & TABLE INFO
+  // 2. TABLE & CUSTOMER INFO (Order, Waiter, and Payment removed as requested)
   doc.setTextColor(0, 0, 0);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.text(tableName.toUpperCase(), centerX, y, { align: 'center' });
   y += 5.5;
 
-  // Order # & Time
+  // Date & Time (One single clean line)
   doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`Order: #${orderNumber.replace('#', '')}`, leftX, y);
   doc.setFont('helvetica', 'normal');
+  doc.text(`Date: ${formattedDate}`, leftX, y);
   doc.text(`Time: ${timeStr}`, rightX, y, { align: 'right' });
-  y += 4.5;
-
-  // Date & Waiter
-  doc.text(`Date: ${dateStr}`, leftX, y);
-  doc.text(`Waiter: ${waiterName}`, rightX, y, { align: 'right' });
   y += 4.5;
 
   // Customer Name
   doc.setFont('helvetica', 'bold');
-  doc.text('Customer: ', leftX, y);
-  const custLabelWidth = doc.getTextWidth('Customer: ');
+  doc.text('Name: ', leftX, y);
+  const nameLabelWidth = doc.getTextWidth('Name: ');
   doc.setTextColor(180, 83, 9); // Amber-800
-  doc.text(customerName, leftX + custLabelWidth, y);
+  doc.text(customerName, leftX + nameLabelWidth, y);
   doc.setTextColor(0, 0, 0);
   y += 4.5;
-
-  // Payment Status
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  doc.text(`Payment: ${paymentMode} (CONFIRMED)`, leftX, y);
-  y += 3.5;
 
   drawDashedDivider(y);
   y += 4;
@@ -182,7 +205,7 @@ export function buildKotPdfDoc(data: KotData): jsPDF {
     // Qty on the right aligned with first line of item name
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text(String(item.quantity), rightX - 2, y, { align: 'right' });
+    doc.text(String(item.quantity), rightX, y, { align: 'right' });
 
     y += nameLines.length * 4.2;
 
@@ -248,7 +271,7 @@ export function buildKotPdfDoc(data: KotData): jsPDF {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(120, 120, 120);
-  doc.text(`Printed: ${dateStr} ${timeStr}`, centerX, y, { align: 'center' });
+  doc.text(`Printed: ${formattedDate} ${timeStr}`, centerX, y, { align: 'center' });
 
   return doc;
 }
@@ -269,4 +292,3 @@ export function downloadKotPdf(data: KotData): string {
     return '';
   }
 }
-
