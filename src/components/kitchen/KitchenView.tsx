@@ -18,7 +18,9 @@ import {
   Utensils,
   LogOut,
   Coffee,
+  Printer,
 } from 'lucide-react';
+import { downloadKotPdf } from '../../utils/kotGenerator';
 
 type KitchenTab = 'new' | 'preparing' | 'ready' | 'served';
 
@@ -299,6 +301,27 @@ export const KitchenView: React.FC = () => {
                             {order.orderNumber}
                           </span>
                           <span className="text-xs text-stone-400">{order.createdAt}</span>
+                          <button
+                            type="button"
+                            title="Download KOT PDF"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadKotPdf({
+                                orderNumber: order.orderNumber,
+                                tableName: order.tableNumber,
+                                customerName: order.customerName || 'Guest',
+                                waiterName: order.waiterName,
+                                items: order.items,
+                                notes: order.notes || undefined,
+                                paymentMethod: order.paymentMethod,
+                                date: order.date,
+                                time: order.createdAt,
+                              });
+                            }}
+                            className="p-1 rounded-md text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors cursor-pointer"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-stone-900 mt-1">
                           {order.tableNumber}

@@ -17,9 +17,11 @@ import {
   Check,
   Sparkles,
   Trash2,
+  Printer,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
+import { downloadKotPdf } from '../../utils/kotGenerator';
 
 interface WaiterActiveOrdersProps {
   onSelectTableForOrder?: (tableId: string) => void;
@@ -243,6 +245,27 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                         <span className="font-mono font-bold text-xs text-[#B45309] bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">
                           {order.orderNumber}
                         </span>
+                        <button
+                          type="button"
+                          title="Download KOT PDF"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadKotPdf({
+                              orderNumber: order.orderNumber,
+                              tableName: order.tableNumber,
+                              customerName: order.customerName || 'Guest',
+                              waiterName: order.waiterName,
+                              items: order.items,
+                              notes: order.notes || undefined,
+                              paymentMethod: order.paymentMethod,
+                              date: order.date,
+                              time: order.createdAt,
+                            });
+                          }}
+                          className="p-1 rounded-md text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors cursor-pointer"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                       <span className="text-[11px] text-stone-500 mt-0.5 block">
                         {order.customerName ? <strong className="text-stone-800 font-bold mr-1.5">Cust: {order.customerName} •</strong> : null}

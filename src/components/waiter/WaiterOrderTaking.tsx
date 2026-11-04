@@ -17,9 +17,12 @@ import {
   Coffee,
   Sparkles,
   User,
+  Printer,
+  Download,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { getMenuItemImage } from '../../utils/menuImages';
+import { downloadKotPdf, KotData } from '../../utils/kotGenerator';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -95,6 +98,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [lastKotData, setLastKotData] = useState<KotData | null>(null);
 
   // Dynamically compute categories for the selected brand
   const brandCategories: MenuItemCategory[] = useMemo(() => {
@@ -202,10 +206,8 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const subtotal = cartItemsList.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleReviewConfirm = () => {
-    if (!customerName.trim()) {
-      setCustomerNameError(true);
-      return;
-    }
+    const resolvedName = customerName.trim() || `${table.name} Guest`;
+    setCustomerName(resolvedName);
     setCustomerNameError(false);
     setShowReviewModal(false);
     setShowPaymentModal(true);
@@ -214,29 +216,46 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
   const handleSendToKitchen = () => {
     if (cartItemsList.length === 0) return;
-    if (!customerName.trim()) {
-      setShowPaymentModal(false);
-      setShowReviewModal(true);
-      setCustomerNameError(true);
-      return;
-    }
+    const resolvedCustomer = customerName.trim() || `${table.name} Guest`;
 
     // Always create a new order instead of appending
-    createOrder({
+    const created = createOrder({
       tableId: table.id,
       items: cartItemsList,
-      customerName: customerName.trim(),
+      customerName: resolvedCustomer,
       notes: notes.trim() ? notes.trim() : undefined,
       waiterId: currentUser?.id,
       waiterName: currentUser?.name,
       paymentMethod,
     });
 
+    // Auto-save KOT PDF for kitchen printer/records
+    const firstOrder = Array.isArray(created) ? created[0] : created;
+    const orderNum = Array.isArray(created)
+      ? created.map((o) => o.orderNumber.replace('#', '')).join(', ')
+      : firstOrder?.orderNumber?.replace('#', '');
+
+    const kotData: KotData = {
+      orderNumber: orderNum,
+      tableName: table.name,
+      customerName: resolvedCustomer,
+      waiterName: currentUser?.name,
+      items: cartItemsList,
+      notes: notes.trim() ? notes.trim() : undefined,
+      paymentMethod,
+      brand: selectedBrand,
+      date: firstOrder?.date,
+      time: firstOrder?.createdAt,
+    };
+
+    setLastKotData(kotData);
+    downloadKotPdf(kotData);
+
     setShowPaymentModal(false);
     setIsSuccess(true);
     setTimeout(() => {
       onOrderSent();
-    }, 1200);
+    }, 2400);
   };
 
   const currentCash = typeof cashTendered === 'number' ? cashTendered : 0;
@@ -244,7 +263,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
 
   if (isSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 min-h-[450px] text-center bg-white rounded-2xl">
+      <div className="flex flex-col items-center justify-center p-8 min-h-[450px] text-center bg-white rounded-2xl shadow-sm border border-stone-100">
         <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 animate-bounce">
           <CheckCircle2 className="w-10 h-10" />
         </div>
@@ -252,9 +271,34 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         <p className="text-sm text-stone-500 mt-1">
           {table.name} • {totalItemCount} items (₹{subtotal})
         </p>
+
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 shadow-2xs">
+            <Download className="w-3.5 h-3.5 text-emerald-600" />
+            KOT PDF Saved to Downloads
+          </span>
+
+          {lastKotData && (
+            <button
+              onClick={() => downloadKotPdf(lastKotData)}
+              className="mt-1 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl border border-stone-300 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5 text-stone-600" />
+              Download / Save KOT Again
+            </button>
+          )}
+        </div>
+
         <span className="inline-block mt-3 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-semibold rounded-full border border-amber-200">
           Kitchen display notified instantly
         </span>
+
+        <button
+          onClick={onOrderSent}
+          className="mt-6 px-6 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer"
+        >
+          Return to Tables
+        </button>
       </div>
     );
   }
@@ -457,8 +501,59 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
               </button>
             </div>
 
+            {/* Customer Details & Notes (Top, always visible even with many items) */}
+            <div className="p-3.5 sm:p-4 bg-stone-50/90 border-b border-stone-200 space-y-2.5">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-stone-700 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Customer Name</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustomerName(`${table.name} Guest`);
+                      setCustomerNameError(false);
+                    }}
+                    className="text-[10px] font-bold text-amber-700 hover:text-amber-900 bg-amber-100/70 hover:bg-amber-100 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                  >
+                    + Quick &quot;{table.name} Guest&quot;
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (customerNameError) setCustomerNameError(false);
+                    }}
+                    placeholder={`e.g. Miren Savani (or leave blank for ${table.name} Guest)`}
+                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-medium shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-600 mb-1 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-stone-400" />
+                  <span>Kitchen Notes / Instructions (Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. Less sugar, extra spicy, warm milk..."
+                  className="w-full px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-xs text-stone-800 placeholder-stone-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-2xs"
+                />
+              </div>
+            </div>
+
             {/* Items List */}
             <div className="p-4 overflow-y-auto divide-y divide-stone-100 flex-1 space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-stone-400 pb-1">
+                Ordered Items ({totalItemCount})
+              </div>
               {cartItemsList.map((item) => (
                 <div key={item.menuItemId} className="pt-2 flex items-center justify-between">
                   <div>
@@ -474,14 +569,14 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                     <div className="flex items-center space-x-1 bg-stone-100 p-0.5 rounded-lg border border-stone-200">
                       <button
                         onClick={() => handleDecreaseItem(item.menuItemId)}
-                        className="w-6 h-6 rounded bg-white text-stone-700 flex items-center justify-center text-xs"
+                        className="w-6 h-6 rounded bg-white text-stone-700 flex items-center justify-center text-xs hover:bg-stone-50 transition-colors"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
                       <span className="w-5 text-center font-bold text-xs">{item.quantity}</span>
                       <button
                         onClick={() => handleAddItem(item.menuItemId, item.name, item.price)}
-                        className="w-6 h-6 rounded bg-amber-600 text-white flex items-center justify-center text-xs"
+                        className="w-6 h-6 rounded bg-amber-600 text-white flex items-center justify-center text-xs hover:bg-amber-700 transition-colors"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -489,74 +584,20 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
                   </div>
                 </div>
               ))}
-
-              {/* Customer Name Input (Mandatory) */}
-              <div className="pt-4">
-                <div className="mb-1">
-                  <label className="text-xs font-extrabold text-stone-700">
-                    Customer Name <span className="text-red-500">*</span>
-                  </label>
-                </div>
-                <div className="relative">
-                  <User className={`w-4 h-4 absolute left-3 top-2.5 ${customerNameError ? 'text-red-500' : 'text-stone-400'}`} />
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => {
-                      setCustomerName(e.target.value);
-                      if (e.target.value.trim()) setCustomerNameError(false);
-                    }}
-                    placeholder="Enter customer name..."
-                    className={`w-full pl-9 pr-3 py-2 bg-stone-50 border ${
-                      customerNameError
-                        ? 'border-red-500 ring-2 ring-red-200 bg-red-50/20 placeholder-red-300'
-                        : 'border-stone-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
-                    } rounded-xl text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:outline-hidden transition-all`}
-                  />
-                </div>
-                {customerNameError && (
-                  <p className="text-[11px] text-red-500 font-bold mt-1.5 flex items-center gap-1">
-                    Customer name is required before proceeding to payment.
-                  </p>
-                )}
-              </div>
-
-              {/* Special Note Input */}
-              <div className="pt-3">
-                <label className="block text-xs font-semibold text-stone-600 mb-1">
-                  Optional Kitchen Note
-                </label>
-                <div className="relative">
-                  <FileText className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="e.g. Less sugar, extra spicy, warm milk..."
-                    className="w-full pl-9 pr-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-800 focus:outline-hidden focus:ring-1 focus:ring-amber-500"
-                  />
-                </div>
-              </div>
-
-              {/* Subtotal Bill summary */}
-              <div className="pt-3 border-t border-stone-200">
-                <div className="flex justify-between text-sm py-1">
-                  <span className="text-stone-500">Subtotal</span>
-                  <span className="font-semibold text-stone-800">₹{subtotal}</span>
-                </div>
-                <div className="flex justify-between text-base font-extrabold text-stone-900 pt-1 border-t border-stone-100">
-                  <span>Estimated Total</span>
-                  <span className="text-amber-700">₹{subtotal}</span>
-                </div>
-              </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="p-4 bg-stone-50 border-t border-stone-200">
+            <div className="p-4 bg-stone-50 border-t border-stone-200 space-y-2.5">
+              <div className="flex justify-between items-center text-sm px-1">
+                <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">
+                  Total Due ({totalItemCount} Items)
+                </span>
+                <span className="text-lg font-black text-amber-700">₹{subtotal}</span>
+              </div>
               <button
                 id="send-to-kitchen-primary-btn"
                 onClick={handleReviewConfirm}
-                className="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl text-base shadow-lg shadow-amber-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95"
+                className="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-xl text-base shadow-lg shadow-amber-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
               >
                 <CreditCard className="w-5 h-5" />
                 <span>PROCEED TO PAYMENT</span>
