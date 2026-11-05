@@ -11,10 +11,10 @@ interface SeatMapProps {
 
 const statusColor: Record<TableStatus, { bg: string; border: string; text: string; dot: string }> = {
   available:  { bg: 'bg-emerald-50 hover:bg-emerald-100/70',  border: 'border-emerald-500', text: 'text-emerald-800', dot: 'bg-emerald-500' },
-  occupied:   { bg: 'bg-amber-50 hover:bg-amber-100/70',      border: 'border-amber-500',   text: 'text-amber-900',   dot: 'bg-amber-500' },
-  preparing:  { bg: 'bg-blue-50 hover:bg-blue-100/70',        border: 'border-blue-500',    text: 'text-blue-900',    dot: 'bg-blue-500 animate-pulse' },
-  ready:      { bg: 'bg-teal-100 hover:bg-teal-200/70',       border: 'border-teal-600',    text: 'text-teal-900',    dot: 'bg-teal-500' },
-  served:     { bg: 'bg-purple-50 hover:bg-purple-100/70',    border: 'border-purple-500',  text: 'text-purple-900',  dot: 'bg-purple-500' },
+  occupied:   { bg: 'bg-amber-50 hover:bg-amber-100/70',      border: 'border-amber-500',   text: 'text-amber-900',   dot: 'bg-emerald-500' },
+  preparing:  { bg: 'bg-blue-50 hover:bg-blue-100/70',        border: 'border-blue-500',    text: 'text-blue-900',    dot: 'bg-emerald-500' },
+  ready:      { bg: 'bg-teal-100 hover:bg-teal-200/70',       border: 'border-teal-600',    text: 'text-teal-900',    dot: 'bg-emerald-500' },
+  served:     { bg: 'bg-purple-50 hover:bg-purple-100/70',    border: 'border-purple-500',  text: 'text-purple-900',  dot: 'bg-emerald-500' },
 };
 
 const zoneStyles: Record<'G' | 'J' | 'Sm' | 'C', { bg: string; border: string; text: string; subtext: string }> = {
@@ -85,7 +85,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({
     return (
       <div
         onClick={() => interactive && onTableClick?.(effectiveTable)}
-        title={effectiveTable ? `${effectiveTable.name} — ${status}` : `${number}`}
+        title={effectiveTable ? effectiveTable.name : number}
         className={[
           'seat-cell relative flex flex-col items-center justify-center rounded-xl select-none transition-all shadow-xs',
           'w-full max-w-[150px]',
@@ -97,7 +97,7 @@ export const SeatMap: React.FC<SeatMapProps> = ({
             : 'cursor-default',
         ].join(' ')}
       >
-        <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${c.dot} shadow-xs`} />
+        <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs" />
         <span className={`font-black text-sm sm:text-base leading-tight text-center tracking-tight ${textClass}`}>
           {number}
         </span>
@@ -324,12 +324,9 @@ export const SeatMap: React.FC<SeatMapProps> = ({
           {/* Legend (only shown if showLegend is true) */}
           {showLegend && (
             <div className="pt-4 pb-2 border-t border-stone-200 flex flex-wrap gap-x-6 gap-y-2.5 justify-center mt-4">
-              {(Object.entries(statusColor) as [TableStatus, typeof statusColor[TableStatus]][]).map(([st, c]) => (
-                <span key={st} className="flex items-center gap-2 text-xs font-semibold text-stone-600">
-                  <span className={`w-3 h-3 rounded-full ${c.dot.replace(' animate-pulse', '')}`} />
-                  {st === 'occupied' ? 'Order Taken' : st.charAt(0).toUpperCase() + st.slice(1)}
-                </span>
-              ))}
+              <span className="flex items-center gap-2 text-xs font-semibold text-stone-600">
+                <span className="w-3 h-3 rounded-full bg-emerald-500" /> All Tables Available
+              </span>
               <span className="flex items-center gap-2 text-xs font-semibold text-stone-500">
                 <span className="w-3.5 h-3.5 rounded-md border-2 border-emerald-500 bg-emerald-50 inline-block shadow-2xs" /> Garden
               </span>
