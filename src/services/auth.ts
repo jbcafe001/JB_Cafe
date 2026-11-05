@@ -3,7 +3,6 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -50,6 +49,15 @@ export const loginUser = async (email: string, password: string): Promise<ApiRes
         };
       }
 
+      if (data.role === 'cook') {
+        await signOut(auth);
+        throw {
+          message: 'Cook / Kitchen login is disabled. Please contact admin.',
+          status: 403,
+          toast: true
+        };
+      }
+
       const appUser: AppUser = {
         uid: user.uid,
         email: user.email!,
@@ -91,7 +99,6 @@ export const logoutUser = async () => {
 export const createDemoUsers = async () => {
   const demoUsers = [
     { email: 'admin@cafe.com', password: 'password123', name: 'Admin User', role: 'admin' as UserRole },
-    { email: 'cook@cafe.com', password: 'password123', name: 'Head Cook', role: 'cook' as UserRole },
     { email: 'waiter@cafe.com', password: 'password123', name: 'Rahul Waiter', role: 'waiter' as UserRole },
     { email: 'other@cafe.com', password: 'password123', name: 'Other Staff', role: 'others' as UserRole },
   ];

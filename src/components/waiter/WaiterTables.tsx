@@ -16,6 +16,7 @@ import {
   Sparkles,
   Grid,
   Map,
+  Clock,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
@@ -238,7 +239,7 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             <h3 className="text-lg font-bold text-stone-700">
               {filter === 'available' ? 'No Available Tables' :
                 filter === 'occupied' ? 'No Orders Taken' :
-                  filter === 'preparing' ? 'Nothing in Kitchen' :
+                  filter === 'preparing' ? 'No Active Orders' :
                     filter === 'ready' ? 'Nothing to Serve' :
                       filter === 'served' ? 'No Dining Tables' :
                         'No tables here'}
@@ -329,9 +330,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                   ) : activeOrders.length > 1 ? (
                     <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs font-bold w-full">
                       {kitchenCount > 0 && (
-                        <span className="text-blue-700 bg-blue-50 px-2 py-1 rounded-md border border-blue-100 flex items-center space-x-1">
-                          <Flame className="w-3 h-3" />
-                          <span>{kitchenCount} In Kitchen</span>
+                        <span className="text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-200 flex items-center space-x-1">
+                          <Clock className="w-3 h-3 text-amber-600" />
+                          <span>{kitchenCount} Active</span>
                         </span>
                       )}
                       {readyCount > 0 && (
@@ -390,9 +391,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                         </div>
                       )}
                       {effectiveStatus === 'preparing' && activeOrder && !isPartiallyReadyState && (
-                        <span className="text-blue-700 text-xs sm:text-sm font-bold flex items-center space-x-1.5">
-                          <Flame className="w-4 h-4 animate-pulse" />
-                          <span>In Kitchen</span>
+                        <span className="text-amber-700 text-xs sm:text-sm font-bold flex items-center space-x-1.5">
+                          <Clock className="w-4 h-4 text-amber-600" />
+                          <span>Active</span>
                         </span>
                       )}
                       {effectiveStatus === 'occupied' && !isReady && !isServed && (

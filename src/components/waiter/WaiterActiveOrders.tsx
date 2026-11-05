@@ -29,7 +29,7 @@ interface WaiterActiveOrdersProps {
   onSelectTableForOrder?: (tableId: string) => void;
 }
 
-type OrderTabFilter = 'all' | 'ready' | 'served' | 'kitchen';
+type OrderTabFilter = 'all' | 'to_serve' | 'served';
 
 interface ItemRemovalTarget {
   orderId: string;
@@ -39,7 +39,7 @@ interface ItemRemovalTarget {
 }
 
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, menuItems, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, servePreparedItems, deleteOrder } = useCafe();
+  const { orders, menuItems, completeOrder, serveOrder, toggleItemServed, removeItemFromOrder, deleteOrder } = useCafe();
 
   const [activeTabFilter, setActiveTabFilter] = useState<OrderTabFilter>('all');
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
@@ -70,16 +70,13 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
       o.status === 'served'
   );
 
-  const readyOrders = activeOrders.filter((o) => o.status === 'ready' && !(o.items.length > 0 && o.items.every(i => i.served)));
-  const servedOrders = activeOrders.filter((o) => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served)));
-  const preparingOrders = activeOrders.filter((o) => o.status === 'preparing' && !(o.items.length > 0 && o.items.every(i => i.served)));
-  const newOrders = activeOrders.filter((o) => o.status === 'new' && !(o.items.length > 0 && o.items.every(i => i.served)));
-  const inKitchenOrders = [...newOrders, ...preparingOrders];
+  const isOrderFullyServed = (o: Order) => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served));
+  const servedOrders = activeOrders.filter(isOrderFullyServed);
+  const toServeOrders = activeOrders.filter(o => !isOrderFullyServed(o));
 
   const filteredOrders = activeOrders.filter((ord) => {
-    if (activeTabFilter === 'ready') return ord.status === 'ready';
-    if (activeTabFilter === 'served') return ord.status === 'served';
-    if (activeTabFilter === 'kitchen') return ord.status === 'new' || ord.status === 'preparing';
+    if (activeTabFilter === 'to_serve') return !isOrderFullyServed(ord);
+    if (activeTabFilter === 'served') return isOrderFullyServed(ord);
     return true;
   });
 
@@ -118,38 +115,6 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-16 sm:pb-20 bg-[#F8F6F0] min-h-0">
       <WaiterHeader />
-      {/* Ready Orders Alert Banner if any */}
-      {readyOrders.length > 0 && (
-        <div className="bg-emerald-50 border-2 border-emerald-500/50 rounded-2xl p-4 shadow-sm animate-pulse">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
-            <div className="flex items-start space-x-2">
-              <span className="w-3 h-3 mt-1.5 shrink-0 rounded-full bg-emerald-500 animate-ping" />
-              <span className="font-extrabold text-emerald-950 text-sm sm:text-base">
-                {readyOrders.length} {readyOrders.length === 1 ? 'Order' : 'Orders'} Ready at Kitchen Counter!
-              </span>
-            </div>
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider bg-emerald-200/90 text-emerald-900 px-2.5 py-1 rounded-lg shrink-0 whitespace-nowrap">
-              Pickup Ready
-            </span>
-          </div>
-          <p className="text-xs text-emerald-800">
-            Pick up from kitchen counter and tap <span className="font-bold underline">Serve to Table</span> to deliver to guests.
-          </p>
-          <div className="mt-2.5 flex flex-wrap gap-2">
-            {readyOrders.map((ro) => (
-              <button
-                key={ro.id}
-                onClick={() => handleServeOrderClick(ro)}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs flex items-center space-x-1.5 transition-all"
-              >
-                <Utensils className="w-3.5 h-3.5" />
-                <span>Serve {ro.tableNumber}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Filter Tabs */}
       <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
         <button
@@ -164,15 +129,15 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
         </button>
 
         <button
-          onClick={() => setActiveTabFilter('ready')}
+          onClick={() => setActiveTabFilter('to_serve')}
           className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap border ${
-            activeTabFilter === 'ready'
-              ? 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs'
-              : 'bg-white border-emerald-200 text-emerald-800 hover:bg-emerald-50'
+            activeTabFilter === 'to_serve'
+              ? 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs'
+              : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Ready to Serve ({readyOrders.length})</span>
+          <Clock className="w-3 h-3 text-amber-600" />
+          <span>To Serve ({toServeOrders.length})</span>
         </button>
 
         <button
@@ -185,18 +150,6 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
         >
           <Utensils className="w-3 h-3 text-purple-600" />
           <span>Served & Dining ({servedOrders.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTabFilter('kitchen')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center space-x-1.5 whitespace-nowrap border ${
-            activeTabFilter === 'kitchen'
-              ? 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
-          }`}
-        >
-          <Flame className="w-3 h-3 text-orange-600" />
-          <span>In Kitchen ({inKitchenOrders.length})</span>
         </button>
       </div>
 
@@ -216,10 +169,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
             </div>
             <h3 className="font-bold text-stone-800 text-sm">No Orders in this view</h3>
             <p className="text-xs text-stone-400 mt-1">
-              {activeTabFilter === 'ready'
-                ? 'No kitchen orders currently waiting to be served.'
+              {activeTabFilter === 'to_serve'
+                ? 'No active orders waiting to be served.'
                 : activeTabFilter === 'served'
-                ? 'No tables currently served. Deliver ready orders first.'
+                ? 'No served orders currently dining.'
                 : 'All orders have been processed and settled.'}
             </p>
           </div>
@@ -228,9 +181,6 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
             {filteredOrders.map((order) => {
               const allItemsServed = order.items.length > 0 && order.items.every(i => i.served);
               const isServed = order.status === 'served' || allItemsServed;
-              const isReady = order.status === 'ready' && !allItemsServed;
-              const isPreparing = order.status === 'preparing' && !allItemsServed;
-              const isNew = order.status === 'new' && !allItemsServed;
               const unservedReadyCount = order.items.reduce((sum, i) => sum + ((i.prepared || 0) > (i.servedCount || 0) ? ((i.prepared || 0) - (i.servedCount || 0)) : 0), 0);
 
               const tableActiveOrders = activeOrders.filter(o => o.tableId === order.tableId);
@@ -241,12 +191,8 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                   key={order.id}
                   id={`order-card-${order.orderNumber.replace('#', '')}`}
                   className={`bg-white rounded-2xl border transition-all shadow-xs p-4 sm:p-5 ${
-                    isReady
-                      ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-emerald-50'
-                      : isServed
+                    isServed
                       ? 'border-indigo-300 ring-1 ring-indigo-400/20'
-                      : isPreparing
-                      ? 'border-blue-200'
                       : 'border-amber-200'
                   }`}
                 >
@@ -292,31 +238,15 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
 
                     {/* Status Badge & Delete Entire Order */}
                     <div className="flex items-center space-x-1.5">
-                      {isReady && (
-                        <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500 text-white shadow-xs animate-pulse whitespace-nowrap">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>READY TO SERVE</span>
-                        </span>
-                      )}
-
-                      {isServed && (
+                      {isServed ? (
                         <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800 border border-indigo-200 whitespace-nowrap">
                           <Utensils className="w-3.5 h-3.5 text-indigo-600" />
                           <span>SERVED / DINING</span>
                         </span>
-                      )}
-
-                      {isPreparing && (
-                        <span className="inline-flex items-center space-x-1 px-2 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap">
-                          <Flame className="w-3 h-3 text-blue-600 animate-pulse" />
-                          <span>PREPARING</span>
-                        </span>
-                      )}
-
-                      {isNew && (
+                      ) : (
                         <span className="inline-flex items-center space-x-1 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap">
                           <Clock className="w-3 h-3 text-amber-600" />
-                          <span>NEW</span>
+                          <span>ACTIVE</span>
                         </span>
                       )}
 
@@ -342,19 +272,14 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                           <button 
                             onClick={(e) => { 
                               e.stopPropagation(); 
-                              if ((item.prepared || 0) >= item.quantity || item.served) {
-                                toggleItemServed(order.id, idx); 
-                              }
+                              toggleItemServed(order.id, idx); 
                             }}
-                            disabled={(item.prepared || 0) < item.quantity && !item.served}
-                            className={`w-5 h-5 shrink-0 rounded flex items-center justify-center transition-colors ${
+                            className={`w-5 h-5 shrink-0 rounded flex items-center justify-center transition-colors cursor-pointer ${
                               item.served 
                                 ? 'bg-emerald-500 text-white' 
-                                : ((item.prepared || 0) < item.quantity 
-                                    ? 'bg-stone-100 border-stone-200 cursor-not-allowed opacity-50 border' 
-                                    : 'border border-stone-300 bg-white hover:border-emerald-400')
+                                : 'border border-stone-300 bg-white hover:border-emerald-400'
                             }`}
-                            title={(item.prepared || 0) < item.quantity && !item.served ? "Item not fully prepared yet" : "Mark as Served"}
+                            title={item.served ? "Item Served" : "Mark as Served"}
                           >
                             {item.served && <Check className="w-3.5 h-3.5" />}
                           </button>
@@ -370,19 +295,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                             />
                           </div>
                           <span className={`font-semibold ${item.served ? 'line-through text-stone-500' : ''}`}>{item.name}</span>
-                          {!item.served && (
-                            <div className="flex gap-1.5 flex-wrap items-center">
-                              {(item.servedCount || 0) > 0 && (
-                                <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
-                                  {item.servedCount}/{item.quantity} Served
-                                </span>
-                              )}
-                              {((item.prepared || 0) - (item.servedCount || 0)) > 0 && (
-                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
-                                  {((item.prepared || 0) - (item.servedCount || 0))} Ready
-                                </span>
-                              )}
-                            </div>
+                          {!item.served && (item.servedCount || 0) > 0 && (
+                            <span className="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+                              {item.servedCount}/{item.quantity} Served
+                            </span>
                           )}
                           {item.notes && (
                             <span className="text-[10px] text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
@@ -437,63 +353,40 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      {/* Step 1: When order is READY from kitchen -> Waiter serves to table */}
-                      {isReady && (
+                      <button
+                        type="button"
+                        onClick={() => setOrderToDelete(order)}
+                        className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Order</span>
+                      </button>
+
+                      {!isServed ? (
                         <button
                           id={`serve-table-btn-${order.orderNumber.replace('#', '')}`}
                           onClick={() => handleServeOrderClick(order)}
-                          className="w-full sm:w-auto px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95"
+                          className="w-full sm:w-auto px-4 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
                         >
                           <Utensils className="w-4 h-4" />
                           <span>Serve to {order.tableNumber}</span>
                         </button>
-                      )}
-
-                      {/* Step 2: When DONE (guests dining or finished) -> Payment option is there */}
-                      {isServed && (
-                        allTableOrdersServed ? (
-                          <button
-                            id={`free-table-btn-${order.orderNumber.replace('#', '')}`}
-                            onClick={() => {
-                              tableActiveOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
-                            }}
-                            className="w-full sm:w-auto px-4 py-2.5 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                          >
-                            <Sparkles className="w-4 h-4 text-emerald-200" />
-                            <span>Free Table</span>
-                          </button>
-                        ) : (
-                          <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-200 flex items-center space-x-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Served Order</span>
-                          </span>
-                        )
-                      )}
-
-                      {/* Fallback for other states */}
-                      {isPreparing && unservedReadyCount > 0 ? (
+                      ) : allTableOrdersServed ? (
                         <button
-                          onClick={() => servePreparedItems(order.id)}
-                          className="text-xs font-extrabold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-4 py-2.5 rounded-xl border border-emerald-300 flex items-center space-x-1.5 transition-colors shadow-xs active:scale-95"
+                          id={`free-table-btn-${order.orderNumber.replace('#', '')}`}
+                          onClick={() => {
+                            tableActiveOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
+                          }}
+                          className="w-full sm:w-auto px-4 py-2 rounded-xl font-extrabold text-xs sm:text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
                         >
-                          <Utensils className="w-3.5 h-3.5" />
-                          <span>Serve {unservedReadyCount} Ready Items</span>
+                          <Sparkles className="w-4 h-4 text-emerald-200" />
+                          <span>Free Table</span>
                         </button>
-                      ) : isPreparing ? (
-                        <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-200">
-                          Cooking in Kitchen
+                      ) : (
+                        <span className="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-200 flex items-center space-x-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Served Order</span>
                         </span>
-                      ) : null}
-
-                      {isNew && (
-                        <button
-                          type="button"
-                          onClick={() => setOrderToDelete(order)}
-                          className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          <span>Delete Order</span>
-                        </button>
                       )}
                     </div>
                   </div>

@@ -23,6 +23,8 @@ export const LoginView: React.FC = () => {
       case 'auth/user-disabled':
       case 'custom/user-inactive':
         return 'Your account has been disabled. Contact admin.';
+      case 'custom/cook-disabled':
+        return 'Cook / Kitchen login has been disabled. Please contact admin.';
       default:
         return 'An unexpected error occurred during login.';
     }
@@ -42,10 +44,13 @@ export const LoginView: React.FC = () => {
       const { db } = await import('../../firebase');
       const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
       
-      if (userDoc.exists() && userDoc.data().status === 'inactive') {
-        const { signOut } = await import('firebase/auth');
-        await signOut(auth);
-        throw { code: 'custom/user-inactive' };
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.status === 'inactive' || userData.role === 'cook') {
+          const { signOut } = await import('firebase/auth');
+          await signOut(auth);
+          throw { code: userData.role === 'cook' ? 'custom/cook-disabled' : 'custom/user-inactive' };
+        }
       }
 
       // If active, CafeContext's onAuthStateChanged will handle the rest

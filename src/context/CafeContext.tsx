@@ -543,8 +543,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activeWaiterName: newOrder.waiterName,
       }).catch(console.error);
 
-      // Notify Kitchen
-      addNotification(`New order ${orderNumber} received for ${tableNumStr}`, 'cook');
+      // Notify Waiter / Staff
+      addNotification(`New order ${orderNumber} placed for ${tableNumStr}`, 'waiter');
 
       createdOrders.push(newOrder);
     };
@@ -603,8 +603,8 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateDoc(doc(db, 'tables', updatedTableId), { status: tableStatus }).catch(console.error);
     }
 
-    // Notify Kitchen
-    addNotification(`Additional items added to ${ordNum} for ${tableNumStr}`, 'cook');
+    // Notify Waiter / Staff
+    addNotification(`Additional items added to ${ordNum} for ${tableNumStr}`, 'waiter');
     addToast('Items added to order successfully!');
   };
 

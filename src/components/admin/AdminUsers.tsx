@@ -39,7 +39,7 @@ export const AdminUsers: React.FC = () => {
           email: email.trim(),
           phone: phone.trim() || undefined,
           role,
-          ...( ['waiter', 'cook', 'others'].includes(role) ? { brand } : { brand: undefined } ),
+          ...( ['waiter', 'others'].includes(role) ? { brand } : { brand: undefined } ),
         });
       } else {
         await addUser({
@@ -48,7 +48,7 @@ export const AdminUsers: React.FC = () => {
           phone: phone.trim() || undefined,
           role,
           status: 'active',
-          ...( ['waiter', 'cook', 'others'].includes(role) ? { brand } : { brand: undefined } ),
+          ...( ['waiter', 'others'].includes(role) ? { brand } : { brand: undefined } ),
         }, password);
       }
 
@@ -84,7 +84,7 @@ export const AdminUsers: React.FC = () => {
     setShowAddModal(true);
   };
 
-  const getRoleBadge = (userRole: UserRole) => {
+  const getRoleBadge = (userRole: UserRole | string) => {
     switch (userRole) {
       case 'admin':
         return {
@@ -100,9 +100,9 @@ export const AdminUsers: React.FC = () => {
         };
       case 'cook':
         return {
-          label: 'Cook',
-          icon: <ChefHat className="w-3.5 h-3.5 text-orange-600" />,
-          cls: 'bg-orange-50 text-orange-800 border-orange-200',
+          label: 'Cook (Disabled)',
+          icon: <ChefHat className="w-3.5 h-3.5 text-stone-400" />,
+          cls: 'bg-stone-100 text-stone-500 border-stone-200',
         };
       case 'others':
         return {
@@ -138,7 +138,7 @@ export const AdminUsers: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">STAFF & ROLES</h2>
-          <p className="text-xs text-stone-500">Manage user access for Waiters, Kitchen Staff, and Admins</p>
+          <p className="text-xs text-stone-500">Manage user access for Waiters, Staff, and Admins</p>
         </div>
 
         <button
@@ -189,7 +189,7 @@ export const AdminUsers: React.FC = () => {
                     </td>
                     {currentRole !== 'admin_kunafa' && (
                       <td className="py-3">
-                        {['waiter', 'cook', 'others'].includes(usr.role) ? (
+                        {['waiter', 'others'].includes(usr.role) ? (
                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${
                             usr.brand === 'KUNAFA' 
                               ? 'bg-rose-50 text-rose-700 border-rose-200' 
@@ -338,7 +338,6 @@ export const AdminUsers: React.FC = () => {
                     onChange={(val) => setRole(val as UserRole)}
                     options={[
                       { value: 'waiter', label: 'Waiter (Mobile Terminal)' },
-                      { value: 'cook', label: 'Cook (KDS Display)' },
                       { value: 'others', label: 'Others (Limited Access)' },
                       ...(currentRole !== 'admin_kunafa'
                         ? [
@@ -350,7 +349,7 @@ export const AdminUsers: React.FC = () => {
                   />
                 </div>
 
-                {['waiter', 'cook', 'others'].includes(role) && currentRole !== 'admin_kunafa' && (
+                {['waiter', 'others'].includes(role) && currentRole !== 'admin_kunafa' && (
                   <div>
                     <label className="block font-semibold text-stone-700 mb-1">Associated Brand *</label>
                     <CustomSelect

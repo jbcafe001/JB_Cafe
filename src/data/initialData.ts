@@ -25,22 +25,6 @@ export const INITIAL_USERS: User[] = [
     status: 'active',
     phone: '+91 98765 43212',
   },
-  {
-    id: 'u-kitchen-1',
-    name: 'Amit Kumar',
-    email: 'cook@cafe.demo',
-    role: 'cook',
-    status: 'active',
-    phone: '+91 98765 43213',
-  },
-  {
-    id: 'u-kitchen-2',
-    name: 'Vikram Joshi',
-    email: 'vikram@cafe.demo',
-    role: 'cook',
-    status: 'active',
-    phone: '+91 98765 43214',
-  },
 ];
 
 export const INITIAL_STOCK: StockItem[] = [];
