@@ -486,19 +486,14 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                       ) : null}
 
                       {isNew && (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => setOrderToDelete(order)}
-                            className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Delete Order</span>
-                          </button>
-                          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
-                            Ticket Sent to Kitchen
-                          </span>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOrderToDelete(order)}
+                          className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete Order</span>
+                        </button>
                       )}
                     </div>
                   </div>
