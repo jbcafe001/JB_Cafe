@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { getMenuItemImage } from '../../utils/menuImages';
-import { downloadKotPdf, KotData } from '../../utils/kotGenerator';
+import { downloadKotPdf, printKotTicket, KotData } from '../../utils/kotGenerator';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -99,6 +99,9 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   const [cashTendered, setCashTendered] = useState<number | ''>('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [lastKotData, setLastKotData] = useState<KotData | null>(null);
+  const [autoPrintKot, setAutoPrintKot] = useState<boolean>(() => {
+    return localStorage.getItem('jb_cafe_auto_print') === 'true';
+  });
 
   // Dynamically compute categories for the selected brand
   const brandCategories: MenuItemCategory[] = useMemo(() => {
@@ -249,7 +252,11 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
     };
 
     setLastKotData(kotData);
-    downloadKotPdf(kotData);
+    downloadKotPdf(kotData, false);
+
+    if (autoPrintKot) {
+      printKotTicket(kotData);
+    }
 
     setShowPaymentModal(false);
     setIsSuccess(true);
@@ -279,18 +286,29 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
           </span>
 
           {lastKotData && (
-            <button
-              onClick={() => downloadKotPdf(lastKotData)}
-              className="mt-1 px-4 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl border border-stone-300 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5 text-stone-600" />
-              Download / Save KOT Again
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+              <button
+                type="button"
+                onClick={() => printKotTicket(lastKotData)}
+                className="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl border border-stone-300 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5 text-stone-600" />
+                Print KOT Ticket
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadKotPdf(lastKotData, false)}
+                className="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl border border-stone-300 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-stone-600" />
+                Re-download PDF
+              </button>
+            </div>
           )}
         </div>
 
         <span className="inline-block mt-3 px-3 py-1 bg-amber-50 text-amber-800 text-xs font-semibold rounded-full border border-amber-200">
-          Kitchen display notified instantly
+          KOT printed & ready for table
         </span>
 
         <button
@@ -716,9 +734,31 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
             </div>
 
             <div className="p-4 bg-stone-50 border-t border-stone-200">
+              <div className="flex items-center justify-between px-3 py-2 bg-white rounded-xl mb-3 border border-stone-200">
+                <div className="flex items-center space-x-2">
+                  <Printer className="w-4 h-4 text-stone-600" />
+                  <div>
+                    <span className="text-xs font-bold text-stone-800 block">Direct Thermal Print</span>
+                    <span className="text-[10px] text-stone-500 block">Auto-print KOT (Kiosk POS Mode)</span>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoPrintKot}
+                    onChange={(e) => {
+                      setAutoPrintKot(e.target.checked);
+                      localStorage.setItem('jb_cafe_auto_print', e.target.checked ? 'true' : 'false');
+                    }}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
               <button
                 onClick={handleSendToKitchen}
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 <span>CONFIRM PAYMENT & SEND TO KITCHEN</span>

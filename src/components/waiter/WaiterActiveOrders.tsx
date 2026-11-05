@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
-import { downloadKotPdf } from '../../utils/kotGenerator';
+import { downloadKotPdf, printKotTicket } from '../../utils/kotGenerator';
 
 interface WaiterActiveOrdersProps {
   onSelectTableForOrder?: (tableId: string) => void;
@@ -133,10 +133,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                         </span>
                         <button
                           type="button"
-                          title="Download KOT PDF"
+                          title="Print KOT Ticket"
                           onClick={(e) => {
                             e.stopPropagation();
-                            downloadKotPdf({
+                            printKotTicket({
                               orderNumber: order.orderNumber,
                               tableName: order.tableNumber,
                               customerName: order.customerName || 'Guest',
