@@ -676,25 +676,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const existingOrder = orders.find(o => o.id === orderId);
     if (!existingOrder) return;
 
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const tableNum = existingOrder.tableNumber;
-    const ordNum = existingOrder.orderNumber;
-    const updatedTableId = existingOrder.tableId;
-
-    const updatedItems = existingOrder.items.map(item => ({ ...item, served: true }));
-
-    updateDoc(doc(db, 'orders', orderId), {
-      items: updatedItems,
-      status: 'served',
-      servedAt: timeStr,
-    }).catch(console.error);
-
-    if (updatedTableId) {
-      updateDoc(doc(db, 'tables', updatedTableId), { status: 'served' }).catch(console.error);
-    }
-
-    addNotification(`${tableNum} — Order ${ordNum} served to table!`, 'waiter');
-    addToast('Order served successfully!');
+    completeOrder(orderId, existingOrder.paymentMethod || 'cash');
   };
 
   const incrementItemPrepared = (orderId: string, itemIndex: number, amount: number = 1) => {
@@ -766,34 +748,11 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const allServed = updatedItems.every(i => i.served);
 
-    if (allServed && existingOrder.status !== 'served') {
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const updatedTableId = existingOrder.tableId;
-
-      updateDoc(doc(db, 'orders', orderId), {
-        items: updatedItems,
-        status: 'served',
-        servedAt: timeStr
-      }).catch(console.error);
-
-      if (updatedTableId) {
-        updateDoc(doc(db, 'tables', updatedTableId), { status: 'served' }).catch(console.error);
-      }
-
-      addToast('All items served! Order marked as served.', 'success');
+    if (allServed && existingOrder.status !== 'completed') {
+      completeOrder(orderId, existingOrder.paymentMethod || 'cash');
     } else {
-      let nextStatus = existingOrder.status;
-      // If we are un-serving an item and the order was marked 'served', revert it to 'ready'
-      if (!allServed && existingOrder.status === 'served') {
-        nextStatus = 'ready';
-        if (existingOrder.tableId) {
-          updateDoc(doc(db, 'tables', existingOrder.tableId), { status: 'ready' }).catch(console.error);
-        }
-      }
-
       updateDoc(doc(db, 'orders', orderId), {
         items: updatedItems,
-        status: nextStatus
       }).catch(console.error);
     }
   };
@@ -915,6 +874,7 @@ export const CafeProvider: React.FC<{ children: React.ReactNode }> = ({ children
       status: 'completed',
       paymentMethod,
       completedAt: timeStr,
+      items: completedOrder.items.map(item => ({ ...item, served: true })),
     }).catch(console.error);
 
     // 1. Free Table (only if no other active orders remain)

@@ -179,15 +179,12 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
       {/* Filter Tabs — only in grid view */}
       {view === 'grid' && (
         <div className="flex space-x-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {(['all', 'available', 'occupied', 'preparing', 'ready', 'served'] as const).map((st) => {
+        {(['all', 'available', 'occupied'] as const).map((st) => {
           const getActiveFilterStyle = (status: string) => {
             switch (status) {
               case 'all': return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
               case 'available': return 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-xs';
               case 'occupied': return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
-              case 'preparing': return 'bg-orange-100 text-orange-950 border-orange-300 shadow-xs';
-              case 'ready': return 'bg-teal-100 text-teal-950 border-teal-300 shadow-xs';
-              case 'served': return 'bg-purple-100 text-purple-950 border-purple-300 shadow-xs';
               default: return 'bg-amber-100 text-amber-950 border-amber-300 shadow-xs';
             }
           };
@@ -203,13 +200,9 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
             >
               {st === 'all'
                 ? 'All Tables'
-                : st === 'ready'
-                  ? 'Ready to Serve'
-                  : st === 'occupied'
-                    ? 'Order Taken'
-                    : st === 'served'
-                      ? 'Served / Dining'
-                      : st}
+                : st === 'occupied'
+                  ? 'Occupied'
+                  : 'Available'}
             </button>
           );
         })}
@@ -238,19 +231,13 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
           <div>
             <h3 className="text-lg font-bold text-stone-700">
               {filter === 'available' ? 'No Available Tables' :
-                filter === 'occupied' ? 'No Orders Taken' :
-                  filter === 'preparing' ? 'No Active Orders' :
-                    filter === 'ready' ? 'Nothing to Serve' :
-                      filter === 'served' ? 'No Dining Tables' :
-                        'No tables here'}
+                filter === 'occupied' ? 'No Occupied Tables' :
+                  'No tables here'}
             </h3>
             <p className="text-sm text-stone-500 max-w-[200px] mx-auto mt-1">
               {filter === 'available' ? 'All tables are currently occupied.' :
-                filter === 'occupied' ? 'No tables are waiting for food preparation.' :
-                  filter === 'preparing' ? 'No orders are currently being prepared.' :
-                    filter === 'ready' ? 'No orders are ready to be served right now.' :
-                      filter === 'served' ? 'No tables are currently dining.' :
-                        'There are no tables currently matching this status.'}
+                filter === 'occupied' ? 'No tables currently have active orders.' :
+                  'There are no tables currently matching this status.'}
             </p>
           </div>
         </div>
@@ -350,57 +337,18 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
                     </div>
                   ) : (
                     <div className="w-full flex items-center justify-end gap-2">
-                      {(isReady || isPartiallyReadyState) && activeOrder && (
+                      {table.status !== 'available' && activeOrder ? (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (isPartiallyReadyState) {
-                              servePreparedItems(activeOrder.id);
-                            } else {
-                              handleServeTable(activeOrder.id);
-                            }
+                            handleServeTable(activeOrder.id);
                           }}
-                          className={`w-full py-1.5 ${isPartiallyReadyState ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} font-extrabold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors`}
+                          className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
                         >
                           <Utensils className="w-4 h-4" />
-                          <span>{isPartiallyReadyState ? `Serve ${unservedReadyCount} Items` : 'Serve'}</span>
+                          <span>Serve to Table</span>
                         </button>
-                      )}
-                      {isServed && activeOrder && (
-                        <div className="flex flex-col sm:flex-row gap-2 w-full">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSelectTable(table);
-                            }}
-                            className="flex-1 text-[10px] sm:text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
-                          >
-                            <Plus className="w-3.5 h-3.5 shrink-0" />
-                            <span>New Order</span>
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              activeOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
-                            }}
-                            className="flex-1 text-[10px] sm:text-xs bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-2 rounded-xl font-bold shadow-xs flex items-center justify-center space-x-1.5 whitespace-nowrap"
-                          >
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                            <span>Free Table</span>
-                          </button>
-                        </div>
-                      )}
-                      {effectiveStatus === 'preparing' && activeOrder && !isPartiallyReadyState && (
-                        <span className="text-amber-700 text-xs sm:text-sm font-bold flex items-center space-x-1.5">
-                          <Clock className="w-4 h-4 text-amber-600" />
-                          <span>Active</span>
-                        </span>
-                      )}
-                      {effectiveStatus === 'occupied' && !isReady && !isServed && (
-                        <span className="text-stone-500 text-xs sm:text-sm font-medium">
-                          Manage &rarr;
-                        </span>
-                      )}
+                      ) : null}
                     </div>
                   )}
                 </div>
@@ -522,82 +470,19 @@ export const WaiterTables: React.FC<WaiterTablesProps> = ({ onSelectTable }) => 
 
             {/* Actions */}
             <div className="space-y-2">
-              {activeOrdersInModal.map(order => {
-                const isAllItemsServed = order.items.length > 0 && order.items.every(i => i.served);
-                const isReady = order.status === 'ready' && !isAllItemsServed;
-                const isServed = order.status === 'served' || isAllItemsServed;
-                const isPreparing = order.status === 'preparing' && !isAllItemsServed;
-                const unservedReadyCount = order.items.reduce((sum, i) => sum + ((i.prepared || 0) > (i.servedCount || 0) ? ((i.prepared || 0) - (i.servedCount || 0)) : 0), 0);
-
-                if (isReady) {
-                  return (
-                    <button
-                      key={order.id}
-                      onClick={() => {
-                        handleServeTable(order.id);
-                        if (activeOrdersInModal.length === 1) setActiveTableModal(null);
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Utensils className="w-4 h-4" />
-                      <span>Serve {order.orderNumber} to {activeTableModal.name}</span>
-                    </button>
-                  );
-                }
-
-                if (isServed) {
-                  const allModalOrdersServed = activeOrdersInModal.length > 0 && activeOrdersInModal.every(o => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served)));
-                  return allModalOrdersServed ? null : (
-                    <div
-                      key={order.id}
-                      className="w-full py-2.5 bg-indigo-50 text-indigo-700 font-extrabold text-sm rounded-xl border border-indigo-200 flex items-center justify-center space-x-2"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Served Order — {order.orderNumber}</span>
-                    </div>
-                  );
-                }
-
-                if (isPreparing && unservedReadyCount > 0) {
-                  return (
-                    <button
-                      key={order.id}
-                      onClick={() => {
-                        servePreparedItems(order.id);
-                        if (activeOrdersInModal.length === 1 && unservedReadyCount === order.items.reduce((s, i) => s + (i.quantity - (i.servedCount || 0)), 0)) {
-                           setActiveTableModal(null);
-                        }
-                      }}
-                      className="w-full py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-extrabold text-sm rounded-xl border border-emerald-300 shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Utensils className="w-4 h-4" />
-                      <span>Serve {unservedReadyCount} Ready Items to {activeTableModal.name}</span>
-                    </button>
-                  );
-                }
-
-                return null;
-              })}
-
-              {activeOrdersInModal.length > 0 && activeOrdersInModal.every(o => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served))) && (
+              {activeOrdersInModal.map(order => (
                 <button
+                  key={order.id}
                   onClick={() => {
-                    activeOrdersInModal.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
-                    setActiveTableModal(null);
+                    handleServeTable(order.id);
+                    if (activeOrdersInModal.length <= 1) setActiveTableModal(null);
                   }}
-                  className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 mb-3"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-200" />
-                  <span>Free Table</span>
+                  <Utensils className="w-4 h-4" />
+                  <span>Serve {order.orderNumber} to {activeTableModal.name}</span>
                 </button>
-              )}
-
-              {activeOrdersInModal.some(o => o.status === 'preparing' && o.items.reduce((sum, i) => sum + ((i.prepared || 0) > (i.servedCount || 0) ? ((i.prepared || 0) - (i.servedCount || 0)) : 0), 0) === 0) && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-center text-xs text-blue-800 font-bold flex items-center justify-center space-x-2">
-                  <Flame className="w-4 h-4 text-blue-600 animate-pulse" />
-                  <span>Preparing in the kitchen</span>
-                </div>
-              )}
+              ))}
             </div>
           </div>
         </div>

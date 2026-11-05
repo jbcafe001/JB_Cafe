@@ -89,9 +89,9 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
         };
       case 'served':
         return {
-          label: 'Served / Dining',
-          bg: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-          dot: 'bg-indigo-600',
+          label: 'Completed',
+          bg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          dot: 'bg-emerald-500',
         };
       default:
         return {
@@ -369,63 +369,18 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
                         </span>
                       )}
                     </div>
-                  ) : table.status !== 'available' && activeOrders.length === 1 ? (
+                  ) : table.status !== 'available' && activeOrder ? (
                     <div className="w-full">
-                      {(isReady || isPartiallyReadyState) && activeOrder && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isPartiallyReadyState) {
-                              servePreparedItems(activeOrder.id);
-                            } else {
-                              handleServeFromModal(activeOrder.id);
-                            }
-                          }}
-                          className={`w-full py-2 ${isPartiallyReadyState ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} font-extrabold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors`}
-                        >
-                          <Utensils className="w-4 h-4" />
-                          <span>{isPartiallyReadyState ? `Serve ${unservedReadyCount} Ready Items` : 'Serve Now'}</span>
-                        </button>
-                      )}
-
-                      {isServed && activeOrder && (
-                        <div className="flex flex-col sm:flex-row gap-2 w-full">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSelectTable(table);
-                            }}
-                            className="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
-                          >
-                            <Plus className="w-3.5 h-3.5 shrink-0" />
-                            <span>Order More</span>
-                          </button>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              activeOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
-                            }}
-                            className="flex-1 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors whitespace-nowrap"
-                          >
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                            <span>Free Table</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {effectiveStatus === 'preparing' && activeOrder && !isPartiallyReadyState && (
-                        <span className="text-amber-700 text-xs sm:text-sm font-bold flex items-center space-x-1.5">
-                          <Clock className="w-4 h-4 text-amber-600" />
-                          <span>Active</span>
-                        </span>
-                      )}
-
-                      {effectiveStatus === 'occupied' && !isReady && !isServed && (
-                        <span className="text-stone-500 text-xs sm:text-sm font-medium">
-                          Manage Order &rarr;
-                        </span>
-                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleServeFromModal(activeOrder.id);
+                        }}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                      >
+                        <Utensils className="w-4 h-4" />
+                        <span>Serve to Table</span>
+                      </button>
                     </div>
                   ) : null}
                 </div>
@@ -554,78 +509,21 @@ export const WaiterHome: React.FC<WaiterHomeProps> = ({
 
             {/* Action buttons depending on order status */}
             <div className="space-y-2">
-              {activeModalOrders.map(order => {
-                const isAllItemsServed = order.items.length > 0 && order.items.every(i => i.served);
-                const isReady = order.status === 'ready' && !isAllItemsServed;
-                const isServed = order.status === 'served' || isAllItemsServed;
-                const isPreparing = order.status === 'preparing' && !isAllItemsServed;
-                const unservedReadyCount = order.items.reduce((sum, i) => sum + ((i.prepared || 0) > (i.servedCount || 0) ? ((i.prepared || 0) - (i.servedCount || 0)) : 0), 0);
-
-                if (isReady) {
-                  return (
-                    <button
-                      key={order.id}
-                      onClick={() => {
-                        handleServeFromModal(order.id);
-                        if (activeModalOrders.length === 1) {
-                          setSelectedTableForAction(null);
-                        }
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Utensils className="w-4 h-4" />
-                      <span>Serve {order.orderNumber} to {selectedTableForAction.name}</span>
-                    </button>
-                  );
-                }
-
-                if (isServed) {
-                  const allModalOrdersServed = activeModalOrders.length > 0 && activeModalOrders.every(o => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served)));
-                  return allModalOrdersServed ? null : (
-                    <div
-                      key={order.id}
-                      className="w-full py-2.5 bg-indigo-50 text-indigo-700 font-extrabold text-sm rounded-xl border border-indigo-200 flex items-center justify-center space-x-2"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Served Order — {order.orderNumber}</span>
-                    </div>
-                  );
-                }
-
-                if (isPreparing && unservedReadyCount > 0) {
-                  return (
-                    <button
-                      key={order.id}
-                      onClick={() => {
-                        servePreparedItems(order.id);
-                        if (activeModalOrders.length === 1 && unservedReadyCount === order.items.reduce((s, i) => s + (i.quantity - (i.servedCount || 0)), 0)) {
-                          // if all remaining items are being served, close modal
-                          setSelectedTableForAction(null);
-                        }
-                      }}
-                      className="w-full py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-extrabold text-sm rounded-xl border border-emerald-300 shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Utensils className="w-4 h-4" />
-                      <span>Serve {unservedReadyCount} Ready Items for {order.orderNumber}</span>
-                    </button>
-                  );
-                }
-
-                return null;
-              })}
-
-              {activeModalOrders.length > 0 && activeModalOrders.every(o => o.status === 'served' || (o.items.length > 0 && o.items.every(i => i.served))) && (
+              {activeModalOrders.map(order => (
                 <button
+                  key={order.id}
                   onClick={() => {
-                    activeModalOrders.forEach(o => completeOrder(o.id, o.paymentMethod || 'cash'));
-                    setSelectedTableForAction(null);
+                    handleServeFromModal(order.id);
+                    if (activeModalOrders.length <= 1) {
+                      setSelectedTableForAction(null);
+                    }
                   }}
-                  className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-emerald-200" />
-                  <span>Free Table</span>
+                  <Utensils className="w-4 h-4" />
+                  <span>Serve {order.orderNumber} to {selectedTableForAction.name}</span>
                 </button>
-              )}
+              ))}
 
               <button
                 onClick={() => {

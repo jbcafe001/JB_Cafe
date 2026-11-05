@@ -224,9 +224,6 @@ const OrderDetailModal: React.FC<{ order: Order; onClose: () => void }> = ({ ord
               <div className="space-y-2">
                 {[
                   { label: 'Order Placed', time: order.createdAt, always: true },
-                  { label: 'Kitchen Started', time: (order as any).preparingAt, always: false },
-                  { label: 'Marked Ready', time: (order as any).readyAt, always: false },
-                  { label: 'Served', time: (order as any).servedAt, always: false },
                   { label: 'Completed', time: (order as any).completedAt, always: false },
                 ]
                   .filter(e => e.always || e.time)
@@ -298,7 +295,7 @@ export const AdminOrders: React.FC = () => {
       (o.customerName && o.customerName.toLowerCase().includes(search.toLowerCase())) ||
       o.waiterName.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || (statusFilter === 'new' ? (o.status === 'new' || o.status === 'preparing' || o.status === 'ready') : o.status === statusFilter);
 
     let matchesDate = true;
     if (fromDate || toDate) {
@@ -405,10 +402,7 @@ export const AdminOrders: React.FC = () => {
           {(
             [
               { id: 'all', label: `All Orders (${orders.length})`, active: 'bg-amber-100 text-amber-900 border-amber-300' },
-              { id: 'new', label: 'New', active: 'bg-sky-100 text-sky-900 border-sky-300' },
-              { id: 'preparing', label: 'Preparing', active: 'bg-orange-100 text-orange-900 border-orange-300' },
-              { id: 'ready', label: 'Ready', active: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
-              { id: 'served', label: 'Served', active: 'bg-purple-100 text-purple-900 border-purple-300' },
+              { id: 'new', label: 'Active', active: 'bg-sky-100 text-sky-900 border-sky-300' },
               { id: 'completed', label: 'Completed', active: 'bg-stone-200 text-stone-900 border-stone-300' },
             ] as const
           ).map((st) => (
