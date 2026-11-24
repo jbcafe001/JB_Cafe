@@ -1,0 +1,7 @@
+{
+  "printerIp": "192.168.1.100",
+  "printerPort": 9100,
+  "serverPort": 8080,
+  "beepOnPrint": true,
+  "autoCut": true
+}

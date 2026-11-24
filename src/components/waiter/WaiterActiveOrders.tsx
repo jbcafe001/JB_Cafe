@@ -23,7 +23,8 @@ import {
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { WaiterHeader } from './WaiterHeader';
-import { downloadKotPdf, printKotTicket } from '../../utils/kotGenerator';
+import { downloadKotPdf, printKotTicket, KotData } from '../../utils/kotGenerator';
+import { sendKotToWifiPrinter } from '../../utils/wifiPrint';
 
 interface WaiterActiveOrdersProps {
   onSelectTableForOrder?: (tableId: string) => void;
@@ -37,7 +38,7 @@ interface ItemRemovalTarget {
 }
 
 export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
-  const { orders, menuItems, completeOrder, toggleItemServed, removeItemFromOrder, deleteOrder } = useCafe();
+  const { orders, menuItems, completeOrder, toggleItemServed, removeItemFromOrder, deleteOrder, settings } = useCafe();
 
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
@@ -133,10 +134,10 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                         </span>
                         <button
                           type="button"
-                          title="Print KOT Ticket"
+                          title="Print KOT Ticket (RETSOL Wi-Fi / Local)"
                           onClick={(e) => {
                             e.stopPropagation();
-                            printKotTicket({
+                            const kotData: KotData = {
                               orderNumber: order.orderNumber,
                               tableName: order.tableNumber,
                               customerName: order.customerName || 'Guest',
@@ -146,7 +147,16 @@ export const WaiterActiveOrders: React.FC<WaiterActiveOrdersProps> = () => {
                               paymentMethod: order.paymentMethod,
                               date: order.date,
                               time: order.createdAt,
-                            });
+                            };
+                            if (settings?.printerIp) {
+                              sendKotToWifiPrinter(
+                                kotData,
+                                settings.printBridgeUrl,
+                                settings.printerIp,
+                                settings.printerPort
+                              ).catch(() => {});
+                            }
+                            printKotTicket(kotData);
                           }}
                           className="p-1 rounded-md text-stone-400 hover:text-stone-800 hover:bg-stone-100 transition-colors cursor-pointer"
                         >

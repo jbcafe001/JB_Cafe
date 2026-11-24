@@ -259,4 +259,11 @@ export interface CafeSettings {
   currencySymbol: string;
   outletTerminal: string;
   taxConfig: string;
+  logoUrl?: string;
+  // RETSOL RTP-82UW Wi-Fi Printer Configuration
+  printerIp?: string;
+  printerPort?: number;
+  printBridgeUrl?: string;
+  printerEnabled?: boolean;
+  printerModel?: string;
 }

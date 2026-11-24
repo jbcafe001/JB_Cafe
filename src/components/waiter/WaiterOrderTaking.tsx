@@ -19,10 +19,12 @@ import {
   User,
   Printer,
   Download,
+  Wifi,
 } from 'lucide-react';
 import { useModalClose } from '../../hooks/useModalClose';
 import { getMenuItemImage } from '../../utils/menuImages';
 import { downloadKotPdf, printKotTicket, KotData } from '../../utils/kotGenerator';
+import { sendKotToWifiPrinter } from '../../utils/wifiPrint';
 
 interface WaiterOrderTakingProps {
   table: Table;
@@ -85,7 +87,7 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
   onOrderSent,
   selectedBrand = 'JB Cafe',
 }) => {
-  const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems } = useCafe();
+  const { menuItems, createOrder, currentUser, addItemsToOrder, stockItems, settings } = useCafe();
 
   const [selectedCategory, setSelectedCategory] = useState<MenuItemCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -252,8 +254,23 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
     };
 
     setLastKotData(kotData);
+
+    // 1. Send directly to RETSOL RTP-82UW Wi-Fi thermal printer if configured
+    if (settings?.printerIp) {
+      sendKotToWifiPrinter(
+        kotData,
+        settings.printBridgeUrl,
+        settings.printerIp,
+        settings.printerPort
+      ).catch((err) => {
+        console.warn('RETSOL Wi-Fi printer bridge unreachable:', err);
+      });
+    }
+
+    // 2. Download KOT PDF (kept intact as requested)
     downloadKotPdf(kotData, false);
 
+    // 3. If local kiosk auto-print is enabled, trigger browser print
     if (autoPrintKot) {
       printKotTicket(kotData);
     }
@@ -280,6 +297,13 @@ export const WaiterOrderTaking: React.FC<WaiterOrderTakingProps> = ({
         </p>
 
         <div className="mt-4 flex flex-col items-center gap-2">
+          {settings?.printerIp && (
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-amber-50 text-amber-900 text-xs font-bold rounded-full border border-amber-200 shadow-2xs">
+              <Wifi className="w-3.5 h-3.5 text-amber-600" />
+              KOT Sent to RETSOL Wi-Fi Printer ({settings.printerIp})
+            </span>
+          )}
+
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 shadow-2xs">
             <Download className="w-3.5 h-3.5 text-emerald-600" />
             KOT PDF Saved to Downloads

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCafe } from '../../context/CafeContext';
-import { Coffee, RotateCcw, Shield, Check, Info } from 'lucide-react';
+import { Coffee, RotateCcw, Shield, Check, Info, Printer, Wifi, Send, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { sendTestPrintToWifi } from '../../utils/wifiPrint';
 
 export const AdminSettings: React.FC = () => {
   const { resetDemoData, settings, updateSettings, currentRole } = useCafe();
@@ -21,6 +22,7 @@ export const AdminSettings: React.FC = () => {
   }, [settings]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [testPrintStatus, setTestPrintStatus] = useState<{ loading: boolean; message?: string; success?: boolean } | null>(null);
 
   const handleSaveProfile = () => {
     setIsSaving(true);
@@ -28,6 +30,19 @@ export const AdminSettings: React.FC = () => {
     setTimeout(() => {
       setIsSaving(false);
     }, 600);
+  };
+
+  const handleTestPrint = async () => {
+    setTestPrintStatus({ loading: true });
+    const res = await sendTestPrintToWifi(profile.printBridgeUrl, profile.printerIp, profile.printerPort);
+    setTestPrintStatus({
+      loading: false,
+      success: res.success,
+      message: res.message,
+    });
+    setTimeout(() => {
+      setTestPrintStatus(null);
+    }, 6000);
   };
 
   return (
@@ -128,6 +143,138 @@ export const AdminSettings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* RETSOL RTP-82UW Wi-Fi Thermal Printer Card */}
+      {!isKunafaAdmin && (
+        <div className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-xs space-y-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Printer className="w-5 h-5 text-amber-600" />
+                <h3 className="font-extrabold text-stone-900 text-sm">
+                  Wi-Fi Kitchen Printer (RETSOL RTP-82UW)
+                </h3>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  80mm / 3" Thermal
+                </span>
+              </div>
+              <p className="text-xs text-stone-500 mt-1">
+                Direct silent printing over local Wi-Fi network (Port 9100 ESC/POS).
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSaveProfile}
+              disabled={isSaving}
+              className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-colors shrink-0"
+            >
+              {isSaving ? 'Saving...' : 'Save Printer'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block text-stone-600 font-bold mb-1 flex items-center gap-1.5">
+                <Wifi className="w-3.5 h-3.5 text-amber-600" />
+                <span>Printer IP Address</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 192.168.1.100"
+                value={profile.printerIp || ''}
+                onChange={(e) => setProfile({ ...profile, printerIp: e.target.value })}
+                className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-mono font-bold text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              />
+              <span className="text-[10px] text-stone-400 mt-0.5 block">
+                Local Wi-Fi IP of the RETSOL RTP-82UW printer
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-stone-600 font-bold mb-1">RAW Port (Default: 9100)</label>
+              <input
+                type="number"
+                placeholder="9100"
+                value={profile.printerPort || 9100}
+                onChange={(e) => setProfile({ ...profile, printerPort: Number(e.target.value) || 9100 })}
+                className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-mono font-bold text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              />
+              <span className="text-[10px] text-stone-400 mt-0.5 block">
+                Standard ESC/POS TCP port (9100)
+              </span>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-stone-600 font-bold mb-1">Print Bridge Server URL</label>
+              <input
+                type="text"
+                placeholder="http://localhost:8080"
+                value={profile.printBridgeUrl || 'http://localhost:8080'}
+                onChange={(e) => setProfile({ ...profile, printBridgeUrl: e.target.value })}
+                className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl font-mono text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+              />
+              <span className="text-[10px] text-stone-400 mt-0.5 block">
+                Address of the local bridge on your PC (started with start-wifi-printer.bat)
+              </span>
+            </div>
+          </div>
+
+          {/* Test Print Button & Status */}
+          <div className="pt-2 border-t border-stone-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={handleTestPrint}
+              disabled={testPrintStatus?.loading}
+              className="px-4 py-2 bg-stone-900 hover:bg-stone-800 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+            >
+              {testPrintStatus?.loading ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Connecting to RETSOL...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send Test Print to RETSOL Printer</span>
+                </>
+              )}
+            </button>
+
+            {testPrintStatus?.message && (
+              <div
+                className={`text-xs px-3 py-1.5 rounded-xl border flex items-center gap-1.5 font-bold ${
+                  testPrintStatus.success
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    : 'bg-red-50 text-red-800 border-red-200'
+                }`}
+              >
+                {testPrintStatus.success ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                )}
+                <span>{testPrintStatus.message}</span>
+              </div>
+            )}
+          </div>
+
+          {/* RETSOL RTP-82UW Quick IP Guide */}
+          <div className="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+            <div className="font-bold flex items-center gap-1.5 text-amber-950">
+              <Info className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>How to find your RETSOL RTP-82UW Printer's Wi-Fi IP Address:</span>
+            </div>
+            <ol className="list-decimal list-inside space-y-0.5 text-[11px] text-amber-900/90 pl-1">
+              <li>Turn <strong>OFF</strong> the printer using the front power switch.</li>
+              <li>Press and <strong>HOLD</strong> the <strong>FEED</strong> button on top of the printer.</li>
+              <li>Turn the power switch <strong>ON</strong> while continuing to hold the FEED button.</li>
+              <li>Release the button after 2 seconds. The printer will print a test ticket showing the <strong>IP Address</strong> (e.g. 192.168.1.100).</li>
+              <li>Type that IP in the box above, click <strong>Save Printer</strong>, and tap <strong>Send Test Print</strong>!</li>
+            </ol>
+          </div>
+        </div>
+      )}
 
       {/* Seed Materials Card - Hidden for Kunafa Admin */}
       {!isKunafaAdmin && (
