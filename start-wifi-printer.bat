@@ -10,5 +10,5 @@ echo.
 echo Press Ctrl+C anytime to stop.
 echo.
 
-node wifi-printer-bridge\wifi-printer-bridge.js
+node wifi-printer-bridge\wifi-printer-bridge.cjs
 pause
